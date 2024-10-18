@@ -36,6 +36,7 @@ if(connectConfig != null) {
   myNode.connectAsStation(connectConfig)
 }
 
+WorkFlow:
 1. When the user tries to connect to a Wi-Fi network, it will first check if permission to access
    nearby Wi-Fi devices is granted.
 2. If permission is granted, it will check if it already knows the network's BSSID
@@ -134,9 +135,7 @@ if(connectConfig != null) {
 //    LaunchedEffect(pendingAssociationRequest) {
 //        val connectRequestVal = pendingAssociationRequest ?: return@LaunchedEffect
 //        val ssid = connectRequestVal.connectConfig.ssid
-//        // logger?.invoke(Log.DEBUG, "ConnectWifiLauncher: check for assocation with $ssid")
 //        val macAddr = connectRequestVal.connectConfig.linkLocalToMacAddress
-//        // logger?.invoke(Log.DEBUG, "ConnectWifiLauncher: Calculated mac addr = $macAddr")
 //
 //        val knownBssid: String? = connectRequestVal.connectConfig.bssid ?: macAddr?.toString()
 //        ?: node.lookupStoredBssid(connectRequestVal.connectConfig.ssid)

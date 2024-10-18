@@ -1,6 +1,7 @@
 package com.greybox.projectmesh
 
 import android.app.Application
+import android.util.Log
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import com.greybox.projectmesh.server.AppServer
@@ -30,6 +31,24 @@ All dependencies are defined in one place, which makes it easier to manage and t
 class GlobalApp : Application(), DIAware {
     // it is an instance of Preferences.key<Int>, used to interact with "DataStore"
     private val addressKey = intPreferencesKey("virtual_node_address")
+    data object DeviceInfoManager {
+        // Global HashMap to store IP-DeviceName mapping
+        val deviceNameMap = HashMap<String, String?>()
+
+        // Helper method to add/update a device name
+        fun addDevice(ipAddress: String, name: String?) {
+            deviceNameMap[ipAddress] = name
+        }
+
+        fun removeDevice(ipAddress: String) {
+            deviceNameMap.remove(ipAddress)
+        }
+
+        // Helper method to get a device name by IP
+        fun getDeviceName(ipAddress: String): String? {
+            return deviceNameMap[ipAddress]
+        }
+    }
     private val diModule = DI.Module("project_mesh") {
         // create a single instance of "InetAddress" for the entire lifetime of the application
         bind<InetAddress>(tag=TAG_VIRTUAL_ADDRESS) with singleton {
@@ -49,10 +68,10 @@ class GlobalApp : Application(), DIAware {
                     // if not, generate a random one,
                     // store it in the data store and converted to IP address
                     randomApipaAddr().also {
-                        randomAddress -> applicationContext.networkDataStore.edit {
-                            // "it" used to access the 'Preferences' object
-                            it[addressKey] = randomAddress
-                        }
+                            randomAddress -> applicationContext.networkDataStore.edit {
+                        // "it" used to access the 'Preferences' object
+                        it[addressKey] = randomAddress
+                    }
                     }.asInetAddress()
                 }
             }
@@ -116,6 +135,7 @@ class GlobalApp : Application(), DIAware {
 
         onReady {
             instance<AppServer>().start()
+            Log.d("AppServer", "Server started successfully on port: ${AppServer.DEFAULT_PORT}")
         }
 
 

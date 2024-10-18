@@ -8,11 +8,14 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.kodein.di.DI
 import com.greybox.projectmesh.model.NetworkScreenModel
+import com.greybox.projectmesh.server.AppServer
+import com.ustadmobile.meshrabiya.ext.addressToByteArray
 import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
 import com.ustadmobile.meshrabiya.vnet.wifi.state.WifiStationState
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
+import java.net.InetAddress
 
 class NetworkScreenViewModel(di:DI): ViewModel() {
     // _uiState will be updated whenever there is a change in the UI state
@@ -21,6 +24,7 @@ class NetworkScreenViewModel(di:DI): ViewModel() {
     val uiState: Flow<NetworkScreenModel> = _uiState.asStateFlow()
     // di is used to get the AndroidVirtualNode instance
     private val node: AndroidVirtualNode by di.instance()
+    private val appServer: AppServer by di.instance()
 
     // launch a coroutine
     init {
@@ -39,9 +43,16 @@ class NetworkScreenViewModel(di:DI): ViewModel() {
                     else{
                         null
                     }
-                    )
+                )
                 }
             }
+        }
+    }
+
+    fun getDeviceName(wifiAddress: Int){
+        viewModelScope.launch {
+            val inetAddress = InetAddress.getByAddress(wifiAddress.addressToByteArray())
+            appServer.sendDeviceName(inetAddress)
         }
     }
 

@@ -3,6 +3,7 @@ package com.greybox.projectmesh.views
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -18,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.buttonStyle.WhiteButton
 import com.greybox.projectmesh.model.SendScreenModel
@@ -54,7 +56,9 @@ fun SendScreen(
             openDocumentLauncher.launch(arrayOf("*/*"))
             //isFileChosen = true
         },
-            modifier = Modifier.align(Alignment.Bottom).padding(16.dp),
+            modifier = Modifier
+                .align(Alignment.Bottom)
+                .padding(16.dp),
             text = "Send File",
             enabled = true)
     }
@@ -73,13 +77,25 @@ fun DisplayAllPendingTransfers(
         ) {transfer ->
             ListItem(
                 headlineContent = {
-                    Text("${transfer.name} -> ${transfer.toHost.hostAddress}")
+                    Text(transfer.name)
                 },
                 supportingContent = {
-                    val byteTransferred: Int = transfer.transferred
-                    val byteSize: Int = transfer.size
-                    Text("Status: ${transfer.status} Sent " +
-                            "${autoConvertByte(byteTransferred)} / ${autoConvertByte(byteSize)}")
+                    Column {
+                        val byteTransferred: Int = transfer.transferred
+                        val byteSize: Int = transfer.size
+                        val toHostAddress = transfer.toHost.hostAddress
+                        val deviceName = toHostAddress?.let {
+                            GlobalApp.DeviceInfoManager.getDeviceName(it)
+                        }
+                        if (deviceName != null){
+                            Text("To ${deviceName}(${toHostAddress})")
+                        }
+                        else{
+                            Text("To Loading...(${toHostAddress})")
+                        }
+                        Text("Status: ${transfer.status}")
+                        Text("Sent ${autoConvertByte(byteTransferred)} / ${autoConvertByte(byteSize)}")
+                    }
                 }
             )
         }

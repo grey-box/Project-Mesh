@@ -2,7 +2,9 @@ package com.greybox.projectmesh.server
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.util.Log
+import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.extension.updateItem
 import com.ustadmobile.meshrabiya.ext.copyToWithProgressCallback
 import com.ustadmobile.meshrabiya.util.FileSerializer
@@ -88,6 +90,7 @@ class AppServer(
         val requestReceivedTime: Long = System.currentTimeMillis(),
         @Serializable(with = InetAddressSerializer::class)
         val fromHost: InetAddress,  // Address of the sender
+        val deviceName: String = "Unknown Device",
         val name: String,   // Name of the file being received
         val status: Status = Status.PENDING,
         val size: Int,  // size of the file in byte
@@ -246,6 +249,7 @@ class AppServer(
             // if size is missing or invalid, then defaults to -1
             val size = searchParams["size"]?.toInt() ?: -1
             val fromAddr = searchParams["from"]
+            val devicename = fromAddr?.let { GlobalApp.DeviceInfoManager.getDeviceName(it) }
 
             // if everything is ready, create a new incomingTransferInfo object that contains all the
             // info extract from the query parameters
@@ -254,7 +258,8 @@ class AppServer(
                     id = id.toInt(),
                     fromHost = InetAddress.getByName(fromAddr),
                     name = filename,
-                    size = size
+                    size = size,
+                    deviceName = devicename ?: ""
                 )
                 /*
                  update the _incomingTransfers list with the new incoming transfer
@@ -292,11 +297,44 @@ class AppServer(
             }
             // return "OK", indicating the decline request has been handled
             return newFixedLengthResponse("OK")
-        }else {
+        }
+        else if(path.startsWith("/getDeviceName")){
+            Log.d("AppServer", "local ip address: ${localVirtualAddr.hostAddress}")
+            return newFixedLengthResponse(Build.MODEL)
+        }
+        else {
             // Returns a NOT_FOUND response indicating that the requested path could not be found.
             return newFixedLengthResponse(
                 Response.Status.NOT_FOUND, "text/plain", "not found: $path"
             )
+        }
+    }
+
+    fun sendDeviceName(wifiAddress: InetAddress, port: Int = 4242) {
+        scope.launch {
+            try {
+                Log.d("AppServer", "wifiAddress: $wifiAddress")
+                // Send local device's name to the remote device
+                val uri = "http://${wifiAddress.hostAddress}:$port/getDeviceName"
+                Log.d("AppServer", "URI: $uri")
+                val request = Request.Builder().url(uri).build()
+                Log.d("AppServer", "Request: $request")
+                val response = httpClient.newCall(request).execute()
+                Log.d("AppServer", "Response: $response")
+                // Get the remote device's name
+                val remoteDeviceName = response.body?.string()
+                Log.d("AppServer", "Remote device name: $remoteDeviceName")
+
+                if (remoteDeviceName != null) {
+                    wifiAddress.hostAddress?.let { GlobalApp.DeviceInfoManager.addDevice(it, remoteDeviceName) }
+                }
+            }
+            catch (e: Exception) {
+                e.printStackTrace()
+                Log.e("AppServer", "Failed to get device name from " +
+                        wifiAddress.hostAddress
+                )
+            }
         }
     }
 
@@ -535,5 +573,3 @@ class AppServer(
         const val DEFAULT_PORT = 4242
     }
 }
-
-

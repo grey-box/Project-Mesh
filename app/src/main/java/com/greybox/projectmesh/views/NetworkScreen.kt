@@ -24,6 +24,7 @@ import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.model.NetworkScreenModel
 import com.greybox.projectmesh.viewModel.NetworkScreenViewModel
@@ -65,6 +66,9 @@ fun NetworkScreen(viewModel: NetworkScreenViewModel = viewModel(
         ){ eachItem ->
             // You can uncomment this line to test Network Screen ui
             // WifiListItem(eachItem.first, eachItem.second, onClick = {})
+            if (!GlobalApp.DeviceInfoManager.deviceNameMap.containsKey(eachItem.key.addressToDotNotation())) {
+                viewModel.getDeviceName(eachItem.key)
+            }
             WifiListItem(eachItem.key, eachItem.value)
         }
     }
@@ -80,6 +84,7 @@ fun WifiListItem(
     wifiEntry: VirtualNode.LastOriginatorMessage,
     onClick: (() -> Unit)? = null,
 ){
+    val wifiAddressDotNotation = wifiAddress.addressToDotNotation()
     ListItem(
         modifier = Modifier.fillMaxWidth().let{
             if(onClick != null){
@@ -99,13 +104,19 @@ fun WifiListItem(
             )
         },
         headlineContent = {
-            // We can obtain the Device ID or Name from the WifiEntry(If possible)
-            Text(text = "Device Name", fontWeight = FontWeight.Bold)
+            // obtain the device name according to the ip address
+            val device = GlobalApp.DeviceInfoManager.getDeviceName(wifiAddressDotNotation)
+            if(device != null){
+                Text(text= device, fontWeight = FontWeight.Bold)
+            }
+            else{
+                Text(text = "Loading...", fontWeight = FontWeight.Bold)
+            }
         },
         supportingContent = {
             // You can uncomment this line to test Network Screen ui
             //Text(text = wifiAddress)
-            Text(text = wifiAddress.addressToDotNotation())
+            Text(text = wifiAddressDotNotation)
         },
         trailingContent = {
             // The mesh status with signal bars and text
