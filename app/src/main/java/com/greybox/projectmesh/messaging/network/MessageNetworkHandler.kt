@@ -103,6 +103,7 @@ class MessageNetworkHandler(
             }
         }
     }
+
     companion object {
         //process incoming messages and route them to the correct conversation
         fun handleIncomingMessage(
