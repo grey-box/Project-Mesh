@@ -33,6 +33,7 @@
 
     <string name="home">Inicio</string>
     <string name="send">Enviar</string>
+    <string name="chat">Charlar</string><!--added by Craig to ensure chat button works-->
 
     <string name="band">Banda</string>
     <string name="hotspot_type">Tipo de punto de acceso</string>

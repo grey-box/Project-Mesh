@@ -42,8 +42,10 @@
     <string name="receive">Receive</string>
     <string name="auto_finish">Auto Finish</string>
     <string name="save_to_folder">Save to folder</string>
+
     <string name="home">Home</string>
     <string name="send">Send</string>
+    <string name="chat">Chat</string>
 
     <string name="band">Band</string>
     <string name="hotspot_type">Hotspot Type</string>

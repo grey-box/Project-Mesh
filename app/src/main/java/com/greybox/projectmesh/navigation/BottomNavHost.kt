@@ -66,7 +66,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         launchSingleTop = true
                     }
                 },
-                
+
             )
         }
     }
