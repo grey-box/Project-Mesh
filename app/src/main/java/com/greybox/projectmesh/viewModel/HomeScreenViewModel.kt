@@ -8,6 +8,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.greybox.projectmesh.model.HomeScreenModel
 import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
+import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
+import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
 import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectConfig
 import com.ustadmobile.meshrabiya.vnet.wifi.state.WifiStationState
 import kotlinx.coroutines.delay
@@ -73,6 +75,14 @@ class HomeScreenViewModel(di: DI,
                 }
             }
         }
+        if (node.meshrabiyaWifiManager.is5GhzSupported){
+            _uiState.update { prev ->
+                prev.copy(
+                    bandMenu = listOf(ConnectBand.BAND_5GHZ, ConnectBand.BAND_2GHZ),
+                    band = ConnectBand.BAND_5GHZ
+                )
+            }
+        }
         settingPrefs.registerOnSharedPreferenceChangeListener(sharedPrefsListener)
     }
 
@@ -92,6 +102,22 @@ class HomeScreenViewModel(di: DI,
     fun saveConcurrencySupported(concurrencySupported: Boolean) {
         _concurrencySupported.value = concurrencySupported
         settingPrefs.edit().putBoolean(CONCURRENCY_SUPPORTED_KEY, concurrencySupported).apply()
+    }
+
+    fun onConnectBandChanged(band: ConnectBand) {
+        _uiState.update { prev ->
+            prev.copy(
+                band = band
+            )
+        }
+    }
+
+    fun onSetHotspotTypeToCreate(hotspotType: HotspotType) {
+        _uiState.update { prev ->
+            prev.copy(
+                hotspotTypeToCreate = hotspotType
+            )
+        }
     }
 
     fun onSetIncomingConnectionsEnabled(enable: Boolean) {

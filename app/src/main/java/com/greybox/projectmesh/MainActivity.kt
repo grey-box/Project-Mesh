@@ -1,17 +1,9 @@
 package com.greybox.projectmesh
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.PowerManager
-import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
@@ -29,9 +21,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -60,16 +49,21 @@ import org.kodein.di.instance
 import java.io.File
 import java.util.Locale
 import java.net.InetAddress
-import com.greybox.projectmesh.viewModel.HomeScreenViewModel
+import com.greybox.projectmesh.views.RequestPermissionsScreen
 
 class MainActivity : ComponentActivity(), DIAware {
     override val di by closestDI()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        // Check if the app was launched from a notification
+        val launchedFromNotification = intent?.getBooleanExtra("from_notification", false) ?: false
         val settingPref: SharedPreferences by di.instance(tag="settings")
         val appServer: AppServer by di.instance()
-        requestNotificationPermission()
+        // crash screen
+        CrashHandler.init(applicationContext,CrashScreenActivity::class.java)
         setContent {
+            // Request all permission in order
+            RequestPermissionsScreen(skipPermissions = launchedFromNotification)
             // check if the default directory exist (Download/Project Mesh)
             val defaultDirectory = File(
                 Environment.getExternalStoragePublicDirectory(
@@ -151,13 +145,7 @@ class MainActivity : ComponentActivity(), DIAware {
                 }
             }
         }
-        // crash screen
-        CrashHandler.init(applicationContext,CrashScreenActivity::class.java)
-        if (!isBatteryOptimizationDisabled(this)) {
-            promptDisableBatteryOptimization(this)
-        }
     }
-
     private fun updateLocale(languageCode: String): Locale {
         val locale = Locale(languageCode)
         val config = resources.configuration
@@ -165,19 +153,6 @@ class MainActivity : ComponentActivity(), DIAware {
         @Suppress("DEPRECATION")
         resources.updateConfiguration(config, resources.displayMetrics)
         return locale
-    }
-
-    private fun requestNotificationPermission() {
-        val postNotifications = "android.permission.POST_NOTIFICATIONS"
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(this, postNotifications)
-                != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this,
-                    arrayOf(postNotifications),
-                    1001 // Request code
-                )
-            }
-        }
     }
 }
 
@@ -204,7 +179,6 @@ fun BottomNavApp(di: DI,
             }
         }
     }
-
     Scaffold(
         bottomBar = { BottomNavigationBar(navController) }
     ){ innerPadding ->
@@ -273,40 +247,3 @@ fun BottomNavApp(di: DI,
         }
     }
 }
-
-@SuppressLint("ServiceCast", "ObsoleteSdkInt")
-fun isBatteryOptimizationDisabled(context: Context): Boolean {
-    val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        powerManager.isIgnoringBatteryOptimizations(context.packageName)
-    } else {
-        true // Battery optimization doesn't apply below Android 6.0
-    }
-}
-
-@SuppressLint("ObsoleteSdkInt")
-fun promptDisableBatteryOptimization(context: Context) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        AlertDialog.Builder(context)
-            .setTitle("Disable Battery Optimization")
-            .setMessage(
-                "To ensure uninterrupted background functionality and maintain a stable connection," +
-                        " please disable battery optimization for this app."
-            )
-            .setPositiveButton("Go to Settings") { _, _ ->
-                try {
-                    // Navigate to Battery Optimization Settings
-                    val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
-                    context.startActivity(intent)
-                } catch (e: Exception) {
-                    // Fallback to App Info screen
-                    val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                        .setData(Uri.fromParts("package", context.packageName, null))
-                    context.startActivity(appSettingsIntent)
-                }
-            }
-            .setNegativeButton("Cancel", null)
-            .show()
-    }
-}
-

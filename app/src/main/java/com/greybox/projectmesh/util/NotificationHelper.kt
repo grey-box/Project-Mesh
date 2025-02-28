@@ -33,6 +33,7 @@ object NotificationHelper {
         val intent = Intent(context, MainActivity::class.java).apply {
             action = "OPEN_RECEIVE_SCREEN"
             putExtra("navigateTo", BottomNavItem.Receive.route) // Set target screen
+            putExtra("from_notification", true) // Tell MainActivity to skip permission requests
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
         }
 

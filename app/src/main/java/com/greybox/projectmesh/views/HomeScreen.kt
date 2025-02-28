@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
@@ -33,6 +34,7 @@ import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
@@ -87,6 +89,8 @@ import org.kodein.di.instance
 import androidx.compose.runtime.State
 import com.greybox.projectmesh.hasStaApConcurrency
 import com.greybox.projectmesh.viewModel.NetworkScreenViewModel
+import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
+import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
 
 @Composable
 // We customize the viewModel since we need to inject dependencies
@@ -107,35 +111,7 @@ fun HomeScreen(
     val currConcurrencyKnown = viewModel.concurrencyKnown.collectAsState()
     val currConcurrencySupported = viewModel.concurrencySupported.collectAsState()
 
-    // Request location permission using rememberLauncherForActivityResult
-    var locationPermissionGranted by remember { mutableStateOf(false) }
-    val locationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        locationPermissionGranted = isGranted
-        if (!isGranted) {
-            Toast.makeText(context, "Location permission is required for Wi-Fi Direct hotspot", Toast.LENGTH_SHORT).show()
-        }
-    }
-    LaunchedEffect(Unit) {
-        // For Android Marshmallow (API 23) and above, check the permission
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(
-                    context,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-            } else {
-                locationPermissionGranted = true
-            }
-        } else {
-            // For devices below API 23, no runtime permission needed
-            locationPermissionGranted = true
-        }
-    }
-
-    // Request nearby wifi permission
+    // Request nearby wifi permission since it is necessary to start a hotspot
     val requestNearbyWifiPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ){ granted -> if (granted){
@@ -155,18 +131,28 @@ fun HomeScreen(
         uiState = uiState,
         node = node as AndroidVirtualNode,
         onSetIncomingConnectionsEnabled = { enabled ->
-            if(enabled && !context.hasNearbyWifiDevicesOrLocationPermission()) {
-                requestNearbyWifiPermissionLauncher.launch(NEARBY_WIFI_PERMISSION_NAME)
+            if(enabled) {
+                if (!context.hasNearbyWifiDevicesOrLocationPermission()) {
+                    requestNearbyWifiPermissionLauncher.launch(NEARBY_WIFI_PERMISSION_NAME)
+                    return@StartHomeScreen
+                }
+                if (uiState.hotspotTypeToCreate == HotspotType.WIFIDIRECT_GROUP) {
+                    val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
+                    if (!wifiManager.isWifiEnabled) {
+                        Toast.makeText(context, "Please Turn on Wifi", Toast.LENGTH_SHORT).show()
+                        return@StartHomeScreen
+                    }
+                }
             }
-            else {
-                viewModel.onSetIncomingConnectionsEnabled(enabled)
-            }
+            viewModel.onSetIncomingConnectionsEnabled(enabled)
         },
         onClickDisconnectWifiStation = viewModel::onClickDisconnectStation,
         deviceName = deviceName,
         context = context,
         currConcurrencyKnown = currConcurrencyKnown,
-        currConcurrencySupported = currConcurrencySupported
+        currConcurrencySupported = currConcurrencySupported,
+        onSetBand = viewModel::onConnectBandChanged,
+        onSetHotspotTypeToCreate = viewModel::onSetHotspotTypeToCreate
     )
 }
 
@@ -181,7 +167,9 @@ fun StartHomeScreen(
     deviceName: String?,
     context: Context,
     currConcurrencyKnown: State<Boolean>,
-    currConcurrencySupported: State<Boolean>
+    currConcurrencySupported: State<Boolean>,
+    onSetBand: (ConnectBand) -> Unit = { },
+    onSetHotspotTypeToCreate: (HotspotType) -> Unit = { }
 ){
     val di = localDI()
     val barcodeEncoder = remember { BarcodeEncoder() }
@@ -257,6 +245,61 @@ fun StartHomeScreen(
                 padding = 6
             )
             Spacer(modifier = Modifier.height(12.dp))
+            if(uiState.connectBandVisible) {
+                Column {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 6.dp),
+                        text = stringResource(id = R.string.band),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp)
+                    ) {
+                        uiState.bandMenu.forEach { band ->
+                            FilterChip(
+                                selected = uiState.band == band,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                                onClick = {
+                                    onSetBand(band)
+                                },
+                                label = {
+                                    Text(band.toString())
+                                },
+                            )
+                        }
+                    }
+                }
+            }
+
+            // Function to check if Wi-Fi Direct is supported
+            fun isWifiDirectSupported(context: Context): Boolean {
+                return context.packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_DIRECT)
+            }
+            if(!uiState.wifiConnectionEnabled) {
+                val wifiDirectSupported = isWifiDirectSupported(context)
+                Column {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 6.dp),
+                        text = stringResource(id = R.string.hotspot_type),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                    Row(
+                        modifier = Modifier.padding(horizontal = 6.dp)
+                    ) {
+                        uiState.hotspotTypeMenu.forEach { hotspotType ->
+                            val isDisabled = (hotspotType == HotspotType.WIFIDIRECT_GROUP && !wifiDirectSupported)
+                            FilterChip(
+                                enabled = !isDisabled,
+                                selected = hotspotType == uiState.hotspotTypeToCreate,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                                onClick = { onSetHotspotTypeToCreate(hotspotType) },
+                                label = { Text(hotspotType.toString()) }
+                            )
+                        }
+                    }
+                }
+            }
+            Spacer(modifier = Modifier.height(8.dp))
             // Display the "Start Hotspot" button
             val stationState = uiState.wifiState?.wifiStationState
             if (!uiState.wifiConnectionEnabled) {
@@ -555,4 +598,3 @@ fun ConcurrencyWarningDialog(onDismiss: () -> Unit) {
         }
     )
 }
-
