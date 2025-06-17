@@ -93,6 +93,7 @@ import com.greybox.projectmesh.views.LogScreen
 
 
 import com.greybox.projectmesh.views.RequestPermissionsScreen
+import org.kodein.di.android.BuildConfig
 import org.kodein.di.compose.localDI
 
 class MainActivity : ComponentActivity(), DIAware {
@@ -218,6 +219,7 @@ class MainActivity : ComponentActivity(), DIAware {
                 }
             }
         }
+        Log.d("BuildCheck", "Build Type is: ${BuildConfig.BUILD_TYPE}")
     }
 
     private fun ensureDefaultDirectory() {
