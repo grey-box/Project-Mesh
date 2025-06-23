@@ -86,6 +86,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.lifecycleScope
+import com.greybox.projectmesh.logging.ReleaseTree
 import kotlinx.coroutines.launch
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
@@ -96,11 +97,23 @@ import com.greybox.projectmesh.views.RequestPermissionsScreen
 import org.kodein.di.android.BuildConfig
 import org.kodein.di.compose.localDI
 
+import timber.log.Timber
+
 class MainActivity : ComponentActivity(), DIAware {
     override val di by closestDI()
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_ProjectMesh)
         super.onCreate(savedInstanceState)
+
+        // Init Timber for Debug Build
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(ReleaseTree())
+        }
+
+        Timber.d("Timber init in ${BuildConfig.BUILD_TYPE}")
+
         // crash screen
         CrashHandler.init(applicationContext, CrashScreenActivity::class.java)
         val settingPref: SharedPreferences by di.instance(tag = "settings")
@@ -111,7 +124,8 @@ class MainActivity : ComponentActivity(), DIAware {
         }
         //Initialize test device:
         TestDeviceService.initialize()
-        Log.d("MainActivity", "Test device initialized")
+        Timber.tag("MainActivity").d("Test device initialized")
+
         setContent {
             val meshPrefs = getSharedPreferences("project_mesh_prefs", MODE_PRIVATE)
             var hasRunBefore by rememberSaveable {
@@ -169,7 +183,7 @@ class MainActivity : ComponentActivity(), DIAware {
                         val route = "chatScreen/$ip"
                         currentScreen = route
                     } catch (e: Exception) {
-                        Log.e("MainActivity", "Invalid IP address in intent: $ip", e)
+                        Timber.tag("MainActivity").e(e, "Invalid IP address in intent: %s", ip)
                         // Fall back to home screen
                         currentScreen = BottomNavItem.Home.route
                     }
@@ -219,7 +233,7 @@ class MainActivity : ComponentActivity(), DIAware {
                 }
             }
         }
-        Log.d("BuildCheck", "Build Type is: ${BuildConfig.BUILD_TYPE}")
+        Timber.tag("BuildCheck").d("Build Type is: ${BuildConfig.BUILD_TYPE}")
     }
 
     private fun ensureDefaultDirectory() {
@@ -230,14 +244,16 @@ class MainActivity : ComponentActivity(), DIAware {
         if (!defaultDirectory.exists()) {
             // Create the directory if it doesn't exist
             if (defaultDirectory.mkdirs()) {
-                Log.d("DirectoryCheck", "Default directory created: ${defaultDirectory.absolutePath}")
+                Timber.tag("DirectoryCheck").d("Default directory created: ${defaultDirectory
+                    .absolutePath}")
             }
             else {
-                Log.e("DirectoryCheck", "Failed to create default directory: ${defaultDirectory.absolutePath}")
+                Timber.tag("DirectoryCheck").e("Failed to create default directory: %s", defaultDirectory.absolutePath)
             }
         }
         else {
-            Log.d("DirectoryCheck", "Default directory already exists: ${defaultDirectory.absolutePath}")
+            Timber.tag("DirectoryCheck").d("Default directory already exists: ${defaultDirectory
+                .absolutePath}")
         }
     }
 
@@ -293,15 +309,15 @@ fun BottomNavApp(di: DI,
                 val ip = entry.arguments?.getString("ip")
                     ?: throw IllegalArgumentException("Invalid address")
 
-                Log.d("Navigation", "Navigating to chatScreen with parameter: $ip")
+                Timber.tag("Navigation").d("Navigating to chatScreen with parameter: $ip")
 
                 //determine if this is an ip address
                 val isValidIpAddress = ip.matches(Regex("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\$"))
-                Log.d("Navigation", "Is valid IP address: $isValidIpAddress")
+                Timber.tag("Navigation").d("Is valid IP address: $isValidIpAddress")
 
 
                 if(isValidIpAddress) {
-                    Log.d("Navigation", "Showing chat for IP address: $ip")
+                    Timber.tag("Navigation").d("Showing chat for IP address: $ip")
                     // This is a valid IP address, use normal chat screen
                     ChatScreen(
                         virtualAddress = InetAddress.getByName(ip),
@@ -310,12 +326,12 @@ fun BottomNavApp(di: DI,
                         }
                     )
                 } else {
-                    Log.d("Navigation", "Showing chat for conversation ID: $ip")
+                    Timber.tag("Navigation").d("Showing chat for conversation ID: $ip")
                     //conversation id: handle offline chat
                     ConversationChatScreen(
                         conversationId = ip,
                         onBackClick = {
-                            Log.d("Navigation", "Navigating back from conversation")
+                            Timber.tag("Navigation").d("Navigating back from conversation")
                             navController.popBackStack()
                         }
                     )

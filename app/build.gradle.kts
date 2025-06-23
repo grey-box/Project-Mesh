@@ -152,4 +152,7 @@ dependencies {
 
     // For JSON serialisation
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // For Debug Build
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }
