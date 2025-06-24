@@ -4,7 +4,6 @@ package com.greybox.projectmesh.messaging.ui.screens
 
 import android.net.Uri
 import android.os.Bundle
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
@@ -73,6 +72,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import timber.log.Timber
 
 @Composable
 fun ChatScreen(
@@ -126,9 +126,10 @@ fun ChatScreen(
         LaunchedEffect(statusMap[virtualAddress.hostAddress]) {
             val newStatus = statusMap[virtualAddress.hostAddress] ?: false
             if (deviceStatus != newStatus) {
-                Log.d(
-                    "ChatScreen",
-                    "Device status changed: ${virtualAddress.hostAddress} is now ${if (newStatus) "online" else "offline"}"
+                Timber.tag(
+                    "ChatScreen")
+                    .d("Device status changed: ${virtualAddress.hostAddress} is now ${if 
+                            (newStatus) "online" else "offline"}"
                 )
                 deviceStatus = newStatus
             }
@@ -374,7 +375,8 @@ fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
     val hasMessages = uiState.allChatMessages.isNotEmpty()
 
     LaunchedEffect(uiState.allChatMessages.size) {
-        Log.d("ChatScreen", "DisplayAllMessages with ${uiState.allChatMessages.size} messages")
+        Timber.tag("ChatScreen").d("DisplayAllMessages with ${uiState.allChatMessages.size} %s",
+                "messages")
     }
 
     LazyColumn{
@@ -406,7 +408,7 @@ fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
         items(
             items = uiState.allChatMessages
         ){ chatMessage ->
-            Log.d("ChatDebug", "Rendering message: ${chatMessage.content}")
+            Timber.tag("ChatDebug").d("Rendering message: ${chatMessage.content}")
             val sender: String = if (chatMessage.sender == "Me") {
                 "Me"
             } else {
