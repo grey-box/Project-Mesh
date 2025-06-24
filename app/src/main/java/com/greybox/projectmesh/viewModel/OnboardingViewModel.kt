@@ -8,7 +8,8 @@ import kotlinx.coroutines.launch
 import java.util.UUID
 import com.greybox.projectmesh.user.UserRepository
 import android.content.SharedPreferences
-import org.acra.ACRA.log
+import timber.log.Timber
+
 
 data class OnboardingUiState(
     val username: String
@@ -65,7 +66,7 @@ class OnboardingViewModel(
             }
 
             val generatedUsername = "Guest$nextGuestNumber"
-            log.d("Username","Username = $generatedUsername")
+            Timber.tag("Username").d("Username = $generatedUsername")
             onResult(generatedUsername)
         }
     }
