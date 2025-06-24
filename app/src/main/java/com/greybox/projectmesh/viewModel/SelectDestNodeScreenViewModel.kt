@@ -1,7 +1,6 @@
 package com.greybox.projectmesh.viewModel
 
 import android.net.Uri
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -21,6 +20,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.instance
+import timber.log.Timber
 import java.net.InetAddress
 
 data class SelectDestNodeScreenModel(
@@ -63,14 +63,14 @@ class SelectDestNodeScreenViewModel(
         // convert the ip address to byte array, then convert it to InetAddress object
         // which can be used to perform network operation
         val inetAddress = InetAddress.getByAddress(address.addressToByteArray())
-        Log.d("uri_track_onClickReveiver", "inetAddress: $inetAddress")
+        Timber.tag("uri_track_onClickReveiver").d("inetAddress: $inetAddress")
         // update the ui state to reflect that we are contacting the device
         _uiState.update { prev ->
             prev.copy(
                 contactingInProgressDevice = address.addressToDotNotation()
             )
         }
-        Log.d("uri_track_onClickReveiver", "sendUris: ${sendUris.toString()}")
+        Timber.tag("uri_track_onClickReveiver").d("sendUris: ${sendUris.toString()}")
         // Launch a coroutine in the ViewModel Scope
         viewModelScope.launch {
             // Switch the coroutine context to Dispatchers.IO for network operations
@@ -79,16 +79,18 @@ class SelectDestNodeScreenViewModel(
                 sendUris.map { uri ->
                     async{
                         try{
-                            Log.d("uri_track_onClickReveiver_Loop", uri.toString())
+                            Timber.tag("uri_track_onClickReveiver_Loop").d(uri.toString())
                             val response = appServer.addOutgoingTransfer(
                                 uri = uri,
                                 toNode = inetAddress,
                             )
-                            Log.d("uri_track_onClickReveiver_Loop", "response: ${response.toString()}")
+                            Timber.tag("uri_track_onClickReveiver_Loop").d("response: ${response
+                                .toString()}")
                             true
                         }
                         catch (e: Exception){
-                            Log.e("AppServer", "Exception attempting to send $uri to destination", e)
+                            Timber.tag("AppServer").e(e, "Exception attempting to send $uri to " +
+                                    "destination")
                             false
                         }
                     }
@@ -96,7 +98,7 @@ class SelectDestNodeScreenViewModel(
             }
             // if any of the transfers were successful, pop back to previous screen
             if(transfer.any{it}){
-                Log.d("uri_track_onClickReveiver", "popBackWhenDone")
+                Timber.tag("uri_track_onClickReveiver").d("popBackWhenDone")
                 popBackWhenDone()
             }
         }
