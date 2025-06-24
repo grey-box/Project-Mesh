@@ -1,10 +1,9 @@
 package com.greybox.projectmesh.testing
 
-import android.util.Log
-import com.ustadmobile.meshrabiya.log.MNetLogger
 import com.ustadmobile.meshrabiya.mmcp.MmcpOriginatorMessage
 import com.ustadmobile.meshrabiya.vnet.VirtualNode
 import com.ustadmobile.meshrabiya.vnet.VirtualNodeDatagramSocket
+import timber.log.Timber
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.util.concurrent.Executors
@@ -29,8 +28,9 @@ class TestDeviceEntry {
                     acc or ((byte.toInt() and 0xFF) shl (24 - (index * 8)))
                 }
 
-                Log.d("TestDeviceEntry", "Creating test entry with IP: ${TestDeviceService.TEST_DEVICE_IP}")
-                Log.d("TestDeviceEntry", "Test address as int: $testAddressInt")
+                Timber.tag("TestDeviceEntry").d("Creating test entry with IP: ${TestDeviceService
+                    .TEST_DEVICE_IP}")
+                Timber.tag("TestDeviceEntry").d("Test address as int: $testAddressInt")
 
 
                 //create basic MmcpOriginatorMessage
@@ -66,7 +66,7 @@ class TestDeviceEntry {
 
                 return Pair(testAddressInt, lastOriginatorMessage)
             } catch (e: Exception) {
-                Log.e("TestDeviceEntry", "Error creating test entry", e)
+                Timber.tag("TestDeviceEntry").e(e,"Error creating test entry")
                 throw e
             }
         }
