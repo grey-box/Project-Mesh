@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.ViewModelFactory
-import com.greybox.projectmesh.viewModel.HomeScreenViewModel
 import com.greybox.projectmesh.viewModel.NetworkScreenModel
 import com.greybox.projectmesh.viewModel.NetworkScreenViewModel
 import org.kodein.di.compose.localDI
