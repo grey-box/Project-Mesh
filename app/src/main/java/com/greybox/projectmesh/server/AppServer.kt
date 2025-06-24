@@ -7,7 +7,6 @@ import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
-import android.se.omapi.Session
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.google.gson.Gson
@@ -58,17 +57,12 @@ import okhttp3.HttpUrl
 import okhttp3.MediaType.Companion.toMediaType
 import java.net.URLDecoder
 import kotlinx.coroutines.runBlocking
-import okhttp3.Call
-import okhttp3.Callback
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
-import okhttp3.RequestBody
-//import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.Response
-import java.io.IOException
 import java.net.URI
 import okhttp3.RequestBody.Companion.toRequestBody
 import com.greybox.projectmesh.util.NotificationHelper
 import com.ustadmobile.meshrabiya.log.MNetLogger
+import timber.log.Timber
 
 /*
 This File is the Server for transferring files
@@ -120,9 +114,9 @@ class AppServer(
     // Restart method to stop and start the server with an optional new IP address
     fun restart() {
         stop() // Stop the server using NanoHTTPD's built-in stop method
-        Log.d("AppServer", "Server stopped successfully")
+        Timber.d("AppServer", "Server stopped successfully")
         start(SOCKET_READ_TIMEOUT, false) // Start the server using NanoHTTPD's built-in start method
-        Log.d("AppServer", "Server restarted successfully on port: $localPort")
+        Timber.d("AppServer", "Server restarted successfully on port: $localPort")
     }
 
 //change to json
@@ -421,7 +415,8 @@ class AppServer(
                         routeToChatEnabled = true
                         chatConversationId = conversation.id
                     } catch (e: Exception) {
-                        Log.e("AppServer", "Failed to find conversation for file sender", e)
+                        Timber.tag("AppServer").e(e, "Failed to find conversation for file " +
+                                "sender")
                     }
                 }
 
@@ -469,34 +464,34 @@ class AppServer(
             return newFixedLengthResponse("OK")
         }
         else if(path.startsWith("/getDeviceName")){
-            Log.d("AppServer", "local ip address: ${localVirtualAddr.hostAddress}")
+            Timber.tag("AppServer").d("local ip address: ${localVirtualAddr.hostAddress}")
             val settingPref: SharedPreferences by di.instance(tag="settings")
             return newFixedLengthResponse(settingPref.getString("device_name", Build.MODEL) ?: Build.MODEL)
         }
         else if(path.startsWith("/chat")) {
-            //Log.d("AppServer", "Received chat message*******")
+            //Timber.d("AppServer", "Received chat message*******")
             //Processes JSON payload into useable data
             val files = mutableMapOf<String, String>()
             session.parseBody(files)
             val jsonPayload = files["postData"]  // This is where the full body lives
-            //Log.d("AppServer", "JSON Payload******: $jsonPayload")
+            //Timber.d("AppServer", "JSON Payload******: $jsonPayload")
 
             //Checks if payload is null/blank
             if (jsonPayload.isNullOrBlank()) {
-                Log.e("AppServer", "Empty or missing JSON payload")
+                Timber.tag("AppServer").e("Empty or missing JSON payload")
                 return newFixedLengthResponse(Response.Status.BAD_REQUEST, "text/plain", "Empty or missing JSON payload")
             }else{
-                Log.d("AppServer", "JSON payload not blank")
+                Timber.tag("AppServer").d("JSON payload not blank")
             }
 
             //Validates validity of JSON payload
             val JSONschema = JSONSchema()
-            Log.d("AppServer", "Validating JSON payload: ${jsonPayload::class.simpleName}")
+            Timber.d("AppServer", "Validating JSON payload: ${jsonPayload::class.simpleName}")
             if (!JSONschema.schemaValidation(jsonPayload)) {
-                Log.e("AppServer", "Invalid JSON payload")
+                Timber.e("AppServer", "Invalid JSON payload")
                 return newFixedLengthResponse(Response.Status.BAD_REQUEST, "application/json", """{"error":"Invalid JSON schema"}""")
             }else{
-                Log.d("AppServer", "Valid JSON payload")
+                Timber.d("AppServer", "Valid JSON payload")
             }
 
             //Deserialize the JSON payload
@@ -506,7 +501,9 @@ class AppServer(
             val time = deserialzedJSON.dateReceived ?: System.currentTimeMillis()
             val senderIpStr = deserialzedJSON.sender ?: null
 
-            Log.d("AppServer", "Received chat message: '$chatMessage' from $senderIpStr at $time")
+            Timber.tag("AppServer").d("Received chat message: '$chatMessage' from $senderIpStr at" +
+                    " " +
+                    "$time")
 //            val chatMessage = session.parameters["chatMessage"]?.firstOrNull()
 //            val timeParam = session.parameters["time"]?.firstOrNull()
 //            val time = timeParam?.toLongOrNull() ?: System.currentTimeMillis()
@@ -519,7 +516,7 @@ class AppServer(
             val senderIp = try {
                 InetAddress.getByName(senderIpStr)
             } catch (e: Exception) {
-                Log.e("AppServer", "Invalid sender IP address: $senderIpStr", e)
+                Timber.tag("AppServer").e(e,"Invalid sender IP address: $senderIpStr")
                 return newFixedLengthResponse(Response.Status.BAD_REQUEST, "text/plain", "Invalid sender IP")
             }
 
@@ -530,14 +527,14 @@ class AppServer(
                 try {
                     URI.create(fileUriStr)
                 } catch (e: Exception) {
-                    Log.e("AppServer", "Invalid file URI: $fileUriStr", e)
+                    Timber.tag("AppServer").e(e,"Invalid file URI: $fileUriStr")
                     null
                 }
             } else {
                 null
             }
 
-            Log.d("AppServer", "Received chat message: '$chatMessage' from $senderIpStr")
+            Timber.tag("AppServer").d("Received chat message: '$chatMessage' from $senderIpStr")
 
             try {
                 val message = MessageNetworkHandler.handleIncomingMessage(
@@ -549,13 +546,13 @@ class AppServer(
 
                 scope.launch {
                     db.messageDao().addMessage(message)
-                    Log.d("AppServer", "Message saved to database: $message")
+                    Timber.tag("AppServer").d("Message saved to database: $message")
                 }
 
                 // Change response type to ensure it's properly formatted
                 return newFixedLengthResponse(Response.Status.OK, "text/plain", "OK")
             } catch (e: Exception) {
-                Log.e("AppServer", "Error processing chat message", e)
+                Timber.e("AppServer", "Error processing chat message", e)
                 return newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "Error processing message")
             }
 
@@ -573,18 +570,18 @@ class AppServer(
         scope.launch {
             try {
                 val ipStr = wifiAddress.hostAddress
-                Log.d("AppServer", "wifiAddress: $ipStr")
+                Timber.tag("AppServer").d("wifiAddress: $ipStr")
 
                 // GET /getDeviceName
                 val uri = "http://$ipStr:$port/getDeviceName"
                 val request = Request.Builder().url(uri).build()
-                Log.d("AppServer", "Request: $request")
+                Timber.tag("AppServer").d("Request: $request")
                 val response = httpClient.newCall(request).execute()
-                Log.d("AppServer", "Response: $response")
+                Timber.tag("AppServer").d("Response: $response")
 
                 // The remote device's name
                 val remoteDeviceName = response.body?.string()
-                Log.d("AppServer", "Remote device name: $remoteDeviceName")
+                Timber.tag("AppServer").d("Remote device name: $remoteDeviceName")
 
                 response.close() // best practice: close the response
 
@@ -612,7 +609,8 @@ class AppServer(
 
             } catch (e: Exception) {
                 e.printStackTrace()
-                Log.e("AppServer", "Failed to get device name from ${wifiAddress.hostAddress}")
+                Timber.tag("AppServer").e("Failed to get device name from ${wifiAddress
+                    .hostAddress}")
             }
         }
     }
@@ -633,7 +631,7 @@ class AppServer(
                     // Possibly store lastSeen, remote IP, etc., if your entity includes those fields
                 }
             } catch (e: Exception) {
-                Log.e("AppServer", "Failed to fetch /myinfo from $remoteAddr", e)
+                Timber.e("AppServer", "Failed to fetch /myinfo from $remoteAddr", e)
             }
         }
     }*/
@@ -675,9 +673,9 @@ class AppServer(
             val notificationManager = appContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(1005, notification)
 
-            Log.d("AppServer", "Showed notification for file in chat")
+            Timber.d("AppServer", "Showed notification for file in chat")
         } catch (e: Exception) {
-            Log.e("AppServer", "Failed to show file in chat notification", e)
+            Timber.e("AppServer", "Failed to show file in chat notification", e)
             // Fall back to regular notification
             NotificationHelper.showFileReceivedNotification(appContext, transfer.name)
         }
@@ -867,7 +865,8 @@ class AppServer(
                 return response.isSuccessful
             }
         } catch (e: Exception) {
-            Log.e("AppServer", "Failed to check if device ${remoteAddr.hostAddress} is reachable", e)
+            Timber.tag("AppServer").e(e, "Failed to check if device ${remoteAddr.hostAddress} is " +
+                    "reachable")
             return false
         }
     }
@@ -967,7 +966,7 @@ class AppServer(
 
                 // Store the echo response in our database
                 db.messageDao().addMessage(testMessage)
-                Log.d("AppServer", "Test device echoed message: $message")
+                Timber.tag("AppServer").d("Test device echoed message: $message")
                 return true
             }
 
@@ -982,7 +981,7 @@ class AppServer(
                 .addQueryParameter("senderIp", localVirtualAddr.hostAddress)
                 .build()
 
-            Log.d("AppServer", "Request URL: $httpUrl")
+            Timber.tag("AppServer").d("Request URL: $httpUrl")
 
             val gs = Gson()
             val msg = Message(//test this
@@ -993,15 +992,15 @@ class AppServer(
                 content = message,
                 file = null//made the file null so that the file doesn't send
             )
-            Log.d("AppServer", "Messagefile: ${msg.file.toString()}")
+            Timber.d("AppServer", "Messagefile: ${msg.file.toString()}")
             val msgJson = gs.toJson(msg)
             //modified http
             val httpURL = HttpUrl.Builder() .scheme("http") .host(address.hostAddress) .port(DEFAULT_PORT) .addPathSegment("chat").build()
-            //Log.d("AppServer", "HTTP URL: $httpURL")
+            //Timber.d("AppServer", "HTTP URL: $httpURL")
             //post request body
             val mt = "application/json; charset=utf-8".toMediaType()
             val rbody = msgJson.toRequestBody(mt)
-            //Log.d("Appserver", "HTTP URL: $httpUrl")
+            //Timber.d("Appserver", "HTTP URL: $httpUrl")
 
             val request = Request.Builder()
                 .url(httpUrl)
@@ -1014,20 +1013,23 @@ class AppServer(
                 httpClient.newCall(request).execute().use { response ->
                     val successful = response.isSuccessful
                     if (successful) {
-                        Log.d("AppServer", "Message successfully sent to ${address.hostAddress}")
+                        Timber.tag("AppServer").d("Message successfully sent to ${address
+                            .hostAddress}")
                     } else {
-                        Log.d("AppServer", "Failed to send message to ${address.hostAddress}, status code: ${response.code}")
+                        Timber.tag("AppServer").d("Failed to send message to ${address
+                            .hostAddress}, status code: ${response.code}")
                     }
                     return successful
                 }
             } catch (e: Exception) {
-                Log.e("AppServer", "Failed to send message to ${address.hostAddress}: ${e.message}", e)
+                Timber.tag("AppServer").e(e,"Failed to send message to ${address.hostAddress}: ${e
+                    .message}")
                 return false
             }
 
         } catch (e: Exception) {
             e.printStackTrace()
-            Log.d("AppServer", "Failed to send message to ${address.hostAddress}: ${e.message}")
+            Timber.tag("AppServer").d("Failed to send message to ${address.hostAddress}: ${e.message}")
             return false
         }
     }
@@ -1038,7 +1040,7 @@ class AppServer(
         scope.launch {//check to see if this accommodates for json
             //not sending URI, i don't think the json is working
             try {
-                Log.d("AppServer", "chat message: $message")
+                Timber.tag("AppServer").d("chat message: $message")
                 if (TestDeviceService.isTestDevice(address)) {
                     // Create an echo response from our test device
                     val testMessage = Message(
@@ -1052,7 +1054,7 @@ class AppServer(
 
                     // Store the echo response in our database
                     db.messageDao().addMessage(testMessage)
-                    Log.d("AppServer", "Test device echoed message: $message")
+                    Timber.tag("AppServer").d("Test device echoed message: $message")
                     return@launch
                 }
 
@@ -1067,19 +1069,19 @@ class AppServer(
                     .addQueryParameter("senderIp", localVirtualAddr.hostAddress)
                     .build()
 
-                Log.d("AppServer", "Request URL: $httpUrl")
+                Timber.tag("AppServer").d("Request URL: $httpUrl")
 
                 val request = Request.Builder()
                     .url(httpUrl)
                     .build()
 
                 val response = httpClient.newCall(request).execute()
-                Log.d("AppServer", "Response: ${response.code}")
+                Timber.tag("AppServer").d("Response: ${response.code}")
 
             }
             catch (e: Exception) {
                 e.printStackTrace()
-                Log.d("AppServer", "Failed to send message to ${address.hostAddress}")
+                Timber.tag("AppServer").d("Failed to send message to ${address.hostAddress}")
             }
         }
     }
@@ -1091,12 +1093,12 @@ class AppServer(
             val sharedPrefs: SharedPreferences by di.instance(tag = "settings")
             val localUuid = sharedPrefs.getString("UUID", null)
             if (localUuid == null) {
-                Log.e("AppServer", "Local UUID not found, cannot push user info")
+                Timber.tag("AppServer").e("Local UUID not found, cannot push user info")
                 return@launch
             }
             val localUser = runBlocking { userRepository.getUser(localUuid) }
             if (localUser == null) {
-                Log.e("AppServer", "Local user info not found in DB, cannot push user info")
+                Timber.tag("AppServer").e("Local user info not found in DB, cannot push user info")
                 return@launch
             }
 
@@ -1109,15 +1111,17 @@ class AppServer(
                 .post(requestBody)
                 .build()
 
-            Log.d("AppServer", "Pushing user info to $url with payload: $userJson")
+            Timber.tag("AppServer").d("Pushing user info to $url with payload: $userJson")
 
             try {
                 val response = httpClient.newCall(request).execute()
-                // Log the response code and body (if any)
+                // Timber the response code and body (if any)
                 val responseBody = response.body?.string()
-                Log.d("AppServer", "Response from ${remoteAddr.hostAddress}: Code=${response.code}, Body=$responseBody")
+                Timber.tag("AppServer").d("Response from ${remoteAddr.hostAddress}: Code=${response
+                    .code}, Body=$responseBody")
             } catch (e: Exception) {
-                Log.e("AppServer", "Failed to push user info to ${remoteAddr.hostAddress}", e)
+                Timber.tag("AppServer").e(e,"Failed to push user info to ${remoteAddr
+                    .hostAddress}")
             }
         }
     }
@@ -1140,11 +1144,12 @@ class AppServer(
             try {
                 val url = "http://${remoteAddr.hostAddress}:$port/myinfo"
                 val request = Request.Builder().url(url).build()
-                Log.d("AppServer", "Requesting remote user info from $url")
+                Timber.tag("AppServer").d("Requesting remote user info from $url")
 
                 val response = httpClient.newCall(request).execute()
                 val userJson = response.body?.string()
-                Log.d("AppServer", "Received user info from ${remoteAddr.hostAddress}: $userJson")
+                Timber.tag("AppServer").d("Received user info from ${remoteAddr.hostAddress}: " +
+                        "$userJson")
                 response.close()
 
                 if (!userJson.isNullOrEmpty()) {
@@ -1185,10 +1190,11 @@ class AppServer(
                                 localUuid = localUuid,
                                 remoteUser = remoteUserWithIp
                             )
-                            Log.d("AppServer", "Created conversation with ${remoteUserWithIp.name}")
+                            Timber.tag("AppServer").d("Created conversation with ${remoteUserWithIp
+                                .name}")
                         }
                     }catch (e: Exception) {
-                        Log.e("AppServer", "Failed to create conversation", e)
+                        Timber.tag("AppServer").e(e, "Failed to create conversation")
 
                         //Update Device Status Manager to show device is offline when connection fails
                         DeviceStatusManager.updateDeviceStatus(remoteAddr.hostAddress, false)
@@ -1204,10 +1210,11 @@ class AppServer(
                         }
                     }
 
-                    Log.d("AppServer", "Updated local DB with remote user info: $remoteUserWithIp")
+                    Timber.tag("AppServer").d("Updated local DB with remote user info: " +
+                            "$remoteUserWithIp")
                 }
             } catch (e: Exception) {
-                Log.e("AppServer", "Failed to fetch /myinfo from ${remoteAddr.hostAddress}", e)
+                Timber.tag("AppServer").e(e,"Failed to fetch /myinfo from ${remoteAddr.hostAddress}")
             }
         }
     }
@@ -1220,9 +1227,10 @@ class AppServer(
                     isOnline = isOnline,
                     userAddress = userAddress
                 )
-                Log.d("AppServer", "Updated user $userUuid connection status: online=$isOnline, address=$userAddress")
+                Timber.tag("AppServer").d("Updated user $userUuid connection status: " +
+                        "online=$isOnline, address=$userAddress")
             }catch (e: Exception){
-                Log.e("AppServer", "Failed to update user connection status", e)
+                Timber.tag("AppServer").e(e,"Failed to update user connection status")
             }
         }
     }
@@ -1235,9 +1243,10 @@ class AppServer(
                     isOnline = isOnline,
                     userAddress = userAddress
                 )
-                Log.d("AppServer", "Updated user $userUuid connection status: online=$isOnline, address=$userAddress")
+                Timber.tag("AppServer").d("Updated user $userUuid connection status: " +
+                        "online=$isOnline, address=$userAddress")
             } catch (e: Exception){
-                Log.e("AppServer", "Failed to update user connection status", e)
+                Timber.tag("AppServer").e(e,"Failed to update user connection status")
             }
         }
     }
@@ -1253,9 +1262,9 @@ class AppServer(
                         userAddress = null
                     )
                 }
-                Log.d("AppServer", "Marked all users as offline")
+                Timber.tag("AppServer").d("Marked all users as offline")
             } catch (e: Exception) {
-                Log.e("AppServer", "Failed to mark all users as offline", e)
+                Timber.tag("AppServer").e(e,"Failed to mark all users as offline")
             }
         }
     }
