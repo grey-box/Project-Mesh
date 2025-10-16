@@ -5,32 +5,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material3.*
 import androidx.compose.ui.graphics.Color
 
-// Define the color schemes for light and dark themes
-private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFFBB86FC),
-    secondary = Color(0xFF03DAC5),
-    background = Color(0xFF121212),
-    surface = Color(0xFF121212),
-    onPrimary = Color.Black,
-    onSecondary = Color.Black,
-    onBackground = Color.White,
-    onSurface = Color.White
-)
-
-private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6200EE),
-    secondary = Color(0xFF03DAC5),
-    background = Color(0xFFFFFFFF),
-    surface = Color(0xFFFFFFFF),
-    onPrimary = Color.White,
-    onSecondary = Color.Black,
-    onBackground = Color.Black,
-    onSurface = Color.Black
-)
-
 enum class AppTheme {
     SYSTEM, LIGHT, DARK
 }
+
+private val DarkColorScheme = darkColorScheme(
+    primary = Color(0xFFB6A4F5),
+    onPrimary = Color.Black,
+    background = Color(0xFF121212),
+    onBackground = Color.White,
+    surface = Color(0xFF1E1E1E),
+    onSurface = Color.White,
+    secondary = Color(0xFFAAAAAA),
+    onSecondary = Color.Black,
+    outline = Color(0xFF444444)
+)
+
+private val LightColorScheme = lightColorScheme(
+    primary = Color(0xFF6A5AE0), // vibrant purple (used for buttons, etc.)
+    onPrimary = Color.White,
+    background = Color(0xFFF9F9F9), // soft white background
+    onBackground = Color.Black,
+    surface = Color.White,
+    onSurface = Color.Black,
+    secondary = Color(0xFFB0B0B0), // soft gray
+    onSecondary = Color.Black,
+    outline = Color(0xFFE0E0E0) // subtle border color
+)
+
 
 @Composable
 fun ProjectMeshTheme(
@@ -42,9 +44,10 @@ fun ProjectMeshTheme(
         AppTheme.LIGHT -> false
         AppTheme.DARK -> true
     }
+
     MaterialTheme(
         colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
-        content = content,
         typography = Typography,
+        content = content
     )
 }

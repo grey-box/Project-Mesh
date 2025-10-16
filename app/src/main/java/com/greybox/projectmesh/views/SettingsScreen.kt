@@ -2,7 +2,6 @@ package com.greybox.projectmesh.views
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Paint.Align
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -17,12 +16,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DarkMode
+import androidx.compose.material.icons.filled.DoneAll
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Folder
+import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
@@ -40,6 +47,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
@@ -54,9 +62,6 @@ import com.greybox.projectmesh.R
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.ui.theme.GradientButton
-import com.greybox.projectmesh.ui.theme.GradientLongButton
-import com.greybox.projectmesh.viewModel.HomeScreenViewModel
-import com.greybox.projectmesh.viewModel.SendScreenViewModel
 import com.greybox.projectmesh.viewModel.SettingsScreenViewModel
 import org.kodein.di.compose.localDI
 import org.kodein.di.instance
@@ -90,20 +95,17 @@ fun SettingsScreen(
 
     val settingPref: SharedPreferences by di.instance(tag = "settings")
 
-    Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()))
+    Column(modifier = Modifier
+        .fillMaxSize()
+        .verticalScroll(rememberScrollState()))
     {
-        Spacer(modifier = Modifier.height(36.dp))
-        // Title "Settings"
-        Text(
-            text = stringResource(id = R.string.settings),
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
-            modifier = Modifier.align(Alignment.CenterHorizontally)
-        )
-        Column(modifier = Modifier.padding(36.dp)) {
+        Column(modifier = Modifier.padding(6.dp)) {
             // General Setting Section (Language, Theme)
             SectionHeader(title = R.string.general)
             SettingItem(
                 label = stringResource(id = R.string.language),
+                icon = Icons.Default.Language,
+                contentDescription = "Language",
                 trailingContent = {
                     LanguageSetting(
                         currentLanguage = currLang.value,
@@ -116,6 +118,8 @@ fun SettingsScreen(
             )
             SettingItem(
                 label = stringResource(id = R.string.theme),
+                icon = Icons.Default.DarkMode,
+                contentDescription = "Theme",
                 trailingContent = {
                     ThemeSetting(
                         currentTheme = currTheme.value,
@@ -130,6 +134,8 @@ fun SettingsScreen(
             SectionHeader(title = R.string.network)
             SettingItem(
                 label = stringResource(id = R.string.server),
+                icon = Icons.Default.Refresh,
+                contentDescription = "Restart Server",
                 trailingContent = {
                     GradientButton(
                         text = stringResource(id = R.string.restart),
@@ -139,6 +145,8 @@ fun SettingsScreen(
             )
             SettingItem(
                 label = stringResource(id = R.string.device_name),
+                icon = Icons.Default.Edit,
+                contentDescription = "Edit Device Name",
                 trailingContent = {
                     GradientButton(text = currDeviceName.value, onClick = { showDialog = true })
                 }
@@ -157,8 +165,12 @@ fun SettingsScreen(
             // Receive Setting Section (Auto Finish, Save to folder)
             SectionHeader(title = R.string.receive)
             SettingItem(label = stringResource(id = R.string.auto_finish),
+                icon = Icons.Default.DoneAll,
+                contentDescription = "Auto Finish",
                 trailingContent = {
-                    Box(modifier = Modifier.width(130.dp).height(70.dp))
+                    Box(modifier = Modifier
+                        .fillMaxWidth(),
+                        contentAlignment = Alignment.CenterEnd)
                     {
                         Switch(
                             checked = currAutoFinish.value,
@@ -172,7 +184,7 @@ fun SettingsScreen(
                                 checkedTrackColor = Color(0xFF4CAF50),
                                 uncheckedTrackColor = Color.LightGray,
                             ),
-                            modifier = Modifier.scale(1.3f).align(Alignment.Center)
+                            modifier = Modifier.scale(0.9f).padding(0.dp,0.dp,16.dp, 0.dp)
                         )
                     }
                 }
@@ -201,6 +213,8 @@ fun SettingsScreen(
                 currSaveToFolder.value.split("/").lastOrNull() ?: "Unknown"
             }
             SettingItem(label = stringResource(id = R.string.save_to_folder),
+                icon = Icons.Default.Folder,
+                contentDescription = "Save to folder",
                 trailingContent = {
                     GradientButton(text = folderNameToShow,
                         onClick = { directoryLauncher.launch(null) }
@@ -210,9 +224,11 @@ fun SettingsScreen(
             // STA/AP Concurrency Setting Section (Only for Android 10 and below)
             if (Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                 SectionHeader(title = R.string.concurrency)
-                SettingItem(label = "",
+                SettingItem(label = "Concurrency",
+                    icon = Icons.Default.Restore,
+                    contentDescription = "Sta ap concurrency",
                     trailingContent = {
-                        GradientLongButton(
+                        GradientButton(
                             text = stringResource(id = R.string.reset),
                             onClick = {
                                 viewModel.updateConcurrencySettings(false, true)
@@ -231,29 +247,37 @@ fun SettingsScreen(
 }
 @Composable
 fun SectionHeader(title: Int) {
-    Spacer(modifier = Modifier.height(20.dp))
+    Spacer(modifier = Modifier.height(18.dp))
     Text(
         text = stringResource(id = title),
-        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        style = TextStyle(fontSize = 18.sp, fontWeight = FontWeight.Bold)
     )
     HorizontalDivider(
         modifier = Modifier
             .fillMaxWidth()
             .padding(0.dp, 10.dp),
         thickness = 2.dp,
-        color = Color.Red
+        color = Color.LightGray
     )
 }
 
 @Composable
-fun SettingItem(label: String, trailingContent: @Composable () -> Unit) {
+fun SettingItem(label: String,
+                icon: ImageVector,
+                contentDescription: String,
+                trailingContent: @Composable () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = TextStyle(fontSize = 18.sp))
+        Icon(
+            imageVector = icon,
+            contentDescription = contentDescription,
+            modifier = Modifier.padding(end = 12.dp)
+        )
+        Text(text = label, style = TextStyle(fontSize = 14.sp))
         Spacer(modifier = Modifier.weight(1f))
         trailingContent()
     }
@@ -267,9 +291,7 @@ fun LanguageSetting(
     // for Language setting
     var langExpanded by remember { mutableStateOf(false) } // Track menu visibility
     val langMenuItems = listOf("en" to "English", "es" to "Español", "cn" to "简体中文", "fr" to
-            "Français") //
-    // Menu
-    // items
+            "Français") // Menu items
     val langSelectedOption = langMenuItems.firstOrNull {it.first == currentLanguage}?.second?:"English"
     Box()
     {

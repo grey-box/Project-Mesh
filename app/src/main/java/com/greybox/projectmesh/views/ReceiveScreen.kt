@@ -19,17 +19,20 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,11 +45,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.greybox.projectmesh.R
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.server.AppServer
 import com.greybox.projectmesh.viewModel.ReceiveScreenViewModel
@@ -54,7 +55,9 @@ import org.kodein.di.compose.localDI
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.File
-import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.ui.graphics.Color
 import com.greybox.projectmesh.viewModel.ReceiveScreenModel
 
 @Composable
@@ -146,71 +149,79 @@ fun HandleIncomingTransfers(
             }
         }
     }
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
-        items(
-            items = uiState.incomingTransfers,
-            key = {"${it.fromHost.hostAddress}-${it.id}-${it.requestReceivedTime}".hashCode()}
-        ){ transfer ->
-            ListItem(
+    LazyColumn(modifier = Modifier.fillMaxSize().padding(16.dp)) {
+        items(uiState.incomingTransfers, key = {
+            "${it.fromHost.hostAddress}-${it.id}-${it.requestReceivedTime}".hashCode()
+        }) { transfer ->
+            val progress = if (transfer.size == 0) 0f else transfer.transferred / transfer.size.toFloat()
+            val isCompleted = transfer.status == AppServer.Status.COMPLETED
+            val isFailedOrDeclined = transfer.status == AppServer.Status.DECLINED || transfer.status == AppServer.Status.FAILED
+
+            Card(
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(6.dp),
                 modifier = Modifier
-                    .clickable {
+                    .fillMaxWidth()
+                    .padding(vertical = 6.dp)
+                    .clickable(enabled = isCompleted) {
                         openFile(transfer)
                     }
-                    .fillMaxWidth(),
-                headlineContent = {
-                    Text(transfer.name)
-                },
-                supportingContent = {
-                    Column{
-                        val fromHostAddress = transfer.fromHost.hostAddress
-                        Text(stringResource(id = R.string.from) + ":")
-                        Text("${transfer.deviceName}(${fromHostAddress})")
-                        Text(stringResource(id = R.string.status) + ": ${transfer.status}")
-                        Text(autoConvertByte(transfer.transferred) + "/" + autoConvertByte(transfer.size))
-                        if(transfer.status == AppServer.Status.COMPLETED){
-                            Text(stringResource(id = R.string.elapsed_time) + ": ${autoConvertMS(transfer.transferTime)}")
-                        }
-                        if(transfer.status == AppServer.Status.PENDING){
-                            Row{
-                                IconButton(onClick = {onAccept(transfer)},
-                                    modifier = Modifier.width(100.dp)) {
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(transfer.name, style = MaterialTheme.typography.titleMedium)
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text("From: ${transfer.deviceName} (${transfer.fromHost.hostAddress})", style = MaterialTheme.typography.bodySmall)
+                    Text("Status: ${transfer.status}", style = MaterialTheme.typography.bodySmall)
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    if (transfer.status != AppServer.Status.PENDING) {
+                        LinearProgressIndicator(
+                            progress = { progress },
+                            color = if (isCompleted) Color(0xFF4CAF50) else MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "${autoConvertByte(transfer.transferred)} / ${autoConvertByte(transfer.size)}",
+                            style = MaterialTheme.typography.labelSmall
+                        )
+                    }
+
+                    if (isCompleted) {
+                        Text("Elapsed Time: ${autoConvertMS(transfer.transferTime)}", style = MaterialTheme.typography.labelSmall)
+                    }
+
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        when {
+                            transfer.status == AppServer.Status.PENDING -> {
+                                IconButton(onClick = { onAccept(transfer) }) {
                                     Icon(Icons.Default.CheckCircle, contentDescription = "Accept")
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
-                                IconButton(onClick = {onDecline(transfer)},
-                                    modifier = Modifier.width(100.dp)) {
+                                IconButton(onClick = { onDecline(transfer) }) {
                                     Icon(Icons.Default.Cancel, contentDescription = "Decline")
                                 }
                             }
-                        }
-                    }
-                },
-                trailingContent = {
-                    if(transfer.status == AppServer.Status.COMPLETED){
-                        Row (
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between buttons
-                        ){
-                            IconButton(onClick = {onDelete(transfer)}) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                            isCompleted -> {
+                                IconButton(onClick = { onDelete(transfer) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                }
+                                IconButton(onClick = { onDownload(context, transfer, defaultUri) }) {
+                                    Icon(Icons.Default.Download, contentDescription = "Download")
+                                }
                             }
-                            IconButton(onClick = {onDownload(context, transfer, defaultUri)}) {
-                                Icon(Icons.Default.Download, contentDescription = "Download")
-                            }
-                        }
-                    }
-                    else if(transfer.status == AppServer.Status.DECLINED || transfer.status == AppServer.Status.FAILED){
-                        Row (
-                            verticalAlignment = Alignment.CenterVertically
-                        ){
-                            IconButton(onClick = {onDelete(transfer)}) {
-                                Icon(Icons.Default.Delete, contentDescription = "Delete")
+                            isFailedOrDeclined -> {
+                                IconButton(onClick = { onDelete(transfer) }) {
+                                    Icon(Icons.Default.Delete, contentDescription = "Delete")
+                                }
                             }
                         }
                     }
                 }
-            )
-            HorizontalDivider()
+            }
         }
     }
 }
@@ -339,3 +350,4 @@ private fun saveFileToContentUri(context: Context, transfer: AppServer.IncomingT
         Toast.makeText(context, "Error saving file: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
     }
 }
+

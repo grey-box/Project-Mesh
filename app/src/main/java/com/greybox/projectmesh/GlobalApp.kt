@@ -58,7 +58,7 @@ All dependencies are defined in one place, which makes it easier to manage and t
 class GlobalApp : Application(), DIAware {
     // it is an instance of Preferences.key<Int>, used to interact with "DataStore"
     private val addressKey = intPreferencesKey("virtual_node_address")
-    /*data object DeviceInfoManager {
+    data object DeviceInfoManager {
         // Global HashMap to store IP-DeviceName mapping
         private val deviceNameMap = ConcurrentHashMap<String, String?>()
 
@@ -82,7 +82,7 @@ class GlobalApp : Application(), DIAware {
         fun getChatName(inetAddress: InetAddress): String {
             return inetAddress.hostAddress
         }
-    }*/
+    }
     object GlobalUserRepo {
         // Lateinit or lazy property
         lateinit var userRepository: UserRepository
@@ -365,7 +365,6 @@ class GlobalApp : Application(), DIAware {
                     }
                 })
                 .fallbackToDestructiveMigration() // handle migrations destructively
-//                .allowMainThreadQueries() // this should generally be avoided for production apps
                 .build()
         }
 
@@ -398,10 +397,6 @@ class GlobalApp : Application(), DIAware {
         }
 
         onReady {
-            // clears all data in the existing tables
-            //GlobalScope.launch {
-              //  instance<MeshDatabase>().messageDao().clearTable()
-            //}
             val logger: MNetLogger = instance()
             instance<AppServer>().start()
             logger(Log.DEBUG,"AppServer started successfully on Port: ${AppServer.DEFAULT_PORT}")

@@ -42,8 +42,8 @@ fun TransparentButton(
             contentColor = Color.Black    // Text color
         ),
         border = BorderStroke(1.dp, Color.Black), // Black border
-        shape = RoundedCornerShape(8.dp), // Optional: Rounded corners
-        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp),
+        modifier = modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(vertical = 8.dp).size(50.dp),
         enabled = enabled
     ) {
         Text(text = text)
