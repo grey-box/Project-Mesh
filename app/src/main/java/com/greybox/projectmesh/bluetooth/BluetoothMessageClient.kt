@@ -52,7 +52,7 @@ class BluetoothMessageClient(
             val msg = Message(
                 id = 0,
                 dateReceived = time,
-                sender = localVirtualAddr.hostName, // keep consistent with Wi-Fi path
+                sender = localVirtualAddr.hostAddress, // keep consistent with Wi-Fi path
                 chat = macAddress, // temporary: use MAC to identify conversation
                 content = message,
                 file = null     // keep null until file over BT is implemented

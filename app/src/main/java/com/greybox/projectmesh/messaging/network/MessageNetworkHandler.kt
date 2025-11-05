@@ -241,7 +241,7 @@ class MessageNetworkHandler(
 
             // Step 7: Update conversation with new message
             // IDENTICAL TO WI-FI
-            if (user != null) {
+            if (user?.macAddress != null) {
                 try {
                     // Get/create conversation
                     val conversation = runBlocking {

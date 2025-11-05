@@ -63,11 +63,9 @@ class ChatScreenViewModel(
     private val sharedPrefs: SharedPreferences by di.instance(tag = "settings")
     private val localUuid = sharedPrefs.getString("UUID", null) ?: "local-user"
 
-    // NEW
     private val isOfflineMode = ipStr == "0.0.0.0"
 
     //Get User info
-    // UPDATED: Get user entity differently based on mode
     private val userEntity = runBlocking {
         if (isOfflineMode && passedConversationId != null) {
             // Extract UUID from conversation ID and load by UUID
@@ -77,7 +75,6 @@ class ChatScreenViewModel(
                 GlobalApp.GlobalUserRepo.userRepository.getUser(it)
             }
         } else {
-            // Load by IP (existing logic)
             GlobalApp.GlobalUserRepo.userRepository.getUserByIp(ipStr)
         }
     }
@@ -197,7 +194,7 @@ class ChatScreenViewModel(
                 }
             }
 
-            // add to track linked mac addresses
+            // add to track linked mac addresses in stateflow and database
             viewModelScope.launch {
                 val currentUser = userRepository.getUser(userUuid)
                 _linkedBtMac.value = currentUser?.macAddress
@@ -330,7 +327,8 @@ class ChatScreenViewModel(
     fun linkBluetoothDevice(macAddress: String) {
         viewModelScope.launch {
             try {
-                if (userEntity != null) {
+
+                if (userEntity  != null) {
                     // Update the user with the MAC address in the database
                     GlobalApp.GlobalUserRepo.userRepository.insertOrUpdateUser(
                         uuid = userUuid,
@@ -344,7 +342,6 @@ class ChatScreenViewModel(
                         "Linked Bluetooth device $macAddress to user $userUuid"
                     )
 
-                    // Optional: Verify it was saved correctly
                     val updatedUser = GlobalApp.GlobalUserRepo.userRepository.getUser(userUuid)
                     Log.d(
                         "ChatScreenViewModel",
@@ -367,19 +364,19 @@ class ChatScreenViewModel(
     fun unlinkDevice() {
         viewModelScope.launch {
             try {
-                val currentUser = userRepository.getUser(userUuid)
-                if (currentUser != null) {
+
+                if (userEntity!= null) {
                     userRepository.insertOrUpdateUser(
-                        uuid = currentUser.uuid,
-                        name = currentUser.name,
-                        address = currentUser.address,
-                        macAddress = null
+                        uuid = userEntity.uuid,
+                        name = userEntity.name,
+                        address = userEntity.address,
+                        macAddress = "AA:BB:CC:DD:EE:FF"  // <-- pass in a placeholder address
                     )
 
                     _linkedBtMac.value = null // <-- null out the linked mac address
 
                     Log.d("ChatScreenViewModel", "Device unlinked")
-                    _uiState.update { it.copy(offlineWarning = null) }
+
                 }
             } catch (e: Exception) {
                 Log.e("ChatScreenViewModel", "Failed to unlink", e)
@@ -478,6 +475,7 @@ class ChatScreenViewModel(
                     } ?: false
                 }
 
+                // if we get anything other than success, then we unlink from this device
                 if (success) {
                     Log.d(
                         "ChatScreenViewModel",
@@ -488,9 +486,12 @@ class ChatScreenViewModel(
                         "ChatScreenViewModel",
                         "Failed to send Bluetooth message to $linkedMacAddress"
                     )
-                    _uiState.update { prev ->
-                        prev.copy(offlineWarning = "Bluetooth message delivery failed.")
-                    }
+
+                    Log.e(
+                        "ChatScreenViewModel",
+                        "Unlinking from: $linkedMacAddress"
+                    )
+                   unlinkDevice()
                 }
             } catch (e: Exception) {
                 Log.e("ChatScreenViewModel", "Error sending Bluetooth message: ${e.message}", e)

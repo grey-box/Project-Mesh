@@ -2,16 +2,20 @@ package com.greybox.projectmesh.bluetooth
 
 import android.content.Context
 import android.util.Log
+import com.greybox.projectmesh.GlobalApp
+import com.greybox.projectmesh.GlobalApp.GlobalUserRepo.userRepository
 import com.greybox.projectmesh.db.MeshDatabase
 import com.greybox.projectmesh.messaging.data.entities.JSONSchema
 import com.greybox.projectmesh.messaging.data.entities.Message
 import com.greybox.projectmesh.messaging.network.MessageNetworkHandler
+import com.greybox.projectmesh.user.UserEntity
 import com.ustadmobile.meshrabiya.log.MNetLogger
 import com.ustadmobile.meshrabiya.server.AbstractHttpOverBluetoothServer
 import com.ustadmobile.meshrabiya.vnet.bluetooth.VirtualNodeGattServer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import rawhttp.core.RawHttp
 import rawhttp.core.RawHttpRequest
@@ -66,6 +70,34 @@ class BluetoothServer(
                 createErrorResponse(404, "Not Found", "not found: $path")
             }
         }
+    }
+
+    private suspend fun validateRemoteDevice(
+        senderIP: String,
+        claimedIdentifier: String
+    ): UserEntity? {
+        // get the user based on their senderIP
+        val user = userRepository.getUserByIp(senderIP)
+        if (user == null) {
+            Log.w("BluetoothServer", "Unknown user: $claimedIdentifier")
+            return null
+        }
+
+        // check if we have a saved MAC address for this user matching the IP
+        if (user.macAddress == null) {
+            Log.w("BluetoothServer", "User ${user.name} has no linked MAC address")
+            return null
+        }
+
+        if (!user.macAddress.equals(claimedIdentifier, ignoreCase = true)) {
+            Log.e("BluetoothServer", "SECURITY ALERT: MAC mismatch!")
+            Log.e("BluetoothServer", "User: ${user.name} (${user.uuid})")
+            Log.e("BluetoothServer", "Expected MAC: ${user.macAddress}")
+            return null
+        }
+
+        Log.d("BluetoothServer", "MAC validation passed for ${user.name}")
+        return user
     }
 
     private fun handleChatRequest(
@@ -133,6 +165,21 @@ class BluetoothServer(
             } else {
                 null
             }
+
+            val validatedUser = runBlocking {
+                validateRemoteDevice(senderStr, remoteDeviceAddress)
+            }
+
+            // make sure we have a valid sender field
+            if (validatedUser == null) {
+                Log.e("BluetoothServer", "MAC Address Mismatch!")
+                return createErrorResponse(
+                    statusCode = 400,
+                    statusMessage = "Bad Request",
+                    body = "MAC Mismatch"
+                )
+            }
+
 
             // Process the incoming message using our new Bluetooth handler
             // - Looks up user by MAC address using getUserByMac()
