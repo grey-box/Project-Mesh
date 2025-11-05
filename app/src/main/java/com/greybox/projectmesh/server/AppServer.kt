@@ -597,7 +597,8 @@ class AppServer(
                             userRepository.insertOrUpdateUser(
                                 uuid = pseudoUuid,
                                 name = remoteDeviceName,
-                                address = ipStr
+                                address = ipStr,
+                                macAddress = null
                             )
                         } else {
                             // Already have a user? Update the name
@@ -1162,7 +1163,8 @@ class AppServer(
                     userRepository.insertOrUpdateUser(
                         remoteUserWithIp.uuid,
                         remoteUserWithIp.name,
-                        remoteUserWithIp.address
+                        remoteUserWithIp.address,
+                        remoteUserWithIp.macAddress
                     )
 
                     // 4) update user connection status to online

@@ -252,6 +252,10 @@ class GlobalApp : Application(), DIAware {
                 }else {
                     Log.d("GlobalApp", "Messages already exist, skipping insertion")
                 }
+
+                DeviceStatusManager.updateDeviceStatus(TestDeviceService.TEST_DEVICE_IP, true)
+                DeviceStatusManager.updateDeviceStatus(TestDeviceService.TEST_DEVICE_IP_OFFLINE, false)
+
             }catch (e: Exception ) {
                 Log.e("GlobalApp", "Error inserting test conversation", e)
             }

@@ -72,8 +72,12 @@ import android.provider.OpenableColumns
 import org.kodein.di.instance
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.filled.Link
+import androidx.compose.material.icons.filled.LinkOff
+import androidx.compose.material3.ButtonDefaults
 import com.greybox.projectmesh.bluetooth.rememberBluetoothConnectLauncher
 import com.ustadmobile.meshrabiya.vnet.bluetooth.MeshrabiyaBluetoothState
 import kotlinx.coroutines.launch
@@ -98,6 +102,8 @@ fun ChatScreen(
         )
     )
 ) {
+
+
 
     //get user info
     val userInfo = remember {
@@ -182,10 +188,16 @@ fun ChatScreen(
 
     val scrollState = rememberScrollState()
 
+    // linked bluetooth device tracking
+    val linkedMac by viewModel.linkedBtMac.collectAsState()
     // bluetooth only flag
     val btOnly by viewModel.btOnlyFlag.collectAsState()
     // boolean use to toggle enabling/disabling chat
-    val canSend = deviceStatus || btOnly
+    val canSend = if (btOnly) {
+        linkedMac != null
+    } else {
+        deviceStatus
+    }
 
 
 // Bluetooth launcher, allows device selection
@@ -210,6 +222,7 @@ fun ChatScreen(
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier
             .fillMaxSize()
+
             .padding(bottom = 72.dp)) {
 
             //add a status bar at the top of the chat
@@ -219,8 +232,8 @@ fun ChatScreen(
                 userAddress = virtualAddress.hostAddress
             )
 
-            // show a link device button when entering bluetooth only mode
-            if (btOnly){
+            if (btOnly) {
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -228,10 +241,45 @@ fun ChatScreen(
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.End
                 ) {
+                    // Show linked device
+                    if (linkedMac != null) {
+                        Text(
+                            text = "Linked: ${linkedMac?.take(17) ?: ""}",  // Show MAC address
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                    }
+
                     Button(
-                        onClick = {bluetoothLauncher.launch(MeshrabiyaBluetoothState()) }
+                        onClick = {
+                            if (linkedMac != null) {
+                                // Device is linked so unlink it
+                                viewModel.unlinkDevice()
+                            } else {
+                                // No device linked yet so call the launcher
+                                bluetoothLauncher.launch(MeshrabiyaBluetoothState())
+                            }
+                        },
+                        colors = if (linkedMac != null) {
+                            // Different color when unlinking for visual cues
+                            ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                                contentColor = MaterialTheme.colorScheme.onErrorContainer
+                            )
+                        } else {
+                            ButtonDefaults.buttonColors()
+                        }
                     ) {
-                        Text("Link Bluetooth Device")
+                        Icon(
+                            // add a cute link icon for visuals
+                            imageVector = if (linkedMac != null) Icons.Default.LinkOff else Icons.Default.Link,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        // change text
+                        Text(if (linkedMac != null) "Unlink Device" else "Link Device")
                     }
                 }
             }
@@ -303,7 +351,7 @@ fun ChatScreen(
                 maxLines = 5,
                 enabled = canSend // disable text input when user is offline
             )
-            Button(modifier = Modifier.weight(1f), onClick = {
+            Button(modifier =  Modifier.weight(1f), onClick = {
                 val message = textMessage.trimEnd()
                 //val imgpath = "sdcard/padorubastard.jpg"//test image path
                 //future implementation should implement file picker
@@ -321,7 +369,7 @@ fun ChatScreen(
             },
                 enabled = canSend  //disable button when user is offline
             ) {
-                Text(text = "Send")
+                Text(text = "Send", fontSize = 12.sp)
             }
         }
     }
@@ -420,15 +468,22 @@ fun UserStatusBar(
 @Composable
 fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
     val context = LocalContext.current
+    // added to auto scroll to make messaging snappier
+    val listState = rememberLazyListState()
 
     //track if messages are showing:
     val hasMessages = uiState.allChatMessages.isNotEmpty()
 
     LaunchedEffect(uiState.allChatMessages.size) {
+        if (hasMessages) {
+            // added to autoscroll
+            listState.animateScrollToItem(uiState.allChatMessages.size - 1)
+        }
         Log.d("ChatScreen", "DisplayAllMessages with ${uiState.allChatMessages.size} messages")
     }
 
-    LazyColumn{
+    // added state to autoscroll
+    LazyColumn(state = listState){
         if (!hasMessages){
             item {
                 Column(
@@ -498,14 +553,16 @@ fun MessageBubble(
     sentBySelf: Boolean,
     messageContent: @Composable () -> Unit,
     sender: String,
-    modifier: Modifier
+    modifier: Modifier,
+
 ){
     val context = LocalContext.current
 
     ElevatedCard(
         colors = CardDefaults.cardColors(
             containerColor = if(sentBySelf){
-                Color.Cyan
+                Color(0xFF2196F3)
+
             }else{
                 MaterialTheme.colorScheme.surfaceVariant
             }

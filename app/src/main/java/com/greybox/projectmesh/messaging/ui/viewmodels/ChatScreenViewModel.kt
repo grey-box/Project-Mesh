@@ -40,6 +40,7 @@ import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.greybox.projectmesh.DeviceStatusManager
+import com.greybox.projectmesh.GlobalApp.GlobalUserRepo.userRepository
 import com.greybox.projectmesh.bluetooth.BluetoothMessageClient
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withTimeoutOrNull
@@ -63,7 +64,7 @@ class ChatScreenViewModel(
     private val localUuid = sharedPrefs.getString("UUID", null) ?: "local-user"
 
     // NEW
-    private val isOfflineMode = ipStr == "0.0.0.0" || passedConversationId != null
+    private val isOfflineMode = ipStr == "0.0.0.0"
 
     //Get User info
     // UPDATED: Get user entity differently based on mode
@@ -85,7 +86,6 @@ class ChatScreenViewModel(
     private val deviceName = userEntity?.name ?: "Unknown"
 
 
-    // UPDATED: Get userUuid differently based on mode  NEW
     private val userUuid: String = when {
         isOfflineMode && passedConversationId != null -> {
             // Extract from conversation ID
@@ -154,9 +154,11 @@ class ChatScreenViewModel(
     private val _deviceOnlineStatus = MutableStateFlow(false)
     val deviceOnlineStatus: StateFlow<Boolean> = _deviceOnlineStatus.asStateFlow()
 
+    // this holds the mac value and lets us observer know when it changes
     private val _linkedBtMac = MutableStateFlow<String?>(null)
+    // now we turn the mutable version into a readonly
     val linkedBtMac: StateFlow<String?> = _linkedBtMac.asStateFlow()
-
+    // updates the valuye inside the MutableStateFlow
     fun setLinkedBluetoothDevice(mac: String?) {
         _linkedBtMac.value = mac
     }
@@ -193,6 +195,13 @@ class ChatScreenViewModel(
                         "Message: id=${msg.id}, chat=${msg.chat}, content=${msg.content}, sender=${msg.sender}"
                     )
                 }
+            }
+
+            // add to track linked mac addresses
+            viewModelScope.launch {
+                val currentUser = userRepository.getUser(userUuid)
+                _linkedBtMac.value = currentUser?.macAddress
+                Log.d("ChatScreenViewModel", "Initialized linkedBtMac: ${_linkedBtMac.value}")
             }
 
             //determine which flow to collect from
@@ -329,6 +338,7 @@ class ChatScreenViewModel(
                         address = userEntity.address,
                         macAddress = macAddress
                     )
+                    _linkedBtMac.value = macAddress // <-- store the macaddress to track it
                     Log.d(
                         "ChatScreenViewModel",
                         "Linked Bluetooth device $macAddress to user $userUuid"
@@ -353,6 +363,30 @@ class ChatScreenViewModel(
         }
     }
 
+// unlink a bluetooth device
+    fun unlinkDevice() {
+        viewModelScope.launch {
+            try {
+                val currentUser = userRepository.getUser(userUuid)
+                if (currentUser != null) {
+                    userRepository.insertOrUpdateUser(
+                        uuid = currentUser.uuid,
+                        name = currentUser.name,
+                        address = currentUser.address,
+                        macAddress = null
+                    )
+
+                    _linkedBtMac.value = null // <-- null out the linked mac address
+
+                    Log.d("ChatScreenViewModel", "Device unlinked")
+                    _uiState.update { it.copy(offlineWarning = null) }
+                }
+            } catch (e: Exception) {
+                Log.e("ChatScreenViewModel", "Failed to unlink", e)
+            }
+        }
+    }
+
     /*
  * This is the Bluetooth equivalent of sendChatMessage() in ChatScreenViewModel
  *
@@ -364,24 +398,30 @@ class ChatScreenViewModel(
  */
     fun sendBluetoothChatMessage(message: String, file: URI?) {
         val sendTime = System.currentTimeMillis()
-        // TO DO: Implement a mechanism to make sure there is a valid BT device
-        //         before launching a coroutine
+
+        if (_linkedBtMac.value == null) {
+            return // don't launch the coroutine
+        }
 
         viewModelScope.launch {
             // current user is the most recent version of the remote device
-            val currentUser = GlobalApp.GlobalUserRepo.userRepository.getUser(userUuid)
+            // verify the stateflow device with the device in the database
+            val currentUser = userRepository.getUser(userUuid)
+            val verifiedMac = currentUser?.macAddress
 
-            // this will make sure a device is linked
-            if (currentUser?.macAddress == null) {
-                Log.w("ChatScreenViewModel", "No linked Bluetooth device selected")
-                _uiState.update { prev ->
-                    prev.copy(offlineWarning = "No Bluetooth device selected. Pick a device first.")
-                }
+            if (verifiedMac != _linkedBtMac.value) {
+                Log.w("ChatScreenViewModel", "MAC mismatch detected, re-syncing")
+                _linkedBtMac.value = verifiedMac
+            }
+
+            // final verification before sending
+            if (verifiedMac == null) {
+                Log.w("ChatScreenViewModel", "Verified: No device linked")
                 return@launch
             }
 
             // added logs for debugging
-            val linkedMacAddress = currentUser.macAddress
+            val linkedMacAddress = verifiedMac
             Log.d("ChatScreenViewModel", "Sending Bluetooth message to MAC: $linkedMacAddress")
 
             // Step 2: Create message entity (same as Wi-Fi)
