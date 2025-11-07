@@ -360,9 +360,11 @@ fun ChatScreen(
                     if (btOnly) {
                         // Send via Bluetooth
                         viewModel.sendBluetoothChatMessage(message, null)
+                        Log.d("ChatScreen", "Chat Message - Bluetooth Path")
                     } else {
                         // Send via WiFi
                         viewModel.sendChatMessage(virtualAddress, message, null)
+                        Log.d("ChatScreen", "Chat Message - Wi-Fi Path")
                     }
                     textMessage = ""
                 }

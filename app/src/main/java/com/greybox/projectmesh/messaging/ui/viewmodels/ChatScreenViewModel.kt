@@ -65,33 +65,34 @@ class ChatScreenViewModel(
 
     private val isOfflineMode = ipStr == "0.0.0.0"
 
-    //Get User info
     private val userEntity = runBlocking {
         if (isOfflineMode && passedConversationId != null) {
-            // Extract UUID from conversation ID and load by UUID
-            val uuids = passedConversationId.split("-")
-            val remoteUuid = uuids.find { it != localUuid }
-            remoteUuid?.let {
-                GlobalApp.GlobalUserRepo.userRepository.getUser(it)
-            }
+            val remoteUuid = passedConversationId
+                .removePrefix("$localUuid-")  // Try removing local UUID from start
+                .removeSuffix("-$localUuid")  // Try removing local UUID from end
+
+            GlobalApp.GlobalUserRepo.userRepository.getUser(remoteUuid)
         } else {
             GlobalApp.GlobalUserRepo.userRepository.getUserByIp(ipStr)
         }
     }
 
+
+
     // Use the retrieved user name (fallback to "Unknown" if no user is found)
     private val deviceName = userEntity?.name ?: "Unknown"
 
 
+
     private val userUuid: String = when {
         isOfflineMode && passedConversationId != null -> {
-            // Extract from conversation ID
-            val uuids = passedConversationId.split("-")
-            uuids.find { it != localUuid } ?: "unknown"
+            passedConversationId
+                .removePrefix("$localUuid-")
+                .removeSuffix("-$localUuid")
         }
-
         TestDeviceService.isOnlineTestDevice(virtualAddress) -> "test-device-uuid"
-        ipStr == TestDeviceService.TEST_DEVICE_IP_OFFLINE -> "offline-test-device-uuid"
+        ipStr == TestDeviceService.TEST_DEVICE_IP_OFFLINE ||
+                userEntity?.name == TestDeviceService.TEST_DEVICE_NAME_OFFLINE -> "offline-test-device-uuid"
         else -> userEntity?.uuid ?: "unknown-${virtualAddress.hostAddress}"
     }
 
@@ -197,7 +198,16 @@ class ChatScreenViewModel(
             // add to track linked mac addresses in stateflow and database
             viewModelScope.launch {
                 val currentUser = userRepository.getUser(userUuid)
-                _linkedBtMac.value = currentUser?.macAddress
+                Log.d("ChatScreenViewModel", "Current user uuid: $userUuid")
+
+                // Filter out the placeholder MAC address
+                val macAddress = currentUser?.macAddress
+                _linkedBtMac.value = if (macAddress == "AA:BB:CC:DD:EE:FF" || macAddress.isNullOrEmpty()) {
+                    null
+                } else {
+                    macAddress
+                }
+
                 Log.d("ChatScreenViewModel", "Initialized linkedBtMac: ${_linkedBtMac.value}")
             }
 
@@ -323,53 +333,94 @@ class ChatScreenViewModel(
         }
     }
 
-    // BLUETOOTH LINKING
     fun linkBluetoothDevice(macAddress: String) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
+                Log.d("ChatScreenViewModel", "=== BLUETOOTH LINKING DEBUG ===")
+                Log.d("ChatScreenViewModel", "MAC Address: $macAddress")
+                Log.d("ChatScreenViewModel", "Local UUID: $localUuid")
+                Log.d("ChatScreenViewModel", "Remote User UUID: $userUuid")
+                Log.d("ChatScreenViewModel", "Conversation ID: $conversationId")
 
-                if (userEntity  != null) {
-                    // Update the user with the MAC address in the database
-                    GlobalApp.GlobalUserRepo.userRepository.insertOrUpdateUser(
-                        uuid = userUuid,
-                        name = userEntity.name,
-                        address = userEntity.address,
-                        macAddress = macAddress
-                    )
-                    _linkedBtMac.value = macAddress // <-- store the macaddress to track it
-                    Log.d(
-                        "ChatScreenViewModel",
-                        "Linked Bluetooth device $macAddress to user $userUuid"
-                    )
+                // STEP 1: Check if this MAC is already linked to another user
+                val allUsers = userRepository.getAllUsers()
+                val userWithThisMac = allUsers.find { user ->
+                    user.macAddress == macAddress &&
+                            user.uuid != userUuid &&
+                            user.macAddress != "AA:BB:CC:DD:EE:FF" // Ignore placeholder
+                }
 
-                    val updatedUser = GlobalApp.GlobalUserRepo.userRepository.getUser(userUuid)
-                    Log.d(
-                        "ChatScreenViewModel",
-                        "Verified MAC in database: ${updatedUser?.macAddress}"
-                    )
+                if (userWithThisMac != null) {
+                    Log.w("ChatScreenViewModel", "MAC $macAddress is already linked to ${userWithThisMac.name} (${userWithThisMac.uuid})")
+                    Log.d("ChatScreenViewModel", "Unlinking from previous user...")
 
-                } else {
-                    Log.w(
-                        "ChatScreenViewModel",
-                        "Cannot link Bluetooth device - userEntity is null"
+                    // Unlink from the previous user
+                    userRepository.insertOrUpdateUser(
+                        uuid = userWithThisMac.uuid,
+                        name = userWithThisMac.name,
+                        address = userWithThisMac.address,
+                        macAddress = "AA:BB:CC:DD:EE:FF" // Use placeholder to unlink
                     )
                 }
+
+                // STEP 2: Check if current user exists
+                val currentUser = userRepository.getUser(userUuid)
+                Log.d("ChatScreenViewModel", "User lookup result: ${currentUser?.name ?: "NULL"}")
+
+                if (currentUser == null) {
+                    Log.e("ChatScreenViewModel", "Cannot link - user $userUuid not found")
+
+                    Log.d("ChatScreenViewModel", "All users in database:")
+                    allUsers.forEach { user ->
+                        Log.d("ChatScreenViewModel", "  - UUID: ${user.uuid}, Name: ${user.name}, MAC: ${user.macAddress}")
+                    }
+
+                    withContext(Dispatchers.Main) {
+                        _uiState.update { it.copy(
+                            offlineWarning = "Cannot link: User not found in database"
+                        )}
+                    }
+                    return@launch
+                }
+
+                // STEP 3: Link the MAC to the current user
+                userRepository.insertOrUpdateUser(
+                    uuid = currentUser.uuid,
+                    name = currentUser.name,
+                    address = currentUser.address,
+                    macAddress = macAddress
+                )
+
+                withContext(Dispatchers.Main) {
+                    _linkedBtMac.value = macAddress
+                }
+
+                Log.d("ChatScreenViewModel", "Successfully linked $macAddress to ${currentUser.name} ($userUuid)")
+
+                // Verify it was saved
+                val updatedUser = userRepository.getUser(userUuid)
+                Log.d("ChatScreenViewModel", "Verified MAC in database: ${updatedUser?.macAddress}")
+
             } catch (e: Exception) {
                 Log.e("ChatScreenViewModel", "Error linking Bluetooth device", e)
+                withContext(Dispatchers.Main) {
+                    _uiState.update { it.copy(
+                        offlineWarning = "Error linking device: ${e.message}"
+                    )}
+                }
             }
         }
     }
-
 // unlink a bluetooth device
     fun unlinkDevice() {
         viewModelScope.launch {
             try {
-
-                if (userEntity!= null) {
+                val currentUser = userRepository.getUser(userUuid)
+                if (currentUser  != null) {
                     userRepository.insertOrUpdateUser(
-                        uuid = userEntity.uuid,
-                        name = userEntity.name,
-                        address = userEntity.address,
+                        uuid = currentUser.uuid,
+                        name = currentUser.name,
+                        address = currentUser.address,
                         macAddress = "AA:BB:CC:DD:EE:FF"  // <-- pass in a placeholder address
                     )
 
