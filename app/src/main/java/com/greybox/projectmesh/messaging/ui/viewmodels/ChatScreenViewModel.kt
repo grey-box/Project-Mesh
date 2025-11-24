@@ -352,15 +352,13 @@ class ChatScreenViewModel(
 
                 if (userWithThisMac != null) {
                     Log.w("ChatScreenViewModel", "MAC $macAddress is already linked to ${userWithThisMac.name} (${userWithThisMac.uuid})")
-                    Log.d("ChatScreenViewModel", "Unlinking from previous user...")
+                    Log.w("ChatScreenViewModel", "Cannot link - device already in use")
 
-                    // Unlink from the previous user
-                    userRepository.insertOrUpdateUser(
-                        uuid = userWithThisMac.uuid,
-                        name = userWithThisMac.name,
-                        address = userWithThisMac.address,
-                        macAddress = "AA:BB:CC:DD:EE:FF" // Use placeholder to unlink
-                    )
+                    // CHANGED: Don't unlink, just show error and return
+                    withContext(Dispatchers.Main) {
+                        Log.e("ChatScreenViewModel", "This device is already linked to ${userWithThisMac.name}. Please unlink it first.")
+                    }
+                    return@launch
                 }
 
                 // STEP 2: Check if current user exists
@@ -376,9 +374,7 @@ class ChatScreenViewModel(
                     }
 
                     withContext(Dispatchers.Main) {
-                        _uiState.update { it.copy(
-                            offlineWarning = "Cannot link: User not found in database"
-                        )}
+                        Log.e("ChatScreenViewModel", "User not found.")
                     }
                     return@launch
                 }
