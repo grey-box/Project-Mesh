@@ -60,3 +60,5 @@ kotlin-ide/
 .kotlin/
 .teamcity
 .idea/
+.aider*
+.env
