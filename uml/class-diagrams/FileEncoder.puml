@@ -1,0 +1,45 @@
+@startuml FileEncoder
+
+package "com.greybox.projectmesh.messaging.data.entities" {
+
+    class FileEncoder {
+
+        + encodebase64(ctxt: Context, inputuri: Uri): String
+        + encodeBytesBase64(bytes: ByteArray): String
+        + decodeBase64(inputbase64: String, output: File): File
+        + sendImage(imageURI: Uri, tgtaddress: InetAddress, tgtport: Int, appctxt: Context): Boolean
+    }
+}
+
+package "android.content" {
+    class Context
+}
+
+package "android.net" {
+    class Uri
+}
+
+package "java.io" {
+    class File
+}
+
+package "java.net" {
+    class InetAddress
+}
+
+FileEncoder --> Context
+FileEncoder --> Uri
+FileEncoder --> File
+FileEncoder --> InetAddress
+
+note right of FileEncoder
+    - Encodes file content to Base64
+    - Decodes Base64 back into a File
+    - Sends image data over HTTP
+    - Used by FileEncoderTest to verify:
+        * correct Base64 encoding
+        * null handling
+        * file overwrite behavior
+end note
+
+@enduml
