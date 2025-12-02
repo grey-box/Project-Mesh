@@ -1,0 +1,24 @@
+@startuml ListExtension
+
+package "kotlin.collections" {
+    interface List {
+        + indexOfFirst(predicate): Int
+        + toMutableList(): MutableList
+    }
+
+    interface MutableList extends List {
+        + set(index: Int, value)
+        + toList(): List
+    }
+}
+
+package "com.greybox.projectmesh.extension" {
+    class ListExtension {
+        <<extension>>
+        + updateItem(condition, function): List
+    }
+}
+
+ListExtension ..> List : extends functionality
+
+@enduml
