@@ -90,6 +90,9 @@ import kotlinx.coroutines.launch
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
 import com.greybox.projectmesh.views.LogScreen
+import com.greybox.projectmesh.mainscreen.MainViewModel
+import com.greybox.projectmesh.mainscreen.MeshUiState
+import com.greybox.projectmesh.mainscreen.MeshUiEvent
 
 
 import com.greybox.projectmesh.views.RequestPermissionsScreen
@@ -112,47 +115,35 @@ class MainActivity : ComponentActivity(), DIAware {
         TestDeviceService.initialize()
         Log.d("MainActivity", "Test device initialized")
         setContent {
-            val meshPrefs = getSharedPreferences("project_mesh_prefs", MODE_PRIVATE)
-            var hasRunBefore by rememberSaveable {
-                mutableStateOf(meshPrefs.getBoolean("hasRunBefore", false))
-            }
-            // Check if the app was launched from a notification
-            val launchedFromNotification = intent?.getBooleanExtra("from_notification", false) ?: false
-            // Request all permission in order
-            RequestPermissionsScreen(skipPermissions = launchedFromNotification)
-            var appTheme by remember {
-                mutableStateOf(AppTheme.valueOf(
-                    settingPref.getString("app_theme", AppTheme.SYSTEM.name) ?:
-                    AppTheme.SYSTEM.name))
-            }
-            var languageCode by remember {
-                mutableStateOf(settingPref.getString(
-                    "language", "en") ?: "en")
-            }
-            var restartServerKey by remember {mutableStateOf(0)}
-            var deviceName by remember {
-                mutableStateOf(settingPref.getString("device_name", Build.MODEL) ?: Build.MODEL)
-            }
-
-            var autoFinish by remember {
-                mutableStateOf(settingPref.getBoolean("auto_finish", false))
-            }
-
-            var saveToFolder by remember {
-                mutableStateOf(
-                    settingPref.getString("save_to_folder", null)
-                        ?: "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh"
+            // Get MainViewModel (this holds all screen state)
+            val mainViewModel: MainViewModel = viewModel(
+                factory = ViewModelFactory(
+                    di = localDI(),
+                    owner = LocalSavedStateRegistryOwner.current,
+                    defaultArgs = null,
+                    vmFactory = { di, _ -> MainViewModel(di) }
                 )
-            }
+            )
 
-            // State to trigger recomposition when locale changes
+// Observe state from ViewModel
+            val uiState by mainViewModel.uiState.collectAsState()
+
+// Use state from ViewModel instead of local state
+            val hasRunBefore = uiState.hasRunBefore
+            val currentScreen = uiState.currentScreen
+            val deviceName = uiState.deviceName
+            val appTheme = uiState.appTheme
+            val languageCode = uiState.languageCode
+            val autoFinish = uiState.autoFinish
+            val saveToFolder = uiState.saveToFolder
+
+            val meshPrefs = getSharedPreferences("project_mesh_prefs", MODE_PRIVATE)
+            var restartServerKey by remember { mutableStateOf(0) }
             var localeState by rememberSaveable { mutableStateOf(Locale.getDefault()) }
 
-            // Remember the current screen across recompositions
-            var currentScreen by rememberSaveable { mutableStateOf(BottomNavItem.Home.route) }
             LaunchedEffect(intent?.getStringExtra("navigateTo")) {
-                if (intent?.getStringExtra("navigateTo") == BottomNavItem.Receive.route) {
-                    currentScreen = BottomNavItem.Receive.route
+                if (intent?.getStringExtra("navigateTo") == BottomNavItem.Receive.route){
+                    mainViewModel.onEvent(MeshUiEvent.NavigateToScreen(BottomNavItem.Receive.route))  // ✅ CORRECT
                 }
             }
 
@@ -166,11 +157,11 @@ class MainActivity : ComponentActivity(), DIAware {
                         InetAddress.getByName(ip)
                         // If that succeeds, navigate to chat screen with this IP
                         val route = "chatScreen/$ip"
-                        currentScreen = route
+                        mainViewModel.onEvent(MeshUiEvent.NavigateToScreen(route))
                     } catch (e: Exception) {
                         Log.e("MainActivity", "Invalid IP address in intent: $ip", e)
                         // Fall back to home screen
-                        currentScreen = BottomNavItem.Home.route
+                        mainViewModel.onEvent(MeshUiEvent.NavigateToScreen(BottomNavItem.Home.route))
                     }
                 }
             } else if (action == "OPEN_CHAT_CONVERSATION") {
@@ -178,7 +169,7 @@ class MainActivity : ComponentActivity(), DIAware {
                 if (conversationId != null) {
                     // Navigate to chat screen with this conversation ID
                     val route = "chatScreen/$conversationId"
-                    currentScreen = route
+                    mainViewModel.onEvent(MeshUiEvent.NavigateToScreen(route))
                 }
             }
 
@@ -193,26 +184,26 @@ class MainActivity : ComponentActivity(), DIAware {
                 localeState = updateLocale(languageCode)
             }
             key(localeState) {
-                ProjectMeshTheme(appTheme = appTheme) {
+                ProjectMeshTheme(appTheme = AppTheme.valueOf(appTheme)) {
                     if (!hasRunBefore) {
                         OnboardingScreen(
-                            onComplete = {meshPrefs.edit().putBoolean("hasRunBefore", true).apply()
-                                hasRunBefore = true }
+                            onComplete = {mainViewModel.onEvent(MeshUiEvent.CompleteOnboarding)
+                            }
                         )
                     }
                     else{
                         BottomNavApp(
                             di,
                             startDestination = currentScreen,
-                            onThemeChange = { selectedTheme -> appTheme = selectedTheme},
-                            onLanguageChange = { selectedLanguage ->  languageCode = selectedLanguage},
+                            onThemeChange = { selectedTheme -> mainViewModel.onEvent(MeshUiEvent.UpdateTheme(selectedTheme.name)) },
+                            onLanguageChange = { selectedLanguage ->  mainViewModel.onEvent(MeshUiEvent.UpdateLanguage(selectedLanguage)) },
                             onNavigateToScreen = {screen ->
-                                currentScreen = screen },
+                                mainViewModel.onEvent(MeshUiEvent.NavigateToScreen(screen)) },
                             onRestartServer = {restartServerKey++},
-                            onDeviceNameChange = {deviceName = it},
+                            onDeviceNameChange = {newName -> mainViewModel.onEvent(MeshUiEvent.UpdateDeviceName(newName)) },
                             deviceName = deviceName,
-                            onAutoFinishChange = {autoFinish = it},
-                            onSaveToFolderChange = {saveToFolder = it}
+                            onAutoFinishChange = { autoFinishValue -> settingPref.edit().putBoolean("auto_finish", autoFinishValue).apply() },
+                                onSaveToFolderChange = {saveToFolder -> settingPref.edit().putString("save_to_folder", saveToFolder).apply() }
                         )
                     }
                 }
