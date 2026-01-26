@@ -27,6 +27,7 @@ The CI pipeline behaves as follows:
   - onsider whether to delete reports files after use
   - add setting on manual run whether to commit anything/deploy to pages
 - replace build-artifacts setup gradle with coverage setup gradle
+- Prevent any non-main commits from showing in the Pages preview, but build in a system to view the webpage from any commit iteration and branch.
 
 ### Backlog
 
