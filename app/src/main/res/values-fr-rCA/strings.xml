@@ -60,4 +60,5 @@
     <string name="concurrency">Concurrence STA/AP</string>
     <string name="manual_test">Test manuel</string>
     <string name="reset">Réinitialiser</string>
+    <string name="log">Registre</string>
 </resources>

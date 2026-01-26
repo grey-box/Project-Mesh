@@ -34,6 +34,9 @@ The CI pipeline behaves as follows:
 - Integrate with Dokka
 - Test auto UML diagramming
 - Break workflows out into multiple intelligently-grouped jobs for improved execution visibility
+- Add graceful error handling if specific preview reports cannot be generated
+- Add graceful error handling to note that coverage reporting can only be generated on PRs and pushes, not workflow dispatches
+- Research if it's possible to ask to run workflows on any push
 
 ---
 
@@ -42,3 +45,4 @@ The CI pipeline behaves as follows:
 - Update Super-Linter reusable workflow to point locally instead of to Thalia Wood's (polygeist111) copy
 - Update any GitHub pages links in workflow doc to point to correct GB Page
 - Petition Chris to configure GitHub pages on the repo
+- Petition Chris to configure GitHub Dependency Graph on the repo
