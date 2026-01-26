@@ -129,7 +129,7 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "(Changed File Coverage is currently bugged, disregard)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Full coverage report can be viewed at https://html-preview.github.io/?url=https://github.com/polygeist111/Project-Mesh/blob/main/build_reports/coverage_report/index.html" >> $GITHUB_STEP_SUMMARY
+          echo "Full coverage report can be viewed at <TO BE UPDATED>" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
