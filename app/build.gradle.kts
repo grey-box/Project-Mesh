@@ -85,7 +85,19 @@ dependencies {
     implementation(libs.androidx.activity)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.android)
+
     testImplementation(libs.junit)
+
+    // ===============================
+    // Unit testing (JVM) deps added
+    // ===============================
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+    testImplementation("io.mockk:mockk:1.13.12")
+    testImplementation("org.robolectric:robolectric:4.12.2")
+    testImplementation("androidx.test:core:1.6.1")
+    testImplementation("app.cash.turbine:turbine:1.1.0")
+
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -147,4 +159,3 @@ dependencies {
     // For JSON serialisation
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 }
-
