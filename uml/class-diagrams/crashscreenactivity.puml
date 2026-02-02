@@ -1,0 +1,83 @@
+@startuml
+title CrashScreenActivity – Structure + Test Coverage (class diagram only)
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+' ---- Coverage color scheme (same as other diagrams) ----
+skinparam class {
+  BackgroundColor<<JVM_TESTED>> #E9FBE9
+  BorderColor<<JVM_TESTED>>     #2E7D32
+  BackgroundColor<<INSTRUMENTED_TESTED>> #FFF3E0
+  BorderColor<<INSTRUMENTED_TESTED>>     #E65100
+}
+
+package "com.greybox.projectmesh.debug" as DBG {
+
+  ' Activity is UI + Android runtime → will be instrumented later
+  class CrashScreenActivity <<INSTRUMENTED_TESTED>> {
+    + onCreate(savedInstanceState: Bundle?)
+    + Crash() <<Composable>>
+  }
+}
+
+' ===== External Android / Compose pieces (simplified) =====
+package "AndroidX / Android / Compose" as EXT {
+  class AppCompatActivity
+  class Bundle
+  class Intent
+  class Color
+  class Modifier
+  class Column
+  class Text
+  class ComposeButton
+}
+
+' Other project dependency
+class CrashHandler
+
+' ===== Relationships =====
+AppCompatActivity <|-- CrashScreenActivity
+CrashScreenActivity ..> Bundle
+CrashScreenActivity ..> CrashHandler
+CrashScreenActivity ..> Color
+CrashScreenActivity ..> Modifier
+CrashScreenActivity ..> Column
+CrashScreenActivity ..> Text
+CrashScreenActivity ..> ComposeButton
+
+note right of CrashScreenActivity
+RUNTIME BEHAVIOR (instrumented later):
+• onCreate() calls setContent { Crash() }
+• Crash() composable:
+   - Shows "Crash! Please screenshot..." text
+   - Shows "Exit app" Button that calls finish()
+   - Uses CrashHandler.getThrowableFromIntent(intent)
+     and displays:
+       - Throwable.message
+       - stackTraceToString()
+
+JVM TESTS (CrashScreenActivityTest):
+• Do NOT instantiate the Activity or Compose UI.
+• Only verify the contract this Activity relies on:
+   - CrashHandler.getThrowableFromIntent(Intent):
+       - returns Throwable when JSON is valid
+       - returns null when JSON is invalid or missing
+
+Net effect:
+• CrashScreenActivity UI itself is NOT JVM-tested.
+• Its dependency contract with CrashHandler is covered
+  by JVM tests; UI & lifecycle will be covered by
+  future instrumented tests.
+end note
+
+legend left
+|= Color |= Meaning |
+|<#E9FBE9>| Covered DIRECTLY by JVM unit tests |
+|<#FFF3E0>| Intended for instrumented tests (Android runtime) |
+|default  | Currently untested |
+endlegend
+
+@enduml

@@ -1,0 +1,177 @@
+@startuml
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+
+title "Spotlight – MVVM Architecture (EventsCse355)"
+
+' ==========================
+' VIEW LAYER
+' ==========================
+package "Views" {
+    class ContentView <<View>> {
+        +TabView
+        +HomeView
+        +EventsListView
+        +EventsMapView
+    }
+
+    class HomeView <<View>> {
+        @EnvironmentObject EventsViewModel
+        @AppStorage city + theme
+    }
+
+    class EventsListView <<View>> {
+        @EnvironmentObject EventsViewModel
+    }
+
+    class EventsMapView <<View>> {
+        @EnvironmentObject EventsViewModel
+    }
+
+    class EventsDetailView <<View>> {
+        let event: TMEvent
+        +toggleInterested()
+    }
+
+    class CityPickerView <<View>>
+    class SettingsSheet <<View>>
+}
+
+' ==========================
+' VIEWMODEL LAYER
+' ==========================
+package "ViewModels" {
+    class EventsViewModel <<ViewModel>> {
+        +age: Int
+        +role: UserRole
+        +radiusMiles: Double
+        +center: CLLocationCoordinate2D
+        +events: [TMEvent]
+        +eventTypes: [String]
+        +selectedTypes: Set<String>
+        +groupedEvents: [EventGroup]
+        +mapRegion: MKCoordinateRegion
+        +mapAnnotations: [TMEvent]
+        --
+        +fetchEvents()
+        +toggleType(_:)
+        +updateCenter(to:)
+    }
+
+    class EventGroup {
+        +id: String
+        +name: String
+        +venueName: String?
+        +city: String?
+        +dates: [String]
+        +representative: TMEvent
+    }
+}
+
+' ==========================
+' MODEL LAYER
+' ==========================
+package "Models" {
+    class TMEvent {
+        +id: String
+        +name: String
+        +dateText: String?
+        +timeText: String?
+        +venueName: String?
+        +city: String?
+        +url: String?
+        +coordinate: CLLocationCoordinate2D?
+        +typeName: String?
+        +imageUrls: [String]
+        +detailDescription: String?
+        +additionalInfo: String?
+        --
+        +from(apiEvent:)
+    }
+
+    class InterestedEvent <<SwiftDataModel>> {
+        +id: String
+        +name: String
+        +venueName: String?
+        +city: String?
+        +dateText: String?
+        +url: String?
+        --
+        +init(from: TMEvent)
+    }
+
+    class UserRole <<enum>> {
+        +student
+        +teacher
+        +softwareEngineer
+        +researcher
+        +doctor
+        +parent
+        +retiree
+        +other
+        +displayName: String
+    }
+
+    class CityLocation {
+        +id: String
+        +displayName: String
+        +coordinate: CLLocationCoordinate2D
+    }
+
+    class CityDirectory {
+        +all: [CityLocation]
+        +defaultCity: CityLocation
+        +city(withID:): CityLocation?
+    }
+}
+
+' ==========================
+' SERVICES / EXTERNAL
+' ==========================
+package "Services" {
+    class TicketmasterService {
+        +fetchEventsRaw(center:radiusMiles:segmentName:includeFamily:size:): [TMEvent]
+    }
+
+    class LocationManager {
+        +requestLocation()
+        +lastKnownLocation: CLLocationCoordinate2D?
+    }
+}
+
+class TicketmasterAPI <<external>>
+class SwiftDataStore <<storage>>
+
+' ==========================
+' RELATIONSHIPS
+' ==========================
+
+' View → ViewModel
+ContentView --> HomeView
+ContentView --> EventsListView
+ContentView --> EventsMapView
+
+HomeView ..> EventsViewModel : @EnvironmentObject
+EventsListView ..> EventsViewModel : @EnvironmentObject
+EventsMapView ..> EventsViewModel : @EnvironmentObject
+
+EventsDetailView ..> TMEvent
+EventsDetailView ..> InterestedEvent : create/delete
+
+CityPickerView ..> CityDirectory
+SettingsSheet ..> CityDirectory
+
+' ViewModel → Model / Service
+EventsViewModel --> TicketmasterService : uses
+EventsViewModel ..> TMEvent
+EventsViewModel ..> EventGroup
+EventsViewModel ..> UserRole
+EventsViewModel ..> CityDirectory
+EventsViewModel ..> LocationManager
+
+TicketmasterService --> TicketmasterAPI : HTTP calls
+InterestedEvent --> SwiftDataStore : persisted in
+
+@enduml

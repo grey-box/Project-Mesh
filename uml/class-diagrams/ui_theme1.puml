@@ -1,0 +1,85 @@
+@startuml
+title Theme Layer (Color.kt + Theme.kt + Type.kt) • Structure + JVM Test Coverage
+
+skinparam packageStyle rectangle
+skinparam classAttributeIconSize 0
+skinparam shadowing false
+skinparam linetype ortho
+
+skinparam class {
+  BackgroundColor<<FILE>> #E0F7FA
+  BorderColor<<FILE>> #00838F
+
+  BackgroundColor<<JVM_TESTED>> #FFF3E0
+  BorderColor<<JVM_TESTED>> #EF6C00
+}
+
+' ===============================
+' PACKAGES / FILE SEPARATION
+' ===============================
+
+package "com.greybox.projectmesh.ui.theme\n(Color.kt)" <<FILE>> {
+
+  class ColorConstants {
+    +Purple80: Color
+    +PurpleGrey80: Color
+    +Pink80: Color
+    +Purple40: Color
+    +PurpleGrey40: Color
+    +Pink40: Color
+  }
+}
+
+package "com.greybox.projectmesh.ui.theme\n(Theme.kt)" <<FILE>> {
+
+  enum AppTheme {
+    SYSTEM
+    LIGHT
+    DARK
+  }
+
+  class ProjectMeshTheme <<Composables (androidTest)>> {
+    +invoke(appTheme: AppTheme, content: Composable)
+  }
+}
+
+package "com.greybox.projectmesh.ui.theme\n(Type.kt)" <<FILE>> {
+
+  class TypographySet {
+    +bodyLarge: TextStyle
+  }
+}
+
+' ===============================
+' TEST FILE (JVM ONLY)
+' ===============================
+
+package "ThemeLayerTest.kt\n(JVM Unit Test)" <<JVM_TESTED>> {
+
+  class ThemeLayerTest {
+    +colors_haveExpectedArgbValues()
+    +appTheme_containsExpectedValuesInOrder()
+    +typography_bodyLarge_hasExpectedDefaults()
+  }
+}
+
+' ===============================
+' RELATIONSHIPS
+' ===============================
+
+ThemeLayerTest ..> ColorConstants : verifies ARGB\nvalues
+ThemeLayerTest ..> AppTheme : verifies enum\norder + names
+ThemeLayerTest ..> TypographySet : verifies\nbodyLarge style
+
+' Composable not JVM testable
+ProjectMeshTheme -[dotted]-> ColorConstants : uses
+ProjectMeshTheme -[dotted]-> TypographySet : uses
+
+note bottom
+Legend:
+  - Blue boxes = Source files (Color.kt, Theme.kt, Type.kt)
+  - Orange boxes = JVM tests (ThemeLayerTest.kt)
+  - Dotted links = Not testable on JVM (requires instrumented tests)
+end note
+
+@enduml

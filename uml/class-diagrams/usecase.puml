@@ -1,0 +1,62 @@
+@startuml
+title "Spotlight – Use Case Diagram"
+
+left to right direction
+skinparam shadowing false
+
+actor "User" as U
+actor "Ticketmaster API" as TM
+actor "Apple Location\nServices" as LOC
+actor "SwiftData Storage" as SD
+
+rectangle "Spotlight App" {
+
+    (Launch app) as UC_LAUNCH
+    (Select / change city) as UC_CITY
+    (Set age, role,\nsearch radius) as UC_PREFS
+    (Toggle light / dark theme) as UC_THEME
+
+    (Fetch recommended\nevents) as UC_FETCH
+    (Browse events list) as UC_LIST
+    (Filter by event types) as UC_FILTER
+    (View event on map) as UC_MAP
+
+    (View event details) as UC_DETAIL
+    (Mark / unmark event\nas Interested) as UC_INTEREST
+    (Open event in browser\n\"Book Your Tickets\") as UC_BOOK
+
+}
+
+' ----- User interactions -----
+U --> UC_LAUNCH
+U --> UC_CITY
+U --> UC_PREFS
+U --> UC_THEME
+
+U --> UC_FETCH
+U --> UC_LIST
+U --> UC_FILTER
+U --> UC_MAP
+
+U --> UC_DETAIL
+U --> UC_INTEREST
+U --> UC_BOOK
+
+' ----- Includes / relationships inside the system -----
+UC_LAUNCH --> UC_CITY : <<first launch>>
+UC_LAUNCH --> UC_PREFS : <<configure>>
+
+UC_FETCH .> UC_PREFS : <<uses>>
+UC_FETCH .> UC_CITY  : <<uses>>
+UC_LIST .> UC_FETCH  : <<depends on>>
+UC_MAP  .> UC_FETCH  : <<depends on>>
+
+UC_DETAIL .> UC_INTEREST : <<optionally>>
+UC_DETAIL .> UC_BOOK     : <<optionally>>
+
+' ----- External systems -----
+TM <-- UC_FETCH : REST API calls
+LOC <-- UC_CITY : get device\nlocation (optional)
+SD <-- UC_INTEREST : persist / remove\nInterestedEvent records
+
+@enduml
