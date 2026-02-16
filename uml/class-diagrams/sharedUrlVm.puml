@@ -1,0 +1,32 @@
+@startuml
+title SharedUriViewModel - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+package "com.greybox.projectmesh.viewModel" {
+
+  class SharedUriViewModel <<ViewModel>> {
+    -_uris: MutableStateFlow<List<Uri>>
+    +uris: StateFlow<List<Uri>>
+    --
+    +setUris(uriList: List<Uri>)
+  }
+
+  class Uri
+  class MutableStateFlow
+  class StateFlow
+}
+
+SharedUriViewModel ..> Uri
+SharedUriViewModel ..> MutableStateFlow
+SharedUriViewModel ..> StateFlow
+
+note right of SharedUriViewModel
+State:
+- uris starts as emptyList()
+- setUris replaces the list
+end note
+
+@enduml
