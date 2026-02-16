@@ -57,7 +57,9 @@ jobs:
         # if all tests pass, no report is generated, which errors the orchestrator. Generate a simple passing notification in the same location.
       - name: Insert Passing Report (only on test pass)
         if: steps.koverXmlReport.outcome == 'success'
-        run: echo "<h1>All tests pass! (or tests not found :/)</h1>" > ./app/build/reports/kover/html/index.html
+        run: |
+          mkdir ./app/build/reports/kover/html
+          echo "<h1>All tests pass! (or tests not found :/)</h1>" > ./app/build/reports/kover/html/index.html
 
       - name: Download Kover CLI (only on test failure)
         if: steps.koverXmlReport.outcome == 'failure'
