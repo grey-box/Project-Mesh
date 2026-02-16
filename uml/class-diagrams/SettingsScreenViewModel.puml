@@ -1,0 +1,34 @@
+@startuml
+package com.greybox.projectmesh.viewModel {
+  enum AppTheme {
+    SYSTEM
+    LIGHT
+    DARK
+  }
+
+  class SettingsScreenViewModel {
+    -settingPrefs: SharedPreferences
+    -_theme: MutableStateFlow<AppTheme>
+    -_lang: MutableStateFlow<String>
+    -_deviceName: MutableStateFlow<String>
+    -_autoFinish: MutableStateFlow<Boolean>
+    -_saveToFolder: MutableStateFlow<String>
+    +theme: StateFlow<AppTheme>
+    +lang: StateFlow<String>
+    +deviceName: StateFlow<String>
+    +autoFinish: StateFlow<Boolean>
+    +saveToFolder: StateFlow<String>
+    +saveTheme(theme: AppTheme)
+    +saveLang(languageCode: String)
+    +saveDeviceName(deviceName: String)
+    +saveAutoFinish(autoFinish: Boolean)
+    +saveSaveToFolder(saveToFolder: String)
+    +updateConcurrencySettings(concurrencyKnown: Boolean, concurrencySupported: Boolean)
+  }
+}
+
+SettingsScreenViewModel --> AppTheme : uses
+SettingsScreenViewModel --> SharedPreferences : reads/writes
+SettingsScreenViewModel --> MutableStateFlow : stores state
+SettingsScreenViewModel --> StateFlow : exposes state
+@enduml
