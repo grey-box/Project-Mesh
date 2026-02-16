@@ -69,8 +69,8 @@ jobs:
 
       - name: Add Coverage Report to PR
         # conditional for graceful handling of Kover limitations
-        if: ${{ github.event_name == "pull_request" || github.event_name == "push" }} 
         id: kover
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }} 
         uses: mi-kas/kover-report@v1
         with:
           path: ${{ github.workspace }}/app/build/reports/kover/report.xml
