@@ -54,6 +54,11 @@ jobs:
         run: ./gradlew koverXmlReport --continue
         continue-on-error: true
 
+        # if all tests pass, no report is generated, which errors the orchestrator. Generate a simple passing notification in the same location.
+      - name: Insert Passing Report (only on test pass)
+        if: steps.koverXmlReport.outcome == 'success'
+        run: echo "<h1>All tests pass! (or tests not found :/)</h1>" > ./app/build/reports/kover/html/index.html
+
       - name: Download Kover CLI (only on test failure)
         if: steps.koverXmlReport.outcome == 'failure'
         run: wget -O kover-cli.jar https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kover-cli/0.9.3/kover-cli-0.9.3.jar
@@ -67,7 +72,7 @@ jobs:
         if: steps.koverXmlReport.outcome == 'failure'
         run: java -jar kover-cli.jar report ./app/build/kover/bin-reports/testDebugUnitTest.ic --classfiles ./app/build/tmp/kotlin-classes --src ./app/src/main/java --html ./app/build/reports/kover/html/
 
-      - name: Add Coverage Report to PR
+      - name: Add Coverage Report to PR (if triggered via valid event)
         # conditional for graceful handling of Kover limitations
         id: kover
         if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }} 
