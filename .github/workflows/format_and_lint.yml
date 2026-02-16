@@ -49,8 +49,16 @@ jobs:
       - name: Call Debug and Release Linters
         # ostensibly, ./gradlew lint should run both, but in practice on my (Thalia Wood's), it only runs the Debug linter
         run: |
-          ./gradlew lintDebug
-          ./gradlew lintRelease
+          output1=$(./gradlew lintDebug)
+          output2=$(./gradlew lintRelease)
+          echo "$output1"
+          echo "---"
+          echo "$output2"
+          if (echo "$output1" | grep -q " Task :app:compileDebugKotlin\nw: file:") || (echo "$output2" | grep -q " Task :app:compileDebugKotlin\nw: file:"); then
+            echo "Linting warnings detected. View details at https://grey-box.github.io/Project-Mesh/ once the workflow is finished."
+            exit 1
+          fi
+        continue-on-error: true
 
       - name: Configure Git Identity (if called individually)
         if: ${{ inputs.skip_commit != true }}

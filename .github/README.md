@@ -2,9 +2,11 @@
 
 ---
 
-## NOTE
+## NOTES
 
-To run the orchestrator to test on branches outside of main, run ```gh workflow run reporting_orchestrator.yml  --ref feature/ras-cicd```, replacing "feature/ras-cicd" whichever branch you wish to run the workflow against.
+- To run the orchestrator to test on branches outside of main, run ```gh workflow run reporting_orchestrator.yml  --ref feature/ras-cicd```, replacing "feature/ras-cicd" whichever branch you wish to run the workflow against.
+- Super-Linter summary can only be added on pushes and PRs, not manual runs. Super-Linter is still running, you just need to dig into the workflow details to view useful results.
+
 ---
 
 ## Pipeline Flow
@@ -15,7 +17,7 @@ The CI pipeline behaves as follows:
    a. Do not use prettier-plugin-kotlin, it is not maintained and errors regularly
 2. On push, run super-linter. For all possible cases, run autofix (this covers Kotlin)
 
-- Needs updating
+- This Section Needs updating
 
 ---
 
@@ -24,9 +26,8 @@ The CI pipeline behaves as follows:
 ### Ongoing
 
 - For all workflows, add current build summary as commit/pr comments
-- Alter system to use GitHub Pages instead of github HTML preview. This will fix CSS on previews
-  - Add script to change iFrame title and onscreen title + pass/fail indicator
-- Add orchestrator workflow for all reporting tasks
+- Add script to preview to change iFrame title and onscreen title + pass/fail indicator
+- For orchestrator
   - determine how to allow multiple reusable workflows to share build cache
   - add link to super-linter actions output
   - onsider whether to delete reports files after use
@@ -42,3 +43,7 @@ The CI pipeline behaves as follows:
 - Add graceful error handling if specific preview reports cannot be generated
 - Add graceful error handling to note that coverage reporting can only be generated on PRs and pushes, not workflow dispatches
 - Research if it's possible to ask to run workflows on any push
+
+### Integration
+- add dokka
+- add uml to previewer
