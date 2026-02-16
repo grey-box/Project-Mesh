@@ -68,6 +68,8 @@ jobs:
         run: java -jar kover-cli.jar report ./app/build/kover/bin-reports/testDebugUnitTest.ic --classfiles ./app/build/tmp/kotlin-classes --src ./app/src/main/java --html ./app/build/reports/kover/html/
 
       - name: Add Coverage Report to PR
+        # conditional for graceful handling of Kover limitations
+        if: ${{ github.event_name == "pull_request" || github.event_name == "push" }} 
         id: kover
         uses: mi-kas/kover-report@v1
         with:
@@ -129,12 +131,10 @@ jobs:
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "(Changed File Coverage is currently bugged, disregard)" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-          echo "Full coverage report can be viewed at <TO BE UPDATED>" >> $GITHUB_STEP_SUMMARY
+          echo "Full coverage report can be viewed at https://grey-box.github.io/Project-Mesh/" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
-      # TODO: update coverage report link to point to GB
-      # configure Mesh for GitHub Pages (need to ask a higher-up)
 
       - name: Verify Test/Build Outcome
         if: steps.koverXmlReport.outcome == 'failure'
