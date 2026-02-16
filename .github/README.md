@@ -2,6 +2,11 @@
 
 ---
 
+## NOTE
+
+To run the orchestrator to test on branches outside of main, run ```gh workflow run reporting_orchestrator.yml  --ref feature/ras-cicd```, replacing "feature/ras-cicd" whichever branch you wish to run the workflow against.
+---
+
 ## Pipeline Flow
 
 The CI pipeline behaves as follows:
