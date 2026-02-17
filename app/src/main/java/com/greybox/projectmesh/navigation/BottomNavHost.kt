@@ -13,6 +13,13 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.greybox.projectmesh.R
 
+/**
+ * Represents a single item inside the bottom navigation bar.
+ *
+ * @param route The navigation route associated with this item.
+ * @param label The text label shown beneath the icon.
+ * @param icon The vector icon displayed for this item.
+ */
 data class NavigationItem(
     val route: String,
     val label: String,
@@ -20,6 +27,9 @@ data class NavigationItem(
 )
 
 //Preview is to show the bottom navigation bar in the preview and notice what it looks like
+/**
+ * Preview for displaying the bottom navigation bar inside the design tools.
+ */
 @Preview(showBackground = true)
 @Composable
 fun BottomNavigationBarPreview() {
@@ -27,6 +37,14 @@ fun BottomNavigationBarPreview() {
     BottomNavigationBar(navController = navController)
 }
 
+/**
+ * Displays the application's bottom navigation bar.
+ *
+ * Automatically highlights the currently selected destination and handles
+ * navigation state restoration and avoiding duplicate destinations.
+ *
+ * @param navController The controller used to perform navigation actions.
+ */
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val items = listOf(
@@ -66,7 +84,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                         launchSingleTop = true
                     }
                 },
-                
+
             )
         }
     }

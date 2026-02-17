@@ -38,10 +38,19 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withTimeoutOrNull
 import java.net.URI
 
+/**
+ * ViewModel for the Chat Screen.
+ *
+ * Responsible for managing chat messages, device status, and conversation information.
+ *
+ * @param di Dependency Injection container to provide required services and repositories.
+ * @param savedStateHandle Handles saved state, including virtualAddress and conversationId.
+ */
 class ChatScreenViewModel(
     di: DI,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
+
     private val virtualAddress: InetAddress = savedStateHandle.get<InetAddress>("virtualAddress")!!
 
     // _uiState will be updated whenever there is a change in the UI state
@@ -78,17 +87,14 @@ class ChatScreenViewModel(
     //Log.d("ChatDebug", "GOT CONVERSATION ID FROM SAVED STATE: $savedConversationId")
 
     private val conversationId = passedConversationId ?:
-    ConversationUtils.createConversationId(localUuid, userUuid)
+        ConversationUtils.createConversationId(localUuid, userUuid)
 
     private val chatName = savedConversationId ?: conversationId
     //Log.d("ChatDebug", "USING CHAT NAME: $chatName (saved: $savedConversationId, generated: $conversationId)")
 
-
-
     private val addressDotNotation = virtualAddress.requireAddressAsInt().addressToDotNotation()
 
     private val conversationRepository: ConversationRepository by di.instance()
-
 
     private val _uiState = MutableStateFlow(
         ChatScreenModel(
@@ -254,7 +260,13 @@ class ChatScreenViewModel(
         }
     }
 
-
+    /**
+     * Sends a chat message to a virtual device.
+     *
+     * @param virtualAddress IP address of the target device.
+     * @param message Message content as String.
+     * @param file Optional file attachment as [URI].
+     */
     fun sendChatMessage(
         virtualAddress: InetAddress,
         message: String,
@@ -341,7 +353,13 @@ class ChatScreenViewModel(
         }
     }
 
-    //handles outgoing file transfer to fix unresolved reference error crash
+    /**
+     * Adds an outgoing file transfer for a given device.
+     *
+     * @param fileUri [Uri] of the file to send.
+     * @param toAddress IP address of the target device.
+     * @return [OutgoingTransferInfo] containing details of the transfer.
+     */
     fun addOutgoingTransfer(fileUri: Uri, toAddress: InetAddress): OutgoingTransferInfo {
         return appServer.addOutgoingTransfer(fileUri, toAddress)
     }

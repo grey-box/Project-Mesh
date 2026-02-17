@@ -27,7 +27,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-// This is a pre-defined button with white background and black text
+/**
+ * A transparent button with white background and black text.
+ * Optional rounded corners and full-width by default.
+ */
 @Composable
 fun TransparentButton(
     onClick: () -> Unit,
@@ -38,35 +41,46 @@ fun TransparentButton(
     Button(
         onClick = onClick,
         colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White, // Background color
-            contentColor = Color.Black    // Text color
+            containerColor = Color.White, // White background
+            contentColor = Color.Black    // Black text
         ),
         border = BorderStroke(1.dp, Color.Black), // Black border
-        shape = RoundedCornerShape(8.dp), // Optional: Rounded corners
-        modifier = modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(8.dp), // Rounded corners
+        modifier = modifier.fillMaxWidth(), // Fill max width by default
         enabled = enabled
     ) {
         Text(text = text)
     }
 }
 
+/**
+ * A gradient button with press animation.
+ *
+ * @param text The label for the button.
+ * @param gradientColors Colors to use for horizontal gradient background.
+ * @param textColor Color of the text.
+ * @param maxWidth Maximum width of the button.
+ * @param onClick Action to perform when the button is clicked.
+ */
 @Composable
 fun GradientButton(
     text: String,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color> = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient colors
+    gradientColors: List<Color> = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient
     textColor: Color = Color.White,
     maxWidth: Dp = 120.dp,
     onClick: () -> Unit
 ) {
     var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down when pressed
+    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down on press
+
     LaunchedEffect(isPressed) {
         if (isPressed) {
-            delay(100) // Wait for 100 ms
+            delay(100) // Short delay to show pressed effect
             isPressed = false
         }
     }
+
     Box(
         modifier = modifier
             .scale(scale)
@@ -75,14 +89,14 @@ fun GradientButton(
                 brush = Brush.horizontalGradient(gradientColors),
                 shape = RoundedCornerShape(12.dp)
             )
-            .height(50.dp) // Height of the button
-            .widthIn(min = 120.dp, max = maxWidth) // Width of the button
+            .height(50.dp)
+            .widthIn(min = 120.dp, max = maxWidth)
             .padding(horizontal = 16.dp)
             .clickable {
                 isPressed = true
                 onClick()
             },
-        contentAlignment = Alignment.Center // Center content in the box
+        contentAlignment = Alignment.Center // Center the text
     ) {
         Text(
             text = text,
@@ -90,42 +104,49 @@ fun GradientButton(
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // Truncate text if it overflows
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
         )
     }
 }
 
+/**
+ * A full-width gradient button with press animation.
+ *
+ * Similar to GradientButton but fills the available width.
+ */
 @Composable
 fun GradientLongButton(
     text: String,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color> = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient colors
+    gradientColors: List<Color> = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient
     textColor: Color = Color.White,
     onClick: () -> Unit
 ) {
     var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down when pressed
+    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down on press
+
     LaunchedEffect(isPressed) {
         if (isPressed) {
-            delay(100) // Wait for 100 ms
+            delay(100)
             isPressed = false
         }
     }
+
     Box(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxWidth() // Fill the full width
             .scale(scale)
-            .shadow(8.dp, RoundedCornerShape(12.dp)) // Shadow effect
+            .shadow(8.dp, RoundedCornerShape(12.dp))
             .background(
                 brush = Brush.horizontalGradient(gradientColors),
                 shape = RoundedCornerShape(12.dp)
             )
-            .height(50.dp) // Height of the button
+            .height(50.dp)
             .clickable {
                 isPressed = true
                 onClick()
             },
-        contentAlignment = Alignment.Center // Center content in the box
+        contentAlignment = Alignment.Center
     ) {
         Text(
             text = text,
@@ -133,7 +154,7 @@ fun GradientLongButton(
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // Truncate text if it overflows
+            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
         )
     }
 }

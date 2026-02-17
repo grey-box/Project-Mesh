@@ -4,6 +4,11 @@ import android.util.Log
 import org.json.JSONObject
 import org.json.JSONException
 
+/**
+ * Utility class to validate JSON strings against a predefined JSON schema.
+ *
+ * The schema enforces required fields and data types for messages.
+ */
 class JSONSchema {
 
     private val schemaString = """
@@ -20,7 +25,13 @@ class JSONSchema {
     }
 }
 """
-    //Takes JSON string and validates it against JSON Schema
+
+    /**
+     * Validates a JSON string against the internal schema.
+     *
+     * @param json The JSON string representing a message.
+     * @return True if the JSON is valid according to the schema, false otherwise.
+     */
     fun schemaValidation(json: String): Boolean {
         //Log.d("JSONSchema", "Validating JSON: $json")
         //Log.d("JSONSchema", "Against schema: $schemaString")
@@ -30,13 +41,19 @@ class JSONSchema {
 
             validate(jsonObject, schemaJson)
             return true
-        }catch (e: JSONException) {
+        } catch (e: JSONException) {
             Log.e("JSONSchema", "JSON schema validation failed: ${e.message}")
             return false
         }
     }
 
-    //Validates JSON object against schema
+    /**
+     * Checks that the given JSON object contains all required fields as per the schema.
+     *
+     * @param json The JSON object to validate.
+     * @param schema The JSON schema object defining required fields.
+     * @throws JSONException If any required field is missing.
+     */
     private fun validate(json: JSONObject, schema: JSONObject) {
         val requiredFields = schema.getJSONArray("required")
         for (i in 0 until requiredFields.length()) {

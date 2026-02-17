@@ -17,6 +17,14 @@ import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
 
+/**
+ * ViewModel for the Conversations Home Screen.
+ *
+ * Manages the list of conversations, updates device online/offline statuses,
+ * and provides functions for refreshing and marking conversations as read.
+ *
+ * @param di Dependency Injection container to provide required repositories and settings.
+ */
 class ConversationsHomeScreenViewModel(
     di: DI
 ) : ViewModel() {
@@ -88,7 +96,6 @@ class ConversationsHomeScreenViewModel(
         }
     }
 
-
     private fun loadConversations() {
         viewModelScope.launch {
             try {
@@ -139,12 +146,20 @@ class ConversationsHomeScreenViewModel(
         }
     }
 
-    //function to refresh conversations manually
+    /**
+     * Refreshes the conversations list manually.
+     *
+     * Reloads the conversations from the repository.
+     */
     fun refreshConversations(){
         loadConversations()
     }
 
-    //Function to mark a conversation as read
+    /**
+     * Marks a conversation as read.
+     *
+     * @param conversationId The ID of the conversation to mark as read.
+     */
     fun markConversationAsRead(conversationId: String) {
         viewModelScope.launch {
             try {

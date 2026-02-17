@@ -32,6 +32,12 @@ import com.greybox.projectmesh.messaging.ui.viewmodels.ConversationsHomeScreenVi
 import com.greybox.projectmesh.messaging.utils.MessageUtils
 import org.kodein.di.compose.localDI
 
+/**
+ * Main Composable for the Conversations Home screen.
+ *
+ * @param onConversationSelected Callback when a conversation is selected.
+ * @param viewModel [ConversationsHomeScreenViewModel] providing the UI state.
+ */
 @Composable
 fun ConversationsHomeScreen(
     onConversationSelected: (String) -> Unit,
@@ -88,6 +94,12 @@ fun ConversationsHomeScreen(
     }
 }
 
+/**
+ * Displays a scrollable list of conversations.
+ *
+ * @param conversations List of [Conversation] objects to display.
+ * @param onConversationClick Callback when a conversation item is clicked.
+ */
 @Composable
 fun ConversationsList(
     conversations: List<Conversation>,
@@ -110,6 +122,12 @@ fun ConversationsList(
     }
 }
 
+/**
+ * Displays an individual conversation item with avatar, status, last message, and unread count.
+ *
+ * @param conversation The [Conversation] to display.
+ * @param onClick Callback for when the conversation item is clicked.
+ */
 @Composable
 fun ConversationItem(
     conversation: Conversation,
@@ -276,6 +294,9 @@ fun ConversationItem(
     }
 }
 
+/**
+ * Displays a placeholder view when there are no conversations.
+ */
 @Composable
 fun EmptyConversationsView() {
     Column(
@@ -310,6 +331,12 @@ fun EmptyConversationsView() {
     }
 }
 
+/**
+ * Displays an error view with retry button when conversation loading fails.
+ *
+ * @param errorMessage The error message to display.
+ * @param onRetry Callback triggered when retry button is pressed.
+ */
 @Composable
 fun ErrorView(
     errorMessage: String,
