@@ -54,9 +54,11 @@ jobs:
           echo "$output1"
           echo "---"
           echo "$output2"
-          if (echo "$output1" | grep -Ezq " Task :app:compileDebugKotlin\nw: file:") || (echo "$output2" | grep -Ezq " Task :app:compileReleaseKotlin\nw: file:"); then
+          if [[ (echo "$output1" | grep -Ezq " Task :app:compileDebugKotlin\nw: file:") || (echo "$output2" | grep -Ezq " Task :app:compileReleaseKotlin\nw: file:") ]]; then
             echo "Linting warnings detected. View details at https://grey-box.github.io/Project-Mesh/ once the workflow is finished."
             exit 1
+          else
+            echo "Linting returned clean"
           fi
         continue-on-error: true
 
