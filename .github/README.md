@@ -43,6 +43,7 @@ The CI pipeline behaves as follows:
 - Add graceful error handling if specific preview reports cannot be generated
 - Add graceful error handling to note that coverage reporting can only be generated on PRs and pushes, not workflow dispatches
 - Research if it's possible to ask to run workflows on any push
+- Alter pages commit process to commit build_reports to gh-pages and not main, so it stays off main and avoids double-commits and extra fetches
 
 ### Integration
 - add dokka
