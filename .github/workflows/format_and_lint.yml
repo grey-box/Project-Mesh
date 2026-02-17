@@ -49,6 +49,7 @@ jobs:
       - name: Call Debug and Release Linters
         # ostensibly, ./gradlew lint should run both, but in practice on my (Thalia Wood's), it only runs the Debug linter
         run: |
+          set -o pipefail
           output1=$(./gradlew lintDebug)
           output2=$(./gradlew lintRelease)
           echo "$output1"
