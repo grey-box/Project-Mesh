@@ -13,6 +13,13 @@ import org.kodein.di.compose.localDI
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import com.greybox.projectmesh.viewModel.NetworkScreenModel
 
+/**
+ * Composable that displays a list of network nodes as clickable items.
+ *
+ * @param onNodeSelected Lambda invoked when a node is selected; passes the node's IP address as a [String].
+ * @param viewModel Optional [NetworkScreenViewModel] instance to provide network node data.
+ *                  Defaults to a ViewModel created with [ViewModelFactory] using the local DI context.
+ */
 @Composable
 fun ChatNodeListScreen(
     onNodeSelected: (String) -> Unit,

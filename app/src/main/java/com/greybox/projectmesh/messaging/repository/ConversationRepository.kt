@@ -10,17 +10,33 @@ import kotlinx.coroutines.flow.Flow
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 
+/**
+ * Repository for managing conversations.
+ * Handles retrieval, creation, updating, and user status tracking for conversations.
+ *
+ * @property conversationDao DAO for database operations related to conversations.
+ * @property di Kodein DI container for dependency injection.
+ */
 class ConversationRepository(
     private val conversationDao: ConversationDao,
     override val di: DI
 ) : DIAware {
 
-    //get all conversations as a flow
+    /**
+     * Returns a [Flow] emitting the list of all conversations.
+     *
+     * @return A [Flow] of [List] of [Conversation].
+     */
     fun getAllConversations(): Flow<List<Conversation>>{
         return conversationDao.getAllConversationsFlow()
     }
 
-    //get specific convo by id
+    /**
+     * Retrieves a conversation by its unique ID.
+     *
+     * @param conversationId The unique ID of the conversation.
+     * @return The [Conversation] if found, null otherwise.
+     */
     suspend fun getConversationById(conversationId: String): Conversation? {
         Log.d("ConversationRepository", "Getting conversation by ID: $conversationId")
         val result = conversationDao.getConversationById(conversationId)
@@ -28,6 +44,13 @@ class ConversationRepository(
         return result
     }
 
+    /**
+     * Retrieves an existing conversation or creates a new one if it does not exist.
+     *
+     * @param localUuid The UUID of the local user.
+     * @param remoteUser The remote user entity to associate with the conversation.
+     * @return The existing or newly created [Conversation].
+     */
     suspend fun getOrCreateConversation(localUuid: String, remoteUser: UserEntity): Conversation {
         //create a unique conversation ID using both UUIDs in order to ensure consistency
         val conversationId = ConversationUtils.createConversationId(localUuid, remoteUser.uuid)
@@ -60,7 +83,13 @@ class ConversationRepository(
         return conversation
     }
 
-    //update conversation with the latest message
+    /**
+     * Updates the conversation with the latest message.
+     * Increments unread count if the message is from another user.
+     *
+     * @param conversationId The unique ID of the conversation.
+     * @param message The [Message] to update in the conversation.
+     */
     suspend fun updateWithMessage(conversationId: String, message: Message) {
 
         conversationDao.updateLastMessage(
@@ -82,12 +111,22 @@ class ConversationRepository(
 
     }
 
-    //mark conversation as read
+    /**
+     * Marks a conversation as read by clearing its unread count.
+     *
+     * @param conversationId The unique ID of the conversation.
+     */
     suspend fun markAsRead(conversationId: String) {
         conversationDao.clearUnreadCount(conversationId)
     }
 
-    //update a user's online status
+    /**
+     * Updates a user's online status and associated address.
+     *
+     * @param userUuid The UUID of the user.
+     * @param isOnline True if the user is online, false otherwise.
+     * @param userAddress The current address of the user, if available.
+     */
     suspend fun updateUserStatus(userUuid: String, isOnline: Boolean, userAddress: String?) {
         try {
             // Update in database

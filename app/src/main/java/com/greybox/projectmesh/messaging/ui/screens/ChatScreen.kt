@@ -74,6 +74,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 
+/**
+ * Composable function representing the main chat screen.
+ *
+ * @param virtualAddress The IP address of the chat participant.
+ * @param userName Optional username for the chat participant.
+ * @param isOffline Boolean flag indicating if the user is offline.
+ * @param onClickButton Callback for button click events.
+ * @param viewModel The [ChatScreenViewModel] providing UI state and actions.
+ */
 @Composable
 fun ChatScreen(
     virtualAddress: InetAddress,
@@ -89,7 +98,6 @@ fun ChatScreen(
             },
             defaultArgs = Bundle().apply {
                 putSerializable("virtualAddress", virtualAddress)
-
             }
         )
     )
@@ -276,6 +284,13 @@ fun ChatScreen(
     }
 }
 
+/**
+ * Composable function showing the user's status bar at the top of the chat.
+ *
+ * @param userName Name of the chat participant.
+ * @param isOnline Boolean flag indicating online/offline status.
+ * @param userAddress IP address of the chat participant.
+ */
 @Composable
 fun UserStatusBar(
     userName: String,
@@ -366,6 +381,12 @@ fun UserStatusBar(
     }
 }
 
+/**
+ * Composable function displaying all messages in the chat.
+ *
+ * @param uiState [ChatScreenModel] representing the current state of the chat.
+ * @param onClickButton Callback for any button interactions within the messages list.
+ */
 @Composable
 fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
     val context = LocalContext.current
@@ -441,6 +462,15 @@ fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
     }
 }
 
+/**
+ * Composable function displaying an individual message bubble.
+ *
+ * @param chatMessage The [Message] object containing message data.
+ * @param sentBySelf Boolean indicating whether the message was sent by the current user.
+ * @param messageContent Composable lambda for rendering the message content.
+ * @param sender Name of the sender of the message.
+ * @param modifier Modifier to apply to the message bubble.
+ */
 @Composable
 fun MessageBubble(
     chatMessage: Message,
@@ -510,4 +540,3 @@ fun MessageBubble(
         }
     }
 }
-

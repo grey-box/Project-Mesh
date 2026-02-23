@@ -12,15 +12,35 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 
+/**
+ * Utility responsible for migrating legacy messages to the newer
+ * conversation-ID–based chat naming format.
+ *
+ * It inspects all existing messages, infers correct conversation IDs,
+ * and rewrites their `chat` field when necessary.
+ *
+ * This allows older installations to transition cleanly to the
+ * standardized conversation model.
+ */
 class MessageMigrationUtils(
     override val di: DI
 ): DIAware {
+
     private val db: MeshDatabase by di.instance()
 
     /**
-     * Migrates existing messages to use in converstion IDs as chatNames
+     * Migrates all historical messages so that each message's `chat`
+     * value follows the modern conversation ID format.
+     *
+     * Steps performed:
+     * - Loads all messages
+     * - Groups them by legacy chat name
+     * - Determines correct UUID association for each chat group
+     * - Generates a conversation ID using local + remote UUIDs
+     * - Rewrites messages with updated chat names
+     *
+     * Errors are logged but do not stop the migration process.
      */
-
     suspend fun migrateMessagesToChatIds() {
         withContext(Dispatchers.IO){
             try {
@@ -93,6 +113,16 @@ class MessageMigrationUtils(
         }
     }
 
+    /**
+     * Generates a consistent conversation ID using two UUIDs.
+     *
+     * Special cases:
+     * - Test device UUIDs map to fixed, readable conversation IDs.
+     *
+     * @param uuid1 Local UUID.
+     * @param uuid2 Remote UUID.
+     * @return A stable, sorted, hyphen-joined conversation ID.
+     */
     private fun createConversationId(uuid1: String, uuid2: String): String {
         // Special cases for test devices
         if (uuid2 == "test-device-uuid") {
