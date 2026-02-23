@@ -1,0 +1,81 @@
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Grey-Box Project Mesh: Build Diagnostics</title>
+  <meta
+    name="description"
+    content="View the well-formatted outputs of CI actions, including linting, testing, and coverage reporting."
+  />
+  <link
+    rel="icon"
+    href="https://www.grey-box.ca/wp-content/uploads/2018/05/cropped-Copy-of-logoGREY-BOX-32x32.jpg"
+    sizes="32x32"
+  />
+  <link
+    rel="icon"
+    href="https://www.grey-box.ca/wp-content/uploads/2018/05/cropped-Copy-of-logoGREY-BOX-192x192.jpg"
+    sizes="192x192"
+  />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header>
+    <div class="header-grid">
+      <div>
+        <a id="home_link" href="https://github.com/polygeist111/Project-Mesh"
+          >Mesh GitHub ↗</a
+        >
+        <nav>
+          <!--use nav buttons to change iframe source-->
+          <a target="report_frame" href="coverage_report/index.html"
+            >Coverage Report</a
+          >
+          <a target="report_frame" href="test_report_debug/index.html"
+            >Debug Testing Report</a
+          >
+          <a target="report_frame" href="test_report_release/index.html"
+            >Release Testing Report</a
+          >
+          <a
+            target="report_frame"
+            href="lint_report_debug/lint_report_debug.html"
+            >Linting Report (Kotlin, Debug)</a
+          >
+          <a
+            target="report_frame"
+            href="lint_report_release/lint_report_release.html"
+            >Linting Report (Kotlin, Release)</a
+          >
+          <!--<a target="report_frame" href="super-linting_report/index.html"
+            >Linting Report (Super-Linter)</a
+          >--><!--At this time, Super-Linter does provide any human-viewable output. Link to github actions output for super-linter-->
+        </nav>
+      </div>
+      <img
+        class="grid-img"
+        src="http://www.grey-box.ca/wp-content/uploads/2018/05/logoGREY-BOX.jpg"
+        alt="Grey-Box logo"
+      />
+    </div>
+  </header>
+
+  <main id="home">
+    <section id="report_view">
+      <div class="centered-content">
+        <iframe
+          name="report_frame"
+          src="coverage_report/index.html"
+          title="Current Report"
+        ></iframe>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>
+      Built by Thalia Wood of GB team Mesh - Reliability & Structure (ASU-CIDSE
+      2025 Fall)
+    </p>
+    <p>Copyright © 2025</p>
+  </footer>
+</body>

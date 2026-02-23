@@ -1,0 +1,112 @@
+name: Lint Code Base
+run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
+
+on:
+  # run when called by another workflow
+  workflow_call:
+    inputs:
+      skip_commit:
+        description: "Skip committing reports"
+        required: false
+        type: boolean
+        default: false
+
+  # run on demand
+  workflow_dispatch:
+    inputs:
+      custom-run-name:
+        description: "Custom name for this Actions run"
+        required: false
+        type: string
+
+# cancel any previously-started, yet still active runs of this workflow on the same branch
+concurrency:
+  group: ${{ github.ref }}-Lint Code Base
+  cancel-in-progress: true
+
+permissions: read-all
+
+# adapted from https://mskelton.medium.com/auto-formatting-code-using-prettier-and-github-actions-ed458f58b7df
+jobs:
+  call-gradle-linter:
+    name: Call Gradle Linter
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Call Debug and Release Linters
+        # ostensibly, ./gradlew lint should run both, but in practice on my (Thalia Wood's), it only runs the Debug linter
+        run: |
+          set -o pipefail
+          output1=$(./gradlew lintDebug)
+          output2=$(./gradlew lintRelease)
+          echo "$output1"
+          echo "---"
+          echo "$output2"
+          if [[ (echo "$output1" | grep -Ezq " Task :app:compileDebugKotlin\nw: file:") || (echo "$output2" | grep -Ezq " Task :app:compileReleaseKotlin\nw: file:") ]]; then
+            echo "Linting warnings detected. View details at https://grey-box.github.io/Project-Mesh/ once the workflow is finished."
+            exit 1
+          else
+            echo "Linting returned clean"
+          fi
+        continue-on-error: true
+
+      - name: Configure Git Identity (if called individually)
+        if: ${{ inputs.skip_commit != true }}
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Copy Linting Reports to Viewing Directory (if called individually)
+        if: ${{ inputs.skip_commit != true }}
+        run: |
+          mkdir ./build_reports/lint_results_debug
+          cp ./app/build/reports/lint-results-debug.html ./build_reports/lint_report_debug/lint_report_debug.html
+          mkdir ./build_reports/lint_results_release
+          cp ./app/build/reports/lint-results-release.html ./build_reports/lint_report_release/lint_report_release.html
+          git add --force ./build_reports/
+          git commit -m "Relocate coverage report for viewing"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Lint Debug Artifact (if called by orchestrator)
+        if: ${{ inputs.skip_commit == true }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: lint_report_debug_artifact
+          path: ./app/build/reports/lint-results-debug.html
+          retention-days: 1
+
+      - name: Upload Lint Release Artifact (if called by orchestrator)
+        if: ${{ inputs.skip_commit == true }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: lint_report_release_artifact
+          path: ./app/build/reports/lint-results-release.html
+          retention-days: 1
+
+  call-super-linter:
+    name: Call Super-Linter
+    permissions:
+      contents: read # clone the repo to lint
+      statuses: write # read/write to repo custom statuses
+
+    uses: ./.github/workflows/super_lint.yml
+
+    # with:
+    ### A regex to exclude files from linting
+    ### defaults to empty
+    # filter-regex-exclude:

@@ -1,0 +1,136 @@
+name: Compile Build Reports
+run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
+
+on:
+  # run anytime a PR is merged to main or a direct push to main
+  push:
+    branches: [main]
+
+  # run on any push to a PR branch
+  pull_request:
+
+  # run on demand
+  workflow_dispatch:
+    inputs:
+      custom-run-name:
+        description: "Custom name for this Actions run"
+        required: false
+        type: string
+
+# cancel any previously-started, yet still active runs of this workflow on the same branch
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  format-and-lint:
+    name: Format and Lint
+    uses: ./.github/workflows/format_and_lint.yml
+    with:
+      skip_commit: true
+
+  test-and-report-coverage:
+    name: Test and Report Coverage
+    uses: ./.github/workflows/test_and_report_coverage.yml
+    with:
+      skip_commit: true
+
+  upload-apks:
+    name: Upload APKs
+    # needs: build-and-test # uses cached build from prior job
+    uses: ./.github/workflows/build_artifacts.yml
+
+  finalize-report-viewer:
+    name: Finalize Report Viewer
+    needs: [format-and-lint, test-and-report-coverage]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+      id-token: write
+      pages: write
+    environment:
+      name: github-pages
+      url: ${{steps.deployment.outputs.page_url}}
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v4
+
+      - name: Ensure Report Dir is empty
+        run: |
+          export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore"
+          rm -rf ./build_reports/*
+          unset GLOBIGNORE
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v5
+        with:
+          path: ./build_reports/
+          # TODO: edit to never pull APKs
+
+      - name: Relocate Linting Reports to Dirs
+        run: |
+          rm -rf ./build_reports/app-debug-apk 2> /dev/null
+          rm -rf ./build_reports/app-release-apk 2> /dev/null
+
+          mkdir ./build_reports/coverage_report
+          cp -a ./build_reports/coverage_report_artifact/. ./build_reports/coverage_report/
+          rm -r ./build_reports/coverage_report_artifact
+
+          mkdir ./build_reports/lint_report_debug
+          cp ./build_reports/lint_report_debug_artifact/lint-results-debug.html ./build_reports/lint_report_debug/lint_report_debug.html
+          rm -r ./build_reports/lint_report_debug_artifact
+
+          ls ./build_reports
+          echo "----"
+          ls ./build_reports/lint_report_debug
+
+          sed -i 's/1px; 1px;/1px 1px;/g' ./build_reports/lint_report_debug/lint_report_debug.html
+
+          mkdir ./build_reports/lint_report_release
+          cp ./build_reports/lint_report_release_artifact/lint-results-release.html ./build_reports/lint_report_release/lint_report_release.html
+          rm -r ./build_reports/lint_report_release_artifact
+
+          ls ./build_reports
+          echo "----"
+          ls ./build_reports/lint_report_release
+
+          sed -i 's/1px; 1px;/1px 1px;/g' ./build_reports/lint_report_release/lint_report_release.html
+
+          mkdir ./build_reports/test_report_debug
+          cp -a ./build_reports/test_report_debug_artifact/. ./build_reports/test_report_debug/
+          rm -r ./build_reports/test_report_debug_artifact
+
+          mkdir ./build_reports/test_report_release
+          cp -a ./build_reports/test_report_release_artifact/. ./build_reports/test_report_release/
+          rm -r ./build_reports/test_report_release_artifact
+
+      - name: Configure Git Identity
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Commit Reports to Viewing Directory
+        run: |
+          git add --force ./build_reports/
+          git commit -m "Relocate reports for viewing"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Reports Viewer Directory to Pages
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./build_reports
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Link Pages in Build Summary
+        run: |
+          echo "All reports can be viewed at ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
