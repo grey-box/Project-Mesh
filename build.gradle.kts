@@ -6,6 +6,7 @@ plugins {
     kotlin("jvm") version "1.9.0"
     id("com.google.devtools.ksp") version "1.9.0-1.0.13" apply false
     id("org.jetbrains.kotlinx.kover") version "0.9.3" apply false
+    id("org.jetbrains.dokka") version "2.2.0-Beta" apply false
 }
 
 java {

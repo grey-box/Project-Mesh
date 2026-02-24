@@ -1,0 +1,77 @@
+name: Build Dokka Docs
+run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
+
+on:
+  # run when called by another workflow
+  workflow_call:
+    inputs:
+      skip_commit:
+        description: "Skip committing reports"
+        required: false
+        type: boolean
+        default: false
+
+  # run on demand
+  workflow_dispatch:
+    inputs:
+      custom-run-name:
+        description: "Custom name for this Actions run"
+        required: false
+        type: string
+
+# cancel any previously-started, yet still active runs of this workflow on the same branch
+concurrency:
+  group: ${{ github.ref }}-Build Dokka Docs
+  cancel-in-progress: true
+
+permissions: read-all
+
+# adapted from https://mskelton.medium.com/auto-formatting-code-using-prettier-and-github-actions-ed458f58b7df
+jobs:
+  call-dokka:
+    name: Call Dokka Html
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      - name: Call Dokka Task
+        run: ./gradlew dokkaGenerate
+        continue-on-error: true
+
+      - name: Configure Git Identity (if called individually)
+        if: ${{ inputs.skip_commit != true }}
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Copy Documentation to Viewing Directory (if called individually)
+        if: ${{ inputs.skip_commit != true }}
+        run: |
+          mkdir ./build_reports/documentation
+          cp ./app/build/reports/lint-results-debug.html ./build_reports/lint_report_debug/lint_report_debug.html
+          cp -r ./app/build/reports/dokka/html/ ./build_reports/documentation
+          git add --force ./build_reports/
+          git commit -m "Relocate documentation for viewing"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Documentation Artifact (if called by orchestrator)
+        if: ${{ inputs.skip_commit == true }}
+        uses: actions/upload-artifact@v5
+        with:
+          name: dokka_documentation_artifact
+          path: ./app/build/reports/dokka/html
+          retention-days: 1

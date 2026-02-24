@@ -35,6 +35,12 @@ jobs:
     with:
       skip_commit: true
 
+  build-documentation:
+    name: Build Dokka Documentation
+    uses: ./.github/workflows/build_documentation.yml
+    with:
+      skip_commit: true
+
   upload-apks:
     name: Upload APKs
     # needs: build-and-test # uses cached build from prior job
@@ -69,7 +75,7 @@ jobs:
           path: ./build_reports/
           # TODO: edit to never pull APKs
 
-      - name: Relocate Linting Reports to Dirs
+      - name: Relocate CI Artifacts to Dirs
         run: |
           rm -rf ./build_reports/app-debug-apk 2> /dev/null
           rm -rf ./build_reports/app-release-apk 2> /dev/null
@@ -105,6 +111,10 @@ jobs:
           mkdir ./build_reports/test_report_release
           cp -a ./build_reports/test_report_release_artifact/. ./build_reports/test_report_release/
           rm -r ./build_reports/test_report_release_artifact
+
+          mkdir ./build_reports/documentation
+          cp -a ./build_reports/dokka_documentation_artifact/. ./build_reports/documentation/
+          rm -r ./build_reports/dokka_documentation_artifact
 
       - name: Configure Git Identity
         run: |

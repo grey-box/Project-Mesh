@@ -77,7 +77,7 @@ jobs:
           mkdir ./build_reports/lint_results_release
           cp ./app/build/reports/lint-results-release.html ./build_reports/lint_report_release/lint_report_release.html
           git add --force ./build_reports/
-          git commit -m "Relocate coverage report for viewing"
+          git commit -m "Relocate linting report for viewing"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
