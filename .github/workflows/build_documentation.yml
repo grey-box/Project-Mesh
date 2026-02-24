@@ -60,8 +60,7 @@ jobs:
         if: ${{ inputs.skip_commit != true }}
         run: |
           mkdir ./build_reports/documentation
-          cp ./app/build/reports/lint-results-debug.html ./build_reports/lint_report_debug/lint_report_debug.html
-          cp -r ./app/build/reports/dokka/html/ ./build_reports/documentation
+          cp -r ./app/build/dokka/html/ ./build_reports/documentation
           git add --force ./build_reports/
           git commit -m "Relocate documentation for viewing"
           git push
@@ -73,5 +72,5 @@ jobs:
         uses: actions/upload-artifact@v5
         with:
           name: dokka_documentation_artifact
-          path: ./app/build/reports/dokka/html
+          path: ./app/build/dokka/html
           retention-days: 1
