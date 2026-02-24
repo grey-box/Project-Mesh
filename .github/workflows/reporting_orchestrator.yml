@@ -48,7 +48,7 @@ jobs:
 
   finalize-report-viewer:
     name: Finalize Report Viewer
-    needs: [format-and-lint, test-and-report-coverage]
+    needs: [format-and-lint, test-and-report-coverage, build-documentation]
     if: always()
     runs-on: ubuntu-latest
     permissions:
