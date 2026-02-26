@@ -1,0 +1,13 @@
+@startuml JSONSchema
+skinparam classAttributeIconSize 0
+
+class JSONSchema {
+  -schemaString: String
+  +schemaValidation(json: String): Boolean
+  -validate(json: JSONObject, schema: JSONObject): Unit
+}
+
+JSONSchema ..> JSONObject
+JSONSchema ..> JSONException
+
+@enduml
