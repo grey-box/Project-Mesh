@@ -1,0 +1,86 @@
+@startuml
+title PingScreen.kt (Compose) - ViewModel Injection + Ping List Rendering
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class PingScreen <<Composable>> {
+    +PingScreen(virtualAddress: InetAddress, viewModel: PingScreenViewModel)
+  }
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class PingScreenViewModel <<ViewModel>> {
+    +uiState: StateFlow<PingScreenModel>
+    <<constructed with virtualAddress>>
+  }
+
+  class PingScreenModel <<State>> {
+    +deviceName: String?
+    +virtualAddress: InetAddress
+    +allOriginatorMessages: List<OriginatorMessageItem>
+  }
+
+  class OriginatorMessageItem <<Model>> {
+    +originatorMessage: MmcpOriginatorMessage
+    +hopCount: Int
+    +lastHopAddr: InetAddress
+  }
+}
+
+package "MMCP / Meshrabiya" as Mesh {
+  class MmcpOriginatorMessage {
+    +pingTimeSum: Long
+    +messageId: Long
+  }
+  class addressToDotNotation <<Extension>> {
+    +InetAddress.addressToDotNotation(): String
+  }
+}
+
+package "DI" as DI {
+  class localDI
+  class ViewModelFactory
+  class LocalSavedStateRegistryOwner
+}
+
+package "Compose UI" as UI {
+  class LazyColumn
+  class Row
+  class Text
+  class Spacer
+}
+
+package "Java Net" as Net {
+  class InetAddress
+}
+
+' ---- Construction / wiring ----
+Views.PingScreen ..> DI.localDI : provide DI
+Views.PingScreen ..> DI.LocalSavedStateRegistryOwner : owner
+Views.PingScreen ..> DI.ViewModelFactory : creates PingScreenViewModel(di, savedStateHandle, virtualAddress)
+Views.PingScreen ..> VM.PingScreenViewModel : viewModel(factory)
+Views.PingScreen ..> VM.PingScreenModel : collectAsState(initial)
+
+' ---- Rendering ----
+Views.PingScreen --> UI.LazyColumn : renders list
+UI.LazyColumn --> UI.Row : header row
+UI.Row --> UI.Text : "Device name: ..., IP address: ..."
+
+UI.LazyColumn --> VM.OriginatorMessageItem : iterates allOriginatorMessages
+VM.OriginatorMessageItem ..> Mesh.MmcpOriginatorMessage : originatorMessage
+VM.OriginatorMessageItem ..> Net.InetAddress : lastHopAddr
+Net.InetAddress ..> Mesh.addressToDotNotation : lastHopAddr.addressToDotNotation()
+
+note right of Views.PingScreen
+Per originator message item:
+- mmcpMessage = item.originatorMessage
+- Render:
+  "Ping: {pingTimeSum}ms,
+   hops: {hopCount},
+   last hop: {lastHopAddr.addressToDotNotation()},
+   id: {messageId}"
+end note
+
+@enduml
