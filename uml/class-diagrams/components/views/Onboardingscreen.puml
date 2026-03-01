@@ -1,0 +1,81 @@
+@startuml
+title OnboardingScreen.kt (Compose) - DI + ViewModel Factory + Next Flow
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class OnboardingScreen <<Composable>> {
+    +OnboardingScreen(onComplete: ()->Unit)
+  }
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class OnboardingViewModel <<ViewModel>> {
+    +uiState: StateFlow<OnboardingUiState>
+    +onUsernameChange(newValue: String)
+    +blankUsernameGenerator(cb: (String)->Unit)
+    +handleFirstTimeSetup(cb: ()->Unit)
+  }
+
+  class OnboardingUiState <<State>> {
+    +username: String?
+  }
+}
+
+package "DI / App Globals" as Infra {
+  class localDI
+  class GlobalApp {
+    +GlobalUserRepo
+  }
+  class GlobalUserRepo {
+    +userRepository
+    +prefs
+  }
+  class getLocalIpFromDI <<Function>> {
+    +getLocalIpFromDI(di): String
+  }
+  class ViewModelProviderFactory as "ViewModelProvider.Factory"
+}
+
+package "Compose UI" as UI {
+  class Column
+  class Text
+  class TextField
+  class Button
+  class Spacer
+}
+
+' ---- Wiring / creation ----
+Views.OnboardingScreen ..> Infra.localDI : get DI
+Views.OnboardingScreen ..> Infra.getLocalIpFromDI : localIp = getLocalIpFromDI(di)
+Views.OnboardingScreen ..> Infra.ViewModelProviderFactory : remember { custom factory }
+Views.OnboardingScreen ..> VM.OnboardingViewModel : viewModel(factory)
+Views.OnboardingScreen ..> VM.OnboardingUiState : collectAsState(uiState)
+
+note right of Infra.ViewModelProviderFactory
+Factory constructs OnboardingViewModel with:
+- GlobalApp.GlobalUserRepo.userRepository
+- GlobalApp.GlobalUserRepo.prefs
+- localIp (from DI)
+end note
+
+' ---- UI events ----
+UI.TextField ..> VM.OnboardingViewModel : onValueChange -> onUsernameChange(newValue)
+
+note bottom of UI.Button
+Button "Next" onClick logic:
+
+IF uiState.username is null OR blank:
+  onboardingViewModel.blankUsernameGenerator { generatedName ->
+     onboardingViewModel.onUsernameChange(generatedName)
+     onboardingViewModel.handleFirstTimeSetup { onComplete() }
+  }
+ELSE:
+  onboardingViewModel.handleFirstTimeSetup { onComplete() }
+
+Then (BUG / duplicate call):
+  onboardingViewModel.handleFirstTimeSetup { onComplete() }  // called again regardless
+end note
+
+@enduml

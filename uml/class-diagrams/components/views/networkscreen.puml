@@ -1,0 +1,70 @@
+@startuml
+title NetworkScreen.kt (Compose) - View + Node Click Flow
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class NetworkScreen <<Composable>> {
+    +NetworkScreen(onNodeClick: (String)->Unit, viewModel: NetworkScreenViewModel)
+  }
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class NetworkScreenViewModel <<ViewModel>> {
+    +uiState: StateFlow<NetworkScreenModel>
+  }
+
+  class NetworkScreenModel <<State>> {
+    +allNodes: Map<String, WifiEntry>
+  }
+}
+
+package "com.greybox.projectmesh.extension" as Ext {
+  class WifiListItem <<Composable>> {
+    +WifiListItem(wifiAddress: String, wifiEntry: WifiEntry, onClick: (String)->Unit)
+  }
+  class WifiEntry <<Model>>
+}
+
+package "com.greybox.projectmesh.server" as Server {
+  class AppServer {
+    +requestRemoteUserInfo(addr: InetAddress)
+    +pushUserInfoTo(addr: InetAddress)
+  }
+}
+
+package "Android / Java" as Android {
+  class InetAddress {
+    +getByName(host: String): InetAddress
+  }
+}
+
+package "DI" as DI {
+  class localDI
+}
+
+' ---- Composition + data flow ----
+NetworkScreen ..> NetworkScreenViewModel : collectAsState(uiState)
+NetworkScreen ..> NetworkScreenModel : reads allNodes
+NetworkScreen ..> localDI : resolve AppServer
+NetworkScreen ..> AppServer : instance()
+
+NetworkScreen --> WifiListItem : renders per node\n(items = allNodes.entries)
+
+' ---- Click behavior ----
+WifiListItem ..> InetAddress : onClick(ip)->getByName(ip)
+WifiListItem ..> AppServer : requestRemoteUserInfo(addr)\npushUserInfoTo(addr)
+WifiListItem ..> NetworkScreen : calls onNodeClick(ip)\n(navigate)
+
+note right of Views.NetworkScreen
+For each (ipAddress -> wifiEntry) in uiState.allNodes:
+- Render WifiListItem
+- On item click:
+   1) addr = InetAddress.getByName(ipAddress)
+   2) appServer.requestRemoteUserInfo(addr)
+   3) appServer.pushUserInfoTo(addr)
+   4) onNodeClick(ipAddress)  // navigation to Ping Screen
+end note
+
+@enduml
