@@ -1,0 +1,18 @@
+@startuml ConversationDao
+skinparam classAttributeIconSize 0
+
+interface ConversationDao <<Dao>> {
+  +getAllConversationsFlow(): Flow<List<Conversation>>
+  +getConversationById(conversationId: String): Conversation?
+  +getConversationByUserUuid(userUuid: String): Conversation?
+  +insertConversation(conversation: Conversation): Unit
+  +updateConversation(conversation: Conversation): Unit
+  +updateUserConnectionStatus(userUuid: String, isOnline: Boolean, userAddress: String?): Unit
+  +updateLastMessage(conversationId: String, lastMessage: String, timestamp: Long): Unit
+  +incrementUnreadCount(conversationId: String): Unit
+  +clearUnreadCount(conversationId: String): Unit
+}
+
+ConversationDao ..> Conversation
+
+@enduml
