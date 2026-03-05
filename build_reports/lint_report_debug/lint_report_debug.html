@@ -177,9 +177,9 @@ document.getElementById(id).style.display = 'none';
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
-      <span class="mdl-layout-title">Lint Report: 143 warnings</span>
+      <span class="mdl-layout-title">Lint Report: 155 warnings</span>
       <div class="mdl-layout-spacer"></div>
-      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Tue Feb 24 00:59:21 UTC 2026 by AGP (8.5.1)</nav>
+      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Thu Mar 05 20:11:04 UTC 2026 by AGP (8.5.1)</nav>
     </div>
   </header>
   <div class="mdl-layout__drawer">
@@ -194,7 +194,7 @@ document.getElementById(id).style.display = 'none';
       <a class="mdl-navigation__link" href="#AppBundleLocaleChanges"><i class="material-icons warning-icon">warning</i>App Bundle handling of runtime locale changes (1)</a>
       <a class="mdl-navigation__link" href="#RedundantLabel"><i class="material-icons warning-icon">warning</i>Redundant label on activity (1)</a>
       <a class="mdl-navigation__link" href="#AndroidGradlePluginVersion"><i class="material-icons warning-icon">warning</i>Obsolete Android Gradle Plugin Version (3)</a>
-      <a class="mdl-navigation__link" href="#GradleDependency"><i class="material-icons warning-icon">warning</i>Obsolete Gradle Dependency (70)</a>
+      <a class="mdl-navigation__link" href="#GradleDependency"><i class="material-icons warning-icon">warning</i>Obsolete Gradle Dependency (72)</a>
       <a class="mdl-navigation__link" href="#LockedOrientationActivity"><i class="material-icons warning-icon">warning</i>Incompatible screenOrientation value (1)</a>
       <a class="mdl-navigation__link" href="#SimilarGradleDependency"><i class="material-icons warning-icon">warning</i>Multiple Versions Gradle Dependency (6)</a>
       <a class="mdl-navigation__link" href="#DiscouragedApi"><i class="material-icons warning-icon">warning</i>Using discouraged APIs (1)</a>
@@ -202,7 +202,7 @@ document.getElementById(id).style.display = 'none';
       <a class="mdl-navigation__link" href="#ObsoleteSdkInt"><i class="material-icons warning-icon">warning</i>Obsolete SDK_INT Version Check (5)</a>
       <a class="mdl-navigation__link" href="#AutoboxingStateCreation"><i class="material-icons warning-icon">warning</i><code>State&lt;T></code> will autobox values assigned to this state. Use a specialized state type instead. (1)</a>
       <a class="mdl-navigation__link" href="#UnusedResources"><i class="material-icons warning-icon">warning</i>Unused resources (19)</a>
-      <a class="mdl-navigation__link" href="#UseTomlInstead"><i class="material-icons warning-icon">warning</i>Use TOML Version Catalog Instead (30)</a>
+      <a class="mdl-navigation__link" href="#UseTomlInstead"><i class="material-icons warning-icon">warning</i>Use TOML Version Catalog Instead (40)</a>
       <a class="mdl-navigation__link" href="#HardcodedText"><i class="material-icons warning-icon">warning</i>Hardcoded text (2)</a>
     </nav>
   </div>
@@ -243,7 +243,7 @@ document.getElementById(id).style.display = 'none';
 <td class="countColumn">3</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
 <a href="#AndroidGradlePluginVersion">AndroidGradlePluginVersion</a>: Obsolete Android Gradle Plugin Version</td></tr>
 <tr>
-<td class="countColumn">70</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
+<td class="countColumn">72</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
 <a href="#GradleDependency">GradleDependency</a>: Obsolete Gradle Dependency</td></tr>
 <tr>
 <td class="countColumn">1</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
@@ -273,7 +273,7 @@ document.getElementById(id).style.display = 'none';
 <tr><td class="countColumn"></td><td class="categoryColumn"><a href="#Productivity">Productivity</a>
 </td></tr>
 <tr>
-<td class="countColumn">30</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
+<td class="countColumn">40</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
 <a href="#UseTomlInstead">UseTomlInstead</a>: Use TOML Version Catalog Instead</td></tr>
 <tr><td class="countColumn"></td><td class="categoryColumn"><a href="#Internationalization">Internationalization</a>
 </td></tr>
@@ -301,23 +301,23 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:40</span>: <span class="message">READ_EXTERNAL_STORAGE is deprecated (and is not granted) when targeting Android 13+. If you need to query or interact with MediaStore or media files on the shared storage, you should instead use one or more new storage permissions: <code>READ_MEDIA_IMAGES</code>, <code>READ_MEDIA_VIDEO</code> or <code>READ_MEDIA_AUDIO</code>.</span><br /><pre class="errorlines">
-<span class="lineno">  37 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute">
-</span><span class="lineno">  38 </span><span class="attribute">        </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_COARSE_LOCATION"</span> />
-<span class="lineno">  39 </span>
-<span class="caretline"><span class="lineno">  40 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"</span><span class="warning"><span class="value">android.permission.READ_EXTERNAL_STORAGE</span></span><span class="value">"</span> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  41 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.WRITE_EXTERNAL_STORAGE"</span> />
-<span class="lineno">  42 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"</span> />
-</pre>
+<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:43</span>: <span class="message">READ_EXTERNAL_STORAGE is deprecated (and is not granted) when targeting Android 13+. If you need to query or interact with MediaStore or media files on the shared storage, you should instead use one or more new storage permissions: <code>READ_MEDIA_IMAGES</code>, <code>READ_MEDIA_VIDEO</code> or <code>READ_MEDIA_AUDIO</code>.</span><br /><pre class="errorlines">
+<span class="lineno">  40 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_FINE_LOCATION"</span> />
+<span class="lineno">  41 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_COARSE_LOCATION"</span> />
+<span class="lineno">  42 </span>
+<span class="caretline"><span class="lineno">  43 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"</span><span class="warning"><span class="value">android.permission.READ_EXTERNAL_STORAGE</span></span><span class="value">"</span> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  44 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.WRITE_EXTERNAL_STORAGE"</span> />
+<span class="lineno">  45 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute">
+</span><span class="lineno">  46 </span><span class="attribute">    </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"</span></pre>
 
-<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:41</span>: <span class="message">WRITE_EXTERNAL_STORAGE is deprecated (and is not granted) when targeting Android 13+. If you need to write to shared storage, use the <code>MediaStore.createWriteRequest</code> intent.</span><br /><pre class="errorlines">
-<span class="lineno">  38 </span><span class="attribute">        </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_COARSE_LOCATION"</span> />
-<span class="lineno">  39 </span>
-<span class="lineno">  40 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.READ_EXTERNAL_STORAGE"</span> />
-<span class="caretline"><span class="lineno">  41 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"</span><span class="warning"><span class="value">android.permission.WRITE_EXTERNAL_STORAGE</span></span><span class="value">"</span> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  42 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"</span> />
-<span class="lineno">  43 </span>
-<span class="lineno">  44 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.POST_NOTIFICATIONS"</span>/>
+<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:44</span>: <span class="message">WRITE_EXTERNAL_STORAGE is deprecated (and is not granted) when targeting Android 13+. If you need to write to shared storage, use the <code>MediaStore.createWriteRequest</code> intent.</span><br /><pre class="errorlines">
+<span class="lineno">  41 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_COARSE_LOCATION"</span> />
+<span class="lineno">  42 </span>
+<span class="lineno">  43 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.READ_EXTERNAL_STORAGE"</span> />
+<span class="caretline"><span class="lineno">  44 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"</span><span class="warning"><span class="value">android.permission.WRITE_EXTERNAL_STORAGE</span></span><span class="value">"</span> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  45 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute">
+</span><span class="lineno">  46 </span><span class="attribute">    </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"</span>
+<span class="lineno">  47 </span>  />
 </pre>
 
 </div>
@@ -525,14 +525,15 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:34</span>: <span class="message">Attribute <code>usesPermissionFlags</code> is only used in API level 31 and higher (current min is 26)</span><br /><pre class="errorlines">
-<span class="lineno">  31 </span><span class="comment">          or higher, you must declare the NEARBY_WIFI_DEVICES permission.
-</span><span class="lineno">  32 </span><span class="comment">    --></span>
-<span class="lineno">  33 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.NEARBY_WIFI_DEVICES"</span>
-<span class="caretline"><span class="lineno">  34 </span>        <span class="warning"><span class="prefix">android:</span><span class="attribute">usesPermissionFlags</span>=<span class="value">"neverForLocation"</span></span> />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  35 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute">
-</span><span class="lineno">  36 </span><span class="attribute">        </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_FINE_LOCATION"</span> />
-<span class="lineno">  37 </span>    <span class="tag">&lt;uses-permission</span></pre>
+<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:38</span>: <span class="message">Attribute <code>usesPermissionFlags</code> is only used in API level 31 and higher (current min is 26)</span><br /><pre class="errorlines">
+<span class="lineno">  35 </span><span class="comment">    --></span>
+<span class="lineno">  36 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute">
+</span><span class="lineno">  37 </span><span class="attribute">    </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.NEARBY_WIFI_DEVICES"</span>
+<span class="caretline"><span class="lineno">  38 </span>    <span class="warning"><span class="prefix">android:</span><span class="attribute">usesPermissionFlags</span>=<span class="value">"neverForLocation"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  39 </span>  />
+<span class="lineno">  40 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_FINE_LOCATION"</span> />
+<span class="lineno">  41 </span>    <span class="tag">&lt;uses-permission</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.permission.ACCESS_COARSE_LOCATION"</span> />
+</pre>
 
 </div>
 <div class="metadata"><div class="explanation" id="explanationUnusedAttribute" style="display: none;">
@@ -620,15 +621,14 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:76</span>: <span class="message">Redundant label can be removed</span><br /><pre class="errorlines">
-<span class="lineno">  73 </span>        <span class="tag">&lt;activity</span><span class="attribute">
-</span><span class="lineno">  74 </span><span class="attribute">            </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">".MainActivity"</span>
-<span class="lineno">  75 </span>            <span class="prefix">android:</span><span class="attribute">exported</span>=<span class="value">"true"</span>
-<span class="caretline"><span class="lineno">  76 </span>            <span class="warning"><span class="prefix">android:</span><span class="attribute">label</span>=<span class="value">"@string/app_name"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  77 </span>            <span class="prefix">android:</span><span class="attribute">theme</span>=<span class="value">"@style/Theme.ProjectMesh.Launcher"</span>>
-<span class="lineno">  78 </span>            <span class="tag">&lt;intent-filter></span>
-<span class="lineno">  79 </span>                <span class="tag">&lt;action</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"android.intent.action.MAIN"</span> />
-</pre>
+<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:82</span>: <span class="message">Redundant label can be removed</span><br /><pre class="errorlines">
+<span class="lineno">  79 </span>        <span class="tag">&lt;activity</span><span class="attribute">
+</span><span class="lineno">  80 </span><span class="attribute">      </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">".MainActivity"</span>
+<span class="lineno">  81 </span>      <span class="prefix">android:</span><span class="attribute">exported</span>=<span class="value">"true"</span>
+<span class="caretline"><span class="lineno">  82 </span>      <span class="warning"><span class="prefix">android:</span><span class="attribute">label</span>=<span class="value">"@string/app_name"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  83 </span>      <span class="prefix">android:</span><span class="attribute">theme</span>=<span class="value">"@style/Theme.ProjectMesh.Launcher"</span>
+<span class="lineno">  84 </span>    >
+<span class="lineno">  85 </span>            <span class="tag">&lt;intent-filter></span></pre>
 
 </div>
 <div class="metadata"><div class="explanation" id="explanationRedundantLabel" style="display: none;">
@@ -665,7 +665,7 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:2</span>: <span class="message">A newer version of com.android.application than 8.5.1 is available: 9.0.1. (There is also a newer version of 8.5.&#55349;&#56421; available, if upgrading to 9.0.1 is difficult: 8.5.2)</span><br /><pre class="errorlines">
+<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:2</span>: <span class="message">A newer version of com.android.application than 8.5.1 is available: 9.1.0. (There is also a newer version of 8.5.&#55349;&#56421; available, if upgrading to 9.1.0 is difficult: 8.5.2)</span><br /><pre class="errorlines">
 <span class="lineno">  1 </span>[versions]
 <span class="caretline"><span class="lineno">  2 </span>agp = <span class="warning">"8.5.1"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno">  3 </span>datastoreCoreVersion = "1.1.1"
@@ -673,7 +673,7 @@ Dismiss</button>            </div>
 <span class="lineno">  5 </span>kotlin = "1.9.0"
 </pre>
 
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:2</span>: <span class="message">A newer version of com.android.application than 8.5.1 is available: 9.0.1. (There is also a newer version of 8.5.&#55349;&#56421; available, if upgrading to 9.0.1 is difficult: 8.5.2)</span><br /><pre class="errorlines">
+<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:2</span>: <span class="message">A newer version of com.android.application than 8.5.1 is available: 9.1.0. (There is also a newer version of 8.5.&#55349;&#56421; available, if upgrading to 9.1.0 is difficult: 8.5.2)</span><br /><pre class="errorlines">
 <span class="lineno">  1 </span>[versions]
 <span class="caretline"><span class="lineno">  2 </span>agp = <span class="warning">"8.5.1"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno">  3 </span>datastoreCoreVersion = "1.1.1"
@@ -681,7 +681,7 @@ Dismiss</button>            </div>
 <span class="lineno">  5 </span>kotlin = "1.9.0"
 </pre>
 
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:2</span>: <span class="message">A newer version of com.android.application than 8.5.1 is available: 9.0.1. (There is also a newer version of 8.5.&#55349;&#56421; available, if upgrading to 9.0.1 is difficult: 8.5.2)</span><br /><pre class="errorlines">
+<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:2</span>: <span class="message">A newer version of com.android.application than 8.5.1 is available: 9.1.0. (There is also a newer version of 8.5.&#55349;&#56421; available, if upgrading to 9.1.0 is difficult: 8.5.2)</span><br /><pre class="errorlines">
 <span class="lineno">  1 </span>[versions]
 <span class="caretline"><span class="lineno">  2 </span>agp = <span class="warning">"8.5.1"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno">  3 </span>datastoreCoreVersion = "1.1.1"
@@ -765,125 +765,145 @@ Dismiss</button>            </div>
 <span class="lineno">  77 </span>    implementation(libs.androidx.ui.graphics)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:97</span>: <span class="message">A newer version of com.github.seancfoley:ipaddress than 5.3.3 is available: 5.4.0</span><br /><pre class="errorlines">
-<span class="lineno">  94 </span>    debugImplementation(libs.androidx.ui.tooling)
-<span class="lineno">  95 </span>    debugImplementation(libs.androidx.ui.test.manifest)
-<span class="lineno">  96 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
-<span class="caretline"><span class="lineno">  97 </span>    implementation(<span class="warning">"com.github.seancfoley:ipaddress:5.3.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  98 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-<span class="lineno">  99 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
-<span class="lineno"> 100 </span>    implementation (libs.material)
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:99</span>: <span class="message">A newer version of androidx.test:core than 1.6.1 is available: 1.7.0</span><br /><pre class="errorlines">
+<span class="lineno">  96 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="lineno">  97 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno">  98 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="caretline"><span class="lineno">  99 </span>    testImplementation(<span class="warning">"androidx.test:core:1.6.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 100 </span>    testImplementation("app.cash.turbine:turbine:1.1.0")
+<span class="lineno"> 101 </span>
+<span class="lineno"> 102 </span>    androidTestImplementation(libs.androidx.junit)
 </pre>
 
-<button class="mdl-button mdl-js-button mdl-button--primary" id="GradleDependencyDivLink" onclick="reveal('GradleDependencyDiv');" />+ 65 More Occurrences...</button>
+<button class="mdl-button mdl-js-button mdl-button--primary" id="GradleDependencyDivLink" onclick="reveal('GradleDependencyDiv');" />+ 67 More Occurrences...</button>
 <div id="GradleDependencyDiv" style="display: none">
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:106</span>: <span class="message">A newer version of androidx.compose.material3:material3 than 1.2.1 is available: 1.4.0</span><br /><pre class="errorlines">
-<span class="lineno"> 103 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
-<span class="lineno"> 105 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
-<span class="caretline"><span class="lineno"> 106 </span>    implementation(<span class="warning">"androidx.compose.material3:material3:1.2.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 107 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
-<span class="lineno"> 108 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
-<span class="lineno"> 109 </span>    // Core Kodein DI dependency
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:109</span>: <span class="message">A newer version of com.github.seancfoley:ipaddress than 5.3.3 is available: 5.4.0</span><br /><pre class="errorlines">
+<span class="lineno"> 106 </span>    debugImplementation(libs.androidx.ui.tooling)
+<span class="lineno"> 107 </span>    debugImplementation(libs.androidx.ui.test.manifest)
+<span class="lineno"> 108 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
+<span class="caretline"><span class="lineno"> 109 </span>    implementation(<span class="warning">"com.github.seancfoley:ipaddress:5.3.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 110 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+<span class="lineno"> 111 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
+<span class="lineno"> 112 </span>    implementation (libs.material)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:107</span>: <span class="message">A newer version of androidx.navigation:navigation-compose than 2.7.7 is available: 2.9.7</span><br /><pre class="errorlines">
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
-<span class="lineno"> 105 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
-<span class="lineno"> 106 </span>    implementation("androidx.compose.material3:material3:1.2.1")
-<span class="caretline"><span class="lineno"> 107 </span>    implementation(<span class="warning">"androidx.navigation:navigation-compose:2.7.7"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 108 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
-<span class="lineno"> 109 </span>    // Core Kodein DI dependency
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:118</span>: <span class="message">A newer version of androidx.compose.material3:material3 than 1.2.1 is available: 1.4.0</span><br /><pre class="errorlines">
+<span class="lineno"> 115 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
+<span class="lineno"> 117 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
+<span class="caretline"><span class="lineno"> 118 </span>    implementation(<span class="warning">"androidx.compose.material3:material3:1.2.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 119 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
+<span class="lineno"> 120 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+<span class="lineno"> 121 </span>    // Core Kodein DI dependency
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:119</span>: <span class="message">A newer version of androidx.room:room-runtime than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 116 </span>
-<span class="lineno"> 117 </span>    val room_version = "2.6.1"
-<span class="lineno"> 118 </span>
-<span class="caretline"><span class="lineno"> 119 </span>    implementation(<span class="warning">"androidx.room:room-runtime:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 120 </span>    annotationProcessor("androidx.room:room-compiler:$room_version")
-<span class="lineno"> 121 </span>
-<span class="lineno"> 122 </span>    // To use Kotlin annotation processing tool (kapt)
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:119</span>: <span class="message">A newer version of androidx.navigation:navigation-compose than 2.7.7 is available: 2.9.7</span><br /><pre class="errorlines">
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
+<span class="lineno"> 117 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
+<span class="lineno"> 118 </span>    implementation("androidx.compose.material3:material3:1.2.1")
+<span class="caretline"><span class="lineno"> 119 </span>    implementation(<span class="warning">"androidx.navigation:navigation-compose:2.7.7"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 120 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+<span class="lineno"> 121 </span>    // Core Kodein DI dependency
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:120</span>: <span class="message">A newer version of androidx.room:room-compiler than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 117 </span>    val room_version = "2.6.1"
-<span class="lineno"> 118 </span>
-<span class="lineno"> 119 </span>    implementation("androidx.room:room-runtime:$room_version")
-<span class="caretline"><span class="lineno"> 120 </span>    annotationProcessor(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 121 </span>
-<span class="lineno"> 122 </span>    // To use Kotlin annotation processing tool (kapt)
-<span class="lineno"> 123 </span>    // kapt("androidx.room:room-compiler:$room_version")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:131</span>: <span class="message">A newer version of androidx.room:room-runtime than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 128 </span>
+<span class="lineno"> 129 </span>    val room_version = "2.6.1"
+<span class="lineno"> 130 </span>
+<span class="caretline"><span class="lineno"> 131 </span>    implementation(<span class="warning">"androidx.room:room-runtime:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 132 </span>    annotationProcessor("androidx.room:room-compiler:$room_version")
+<span class="lineno"> 133 </span>
+<span class="lineno"> 134 </span>    // To use Kotlin annotation processing tool (kapt)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:125</span>: <span class="message">A newer version of androidx.room:room-compiler than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 122 </span>    // To use Kotlin annotation processing tool (kapt)
-<span class="lineno"> 123 </span>    // kapt("androidx.room:room-compiler:$room_version")
-<span class="lineno"> 124 </span>    // To use Kotlin Symbol Processing (KSP)
-<span class="caretline"><span class="lineno"> 125 </span>    ksp(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 126 </span>
-<span class="lineno"> 127 </span>    // optional - Kotlin Extensions and Coroutines support for Room
-<span class="lineno"> 128 </span>    implementation("androidx.room:room-ktx:$room_version")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:132</span>: <span class="message">A newer version of androidx.room:room-compiler than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 129 </span>    val room_version = "2.6.1"
+<span class="lineno"> 130 </span>
+<span class="lineno"> 131 </span>    implementation("androidx.room:room-runtime:$room_version")
+<span class="caretline"><span class="lineno"> 132 </span>    annotationProcessor(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 133 </span>
+<span class="lineno"> 134 </span>    // To use Kotlin annotation processing tool (kapt)
+<span class="lineno"> 135 </span>    // kapt("androidx.room:room-compiler:$room_version")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:128</span>: <span class="message">A newer version of androidx.room:room-ktx than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 125 </span>    ksp("androidx.room:room-compiler:$room_version")
-<span class="lineno"> 126 </span>
-<span class="lineno"> 127 </span>    // optional - Kotlin Extensions and Coroutines support for Room
-<span class="caretline"><span class="lineno"> 128 </span>    implementation(<span class="warning">"androidx.room:room-ktx:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 129 </span>
-<span class="lineno"> 130 </span>    // optional - RxJava2 support for Room
-<span class="lineno"> 131 </span>    implementation("androidx.room:room-rxjava2:$room_version")
-</pre>
-
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:131</span>: <span class="message">A newer version of androidx.room:room-rxjava2 than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 128 </span>    implementation("androidx.room:room-ktx:$room_version")
-<span class="lineno"> 129 </span>
-<span class="lineno"> 130 </span>    // optional - RxJava2 support for Room
-<span class="caretline"><span class="lineno"> 131 </span>    implementation(<span class="warning">"androidx.room:room-rxjava2:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 132 </span>
-<span class="lineno"> 133 </span>    // optional - RxJava3 support for Room
-<span class="lineno"> 134 </span>    implementation("androidx.room:room-rxjava3:$room_version")
-</pre>
-
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:134</span>: <span class="message">A newer version of androidx.room:room-rxjava3 than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 131 </span>    implementation("androidx.room:room-rxjava2:$room_version")
-<span class="lineno"> 132 </span>
-<span class="lineno"> 133 </span>    // optional - RxJava3 support for Room
-<span class="caretline"><span class="lineno"> 134 </span>    implementation(<span class="warning">"androidx.room:room-rxjava3:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 135 </span>
-<span class="lineno"> 136 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
-<span class="lineno"> 137 </span>    implementation("androidx.room:room-guava:$room_version")
-</pre>
-
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:137</span>: <span class="message">A newer version of androidx.room:room-guava than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 134 </span>    implementation("androidx.room:room-rxjava3:$room_version")
-<span class="lineno"> 135 </span>
-<span class="lineno"> 136 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
-<span class="caretline"><span class="lineno"> 137 </span>    implementation(<span class="warning">"androidx.room:room-guava:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:137</span>: <span class="message">A newer version of androidx.room:room-compiler than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 134 </span>    // To use Kotlin annotation processing tool (kapt)
+<span class="lineno"> 135 </span>    // kapt("androidx.room:room-compiler:$room_version")
+<span class="lineno"> 136 </span>    // To use Kotlin Symbol Processing (KSP)
+<span class="caretline"><span class="lineno"> 137 </span>    ksp(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 138 </span>
-<span class="lineno"> 139 </span>    // optional - Test helpers
-<span class="lineno"> 140 </span>    testImplementation("androidx.room:room-testing:$room_version")
+<span class="lineno"> 139 </span>    // optional - Kotlin Extensions and Coroutines support for Room
+<span class="lineno"> 140 </span>    implementation("androidx.room:room-ktx:$room_version")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:140</span>: <span class="message">A newer version of androidx.room:room-testing than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 137 </span>    implementation("androidx.room:room-guava:$room_version")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:140</span>: <span class="message">A newer version of androidx.room:room-ktx than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 137 </span>    ksp("androidx.room:room-compiler:$room_version")
 <span class="lineno"> 138 </span>
-<span class="lineno"> 139 </span>    // optional - Test helpers
-<span class="caretline"><span class="lineno"> 140 </span>    testImplementation(<span class="warning">"androidx.room:room-testing:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 139 </span>    // optional - Kotlin Extensions and Coroutines support for Room
+<span class="caretline"><span class="lineno"> 140 </span>    implementation(<span class="warning">"androidx.room:room-ktx:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 141 </span>
-<span class="lineno"> 142 </span>    // optional - Paging 3 Integration
-<span class="lineno"> 143 </span>    implementation("androidx.room:room-paging:$room_version")
+<span class="lineno"> 142 </span>    // optional - RxJava2 support for Room
+<span class="lineno"> 143 </span>    implementation("androidx.room:room-rxjava2:$room_version")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:143</span>: <span class="message">A newer version of androidx.room:room-paging than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
-<span class="lineno"> 140 </span>    testImplementation("androidx.room:room-testing:$room_version")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:143</span>: <span class="message">A newer version of androidx.room:room-rxjava2 than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 140 </span>    implementation("androidx.room:room-ktx:$room_version")
 <span class="lineno"> 141 </span>
-<span class="lineno"> 142 </span>    // optional - Paging 3 Integration
-<span class="caretline"><span class="lineno"> 143 </span>    implementation(<span class="warning">"androidx.room:room-paging:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 142 </span>    // optional - RxJava2 support for Room
+<span class="caretline"><span class="lineno"> 143 </span>    implementation(<span class="warning">"androidx.room:room-rxjava2:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 144 </span>
-<span class="lineno"> 145 </span>    // for crash scren
-<span class="lineno"> 146 </span>    implementation("com.google.code.gson:gson:2.10.1")
+<span class="lineno"> 145 </span>    // optional - RxJava3 support for Room
+<span class="lineno"> 146 </span>    implementation("androidx.room:room-rxjava3:$room_version")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:146</span>: <span class="message">A newer version of androidx.room:room-rxjava3 than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 143 </span>    implementation("androidx.room:room-rxjava2:$room_version")
+<span class="lineno"> 144 </span>
+<span class="lineno"> 145 </span>    // optional - RxJava3 support for Room
+<span class="caretline"><span class="lineno"> 146 </span>    implementation(<span class="warning">"androidx.room:room-rxjava3:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 147 </span>
+<span class="lineno"> 148 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
+<span class="lineno"> 149 </span>    implementation("androidx.room:room-guava:$room_version")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:149</span>: <span class="message">A newer version of androidx.room:room-guava than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 146 </span>    implementation("androidx.room:room-rxjava3:$room_version")
+<span class="lineno"> 147 </span>
+<span class="lineno"> 148 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
+<span class="caretline"><span class="lineno"> 149 </span>    implementation(<span class="warning">"androidx.room:room-guava:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 150 </span>
+<span class="lineno"> 151 </span>    // optional - Test helpers
+<span class="lineno"> 152 </span>    testImplementation("androidx.room:room-testing:$room_version")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:152</span>: <span class="message">A newer version of androidx.room:room-testing than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 149 </span>    implementation("androidx.room:room-guava:$room_version")
+<span class="lineno"> 150 </span>
+<span class="lineno"> 151 </span>    // optional - Test helpers
+<span class="caretline"><span class="lineno"> 152 </span>    testImplementation(<span class="warning">"androidx.room:room-testing:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 153 </span>
+<span class="lineno"> 154 </span>    // Unit test libs (local JVM tests in app/src/test)
+<span class="lineno"> 155 </span>    testImplementation("io.mockk:mockk:1.13.12")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:158</span>: <span class="message">A newer version of androidx.test:core than 1.6.1 is available: 1.7.0</span><br /><pre class="errorlines">
+<span class="lineno"> 155 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno"> 156 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="lineno"> 157 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="caretline"><span class="lineno"> 158 </span>    testImplementation(<span class="warning">"androidx.test:core:1.6.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 159 </span>
+<span class="lineno"> 160 </span>    // optional - Paging 3 Integration
+<span class="lineno"> 161 </span>    implementation("androidx.room:room-paging:$room_version")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:161</span>: <span class="message">A newer version of androidx.room:room-paging than 2.6.1 is available: 2.8.4</span><br /><pre class="errorlines">
+<span class="lineno"> 158 </span>    testImplementation("androidx.test:core:1.6.1")
+<span class="lineno"> 159 </span>
+<span class="lineno"> 160 </span>    // optional - Paging 3 Integration
+<span class="caretline"><span class="lineno"> 161 </span>    implementation(<span class="warning">"androidx.room:room-paging:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 162 </span>
+<span class="lineno"> 163 </span>    // for crash scren
+<span class="lineno"> 164 </span>    implementation("com.google.code.gson:gson:2.10.1")
 </pre>
 
 <span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:3</span>: <span class="message">A newer version of androidx.datastore:datastore-core than 1.1.1 is available: 1.2.0</span><br /><pre class="errorlines">
@@ -1093,7 +1113,7 @@ Dismiss</button>            </div>
 <span class="lineno"> 15 </span>material = "1.11.0"
 </pre>
 
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:13</span>: <span class="message">A newer version of androidx.compose:compose-bom than 2023.08.00 is available: 2026.02.00</span><br /><pre class="errorlines">
+<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:13</span>: <span class="message">A newer version of androidx.compose:compose-bom than 2023.08.00 is available: 2026.02.01</span><br /><pre class="errorlines">
 <span class="lineno"> 10 </span>libMeshrabiya = "0.1-snapshot"
 <span class="lineno"> 11 </span>lifecycleRuntimeKtx = "2.6.1"
 <span class="lineno"> 12 </span>activityCompose = "1.7.0"
@@ -1103,7 +1123,7 @@ Dismiss</button>            </div>
 <span class="lineno"> 16 </span>datastoreCore = "1.0.0"
 </pre>
 
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:13</span>: <span class="message">A newer version of androidx.compose:compose-bom than 2023.08.00 is available: 2026.02.00</span><br /><pre class="errorlines">
+<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:13</span>: <span class="message">A newer version of androidx.compose:compose-bom than 2023.08.00 is available: 2026.02.01</span><br /><pre class="errorlines">
 <span class="lineno"> 10 </span>libMeshrabiya = "0.1-snapshot"
 <span class="lineno"> 11 </span>lifecycleRuntimeKtx = "2.6.1"
 <span class="lineno"> 12 </span>activityCompose = "1.7.0"
@@ -1113,7 +1133,7 @@ Dismiss</button>            </div>
 <span class="lineno"> 16 </span>datastoreCore = "1.0.0"
 </pre>
 
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:13</span>: <span class="message">A newer version of androidx.compose:compose-bom than 2023.08.00 is available: 2026.02.00</span><br /><pre class="errorlines">
+<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:13</span>: <span class="message">A newer version of androidx.compose:compose-bom than 2023.08.00 is available: 2026.02.01</span><br /><pre class="errorlines">
 <span class="lineno"> 10 </span>libMeshrabiya = "0.1-snapshot"
 <span class="lineno"> 11 </span>lifecycleRuntimeKtx = "2.6.1"
 <span class="lineno"> 12 </span>activityCompose = "1.7.0"
@@ -1203,27 +1223,7 @@ Dismiss</button>            </div>
 <span class="lineno"> 19 </span>appcompat = "1.6.1"
 </pre>
 
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:16</span>: <span class="message">A newer version of androidx.datastore:datastore-core than 1.0.0 is available: 1.2.0</span><br /><pre class="errorlines">
-<span class="lineno"> 13 </span>composeBom = "2023.08.00"
-<span class="lineno"> 14 </span>constraintlayout = "2.1.4"
-<span class="lineno"> 15 </span>material = "1.11.0"
-<span class="caretline"><span class="lineno"> 16 </span>datastoreCore = <span class="warning">"1.0.0"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 17 </span>lifecycleRuntimeCompose = "2.7.0"
-<span class="lineno"> 18 </span>datastorePreferencesCore = "1.0.0"
-<span class="lineno"> 19 </span>appcompat = "1.6.1"
-</pre>
-
-<span class="location"><a href="../../../gradle/libs.versions.toml">../../../gradle/libs.versions.toml</a>:17</span>: <span class="message">A newer version of androidx.lifecycle:lifecycle-runtime-compose than 2.7.0 is available: 2.10.0</span><br /><pre class="errorlines">
-<span class="lineno"> 14 </span>constraintlayout = "2.1.4"
-<span class="lineno"> 15 </span>material = "1.11.0"
-<span class="lineno"> 16 </span>datastoreCore = "1.0.0"
-<span class="caretline"><span class="lineno"> 17 </span>lifecycleRuntimeCompose = <span class="warning">"2.7.0"</span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 18 </span>datastorePreferencesCore = "1.0.0"
-<span class="lineno"> 19 </span>appcompat = "1.6.1"
-<span class="lineno"> 20 </span>activity = "1.9.0"
-</pre>
-
-<br/><b>NOTE: 20 results omitted.</b><br/><br/></div>
+<br/><b>NOTE: 22 results omitted.</b><br/><br/></div>
 </div>
 <div class="metadata"><div class="explanation" id="explanationGradleDependency" style="display: none;">
 This detector looks for usages of libraries where the version you are using is not the current stable release. Using older versions is fine, and there are cases where you deliberately want to stick with an older version. However, you may simply not be aware that a more recent version is available, and that is what this lint check helps find.<br/>Note: This issue has an associated quickfix operation in Android Studio and IntelliJ IDEA.<br>
@@ -1260,14 +1260,15 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:96</span>: <span class="message">Expecting <code>android:screenOrientation="unspecified"</code> or <code>"fullSensor"</code> for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices</span><br /><pre class="errorlines">
-<span class="lineno">  93 </span>  <span class="tag">&lt;/provider></span>
-<span class="lineno">  94 </span>  <span class="tag">&lt;activity</span><span class="attribute">
-</span><span class="lineno">  95 </span><span class="attribute">      </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"com.journeyapps.barcodescanner.CaptureActivity"</span>
-<span class="caretline"><span class="lineno">  96 </span>      <span class="warning"><span class="prefix">android:</span><span class="attribute">screenOrientation</span>=<span class="value">"portrait"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  97 </span>      <span class="prefix">android:</span><span class="attribute">stateNotNeeded</span>=<span class="value">"true"</span>
-<span class="lineno">  98 </span>      <span class="prefix">tools:</span><span class="attribute">replace</span>=<span class="value">"android:screenOrientation"</span> />
-<span class="lineno">  99 </span>  <span class="tag">&lt;activity</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">".debug.CrashScreenActivity"</span> <span class="prefix">android:</span><span class="attribute">process</span>=<span class="value">":error_handler"</span> <span class="prefix">android:</span><span class="attribute">exported</span>=<span class="value">"false"</span>><span class="tag">&lt;/activity></span></pre>
+<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:105</span>: <span class="message">Expecting <code>android:screenOrientation="unspecified"</code> or <code>"fullSensor"</code> for this activity so the user can use the application in any orientation and provide a great experience on Chrome OS devices</span><br /><pre class="errorlines">
+<span class="lineno"> 102 </span>        <span class="tag">&lt;/provider></span>
+<span class="lineno"> 103 </span>        <span class="tag">&lt;activity</span><span class="attribute">
+</span><span class="lineno"> 104 </span><span class="attribute">      </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"com.journeyapps.barcodescanner.CaptureActivity"</span>
+<span class="caretline"><span class="lineno"> 105 </span>      <span class="warning"><span class="prefix">android:</span><span class="attribute">screenOrientation</span>=<span class="value">"portrait"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 106 </span>      <span class="prefix">android:</span><span class="attribute">stateNotNeeded</span>=<span class="value">"true"</span>
+<span class="lineno"> 107 </span>      <span class="prefix">tools:</span><span class="attribute">replace</span>=<span class="value">"android:screenOrientation"</span>
+<span class="lineno"> 108 </span>    />
+</pre>
 
 </div>
 <div class="metadata"><div class="explanation" id="explanationLockedOrientationActivity" style="display: none;">
@@ -1401,14 +1402,15 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:96</span>: <span class="message">Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed.</span><br /><pre class="errorlines">
-<span class="lineno">  93 </span>  <span class="tag">&lt;/provider></span>
-<span class="lineno">  94 </span>  <span class="tag">&lt;activity</span><span class="attribute">
-</span><span class="lineno">  95 </span><span class="attribute">      </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"com.journeyapps.barcodescanner.CaptureActivity"</span>
-<span class="caretline"><span class="lineno">  96 </span>      <span class="warning"><span class="prefix">android:</span><span class="attribute">screenOrientation</span>=<span class="value">"portrait"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  97 </span>      <span class="prefix">android:</span><span class="attribute">stateNotNeeded</span>=<span class="value">"true"</span>
-<span class="lineno">  98 </span>      <span class="prefix">tools:</span><span class="attribute">replace</span>=<span class="value">"android:screenOrientation"</span> />
-<span class="lineno">  99 </span>  <span class="tag">&lt;activity</span><span class="attribute"> </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">".debug.CrashScreenActivity"</span> <span class="prefix">android:</span><span class="attribute">process</span>=<span class="value">":error_handler"</span> <span class="prefix">android:</span><span class="attribute">exported</span>=<span class="value">"false"</span>><span class="tag">&lt;/activity></span></pre>
+<span class="location"><a href="../../src/main/AndroidManifest.xml">../../src/main/AndroidManifest.xml</a>:105</span>: <span class="message">Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed.</span><br /><pre class="errorlines">
+<span class="lineno"> 102 </span>        <span class="tag">&lt;/provider></span>
+<span class="lineno"> 103 </span>        <span class="tag">&lt;activity</span><span class="attribute">
+</span><span class="lineno"> 104 </span><span class="attribute">      </span><span class="prefix">android:</span><span class="attribute">name</span>=<span class="value">"com.journeyapps.barcodescanner.CaptureActivity"</span>
+<span class="caretline"><span class="lineno"> 105 </span>      <span class="warning"><span class="prefix">android:</span><span class="attribute">screenOrientation</span>=<span class="value">"portrait"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 106 </span>      <span class="prefix">android:</span><span class="attribute">stateNotNeeded</span>=<span class="value">"true"</span>
+<span class="lineno"> 107 </span>      <span class="prefix">tools:</span><span class="attribute">replace</span>=<span class="value">"android:screenOrientation"</span>
+<span class="lineno"> 108 </span>    />
+</pre>
 
 </div>
 <div class="metadata"><div class="explanation" id="explanationDiscouragedApi" style="display: none;">
@@ -1626,21 +1628,21 @@ Dismiss</button>            </div>
 <div class="issue">
 <div class="warningslist">
 <span class="location"><a href="../../src/main/res/layout/activity_crash_screen.xml">../../src/main/res/layout/activity_crash_screen.xml</a>:2</span>: <span class="message">The resource <code>R.layout.activity_crash_screen</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8"?></span>
-<span class="caretline"><span class="lineno">  2 </span><span class="warning"><span class="tag">&lt;androidx.constraintlayout.widget.ConstraintLayout</span><span class="attribute"> </span><span class="prefix">xmlns:</span><span class="attribute">android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span></span></span>
-<span class="lineno">  3 </span>    <span class="prefix">xmlns:</span><span class="attribute">app</span>=<span class="value">"http://schemas.android.com/apk/res-auto"</span>
-<span class="lineno">  4 </span>    <span class="prefix">xmlns:</span><span class="attribute">tools</span>=<span class="value">"http://schemas.android.com/tools"</span>
-<span class="lineno">  5 </span>    <span class="prefix">android:</span><span class="attribute">id</span>=<span class="value">"@+id/main"</span></pre>
+<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8" ?></span>
+<span class="caretline"><span class="lineno">  2 </span><span class="warning"><span class="tag">&lt;androidx.constraintlayout.widget.ConstraintLayout</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="attribute">
+</span><span class="lineno">  3 </span><span class="attribute">  </span><span class="prefix">xmlns:</span><span class="attribute">android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span>
+<span class="lineno">  4 </span>  <span class="prefix">xmlns:</span><span class="attribute">app</span>=<span class="value">"http://schemas.android.com/apk/res-auto"</span>
+<span class="lineno">  5 </span>  <span class="prefix">xmlns:</span><span class="attribute">tools</span>=<span class="value">"http://schemas.android.com/tools"</span></pre>
 
 <span class="location"><a href="../../src/main/res/layout/activity_main.xml">../../src/main/res/layout/activity_main.xml</a>:2</span>: <span class="message">The resource <code>R.layout.activity_main</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8"?></span>
+<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8" ?></span>
 <span class="caretline"><span class="lineno">  2 </span><span class="warning"><span class="tag">&lt;androidx.constraintlayout.widget.ConstraintLayout</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span><span class="attribute">
-</span><span class="lineno">  3 </span><span class="attribute">    </span><span class="prefix">xmlns:</span><span class="attribute">android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span>
-<span class="lineno">  4 </span>    <span class="prefix">xmlns:</span><span class="attribute">app</span>=<span class="value">"http://schemas.android.com/apk/res-auto"</span>
-<span class="lineno">  5 </span>    <span class="prefix">xmlns:</span><span class="attribute">tools</span>=<span class="value">"http://schemas.android.com/tools"</span></pre>
+</span><span class="lineno">  3 </span><span class="attribute">  </span><span class="prefix">xmlns:</span><span class="attribute">android</span>=<span class="value">"http://schemas.android.com/apk/res/android"</span>
+<span class="lineno">  4 </span>  <span class="prefix">xmlns:</span><span class="attribute">app</span>=<span class="value">"http://schemas.android.com/apk/res-auto"</span>
+<span class="lineno">  5 </span>  <span class="prefix">xmlns:</span><span class="attribute">tools</span>=<span class="value">"http://schemas.android.com/tools"</span></pre>
 
 <span class="location"><a href="../../src/main/res/values/colors.xml">../../src/main/res/values/colors.xml</a>:3</span>: <span class="message">The resource <code>R.color.purple_200</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8"?></span>
+<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8" ?></span>
 <span class="lineno">  2 </span><span class="tag">&lt;resources></span>
 <span class="caretline"><span class="lineno">  3 </span>    <span class="tag">&lt;color</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"purple_200"</span></span>>#FFBB86FC<span class="tag">&lt;/color></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno">  4 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"purple_500"</span>>#FF6200EE<span class="tag">&lt;/color></span>
@@ -1648,7 +1650,7 @@ Dismiss</button>            </div>
 <span class="lineno">  6 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"teal_200"</span>>#FF03DAC5<span class="tag">&lt;/color></span></pre>
 
 <span class="location"><a href="../../src/main/res/values/colors.xml">../../src/main/res/values/colors.xml</a>:4</span>: <span class="message">The resource <code>R.color.purple_500</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8"?></span>
+<span class="lineno">  1 </span><span class="prologue">&lt;?xml version="1.0" encoding="utf-8" ?></span>
 <span class="lineno">  2 </span><span class="tag">&lt;resources></span>
 <span class="lineno">  3 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"purple_200"</span>>#FFBB86FC<span class="tag">&lt;/color></span>
 <span class="caretline"><span class="lineno">  4 </span>    <span class="tag">&lt;color</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"purple_500"</span></span>>#FF6200EE<span class="tag">&lt;/color></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
@@ -1718,67 +1720,69 @@ Dismiss</button>            </div>
 <span class="lineno"> 11 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"light_blue_600"</span>>#FF039BE5<span class="tag">&lt;/color></span>
 <span class="caretline"><span class="lineno"> 12 </span>    <span class="tag">&lt;color</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"gray_400"</span></span>>#FFBDBDBD<span class="tag">&lt;/color></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 13 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"gray_600"</span>>#FF757575<span class="tag">&lt;/color></span>
-<span class="lineno"> 14 </span><span class="tag">&lt;/resources></span></pre>
+<span class="lineno"> 14 </span><span class="tag">&lt;/resources></span>
+</pre>
 
 <span class="location"><a href="../../src/main/res/values/colors.xml">../../src/main/res/values/colors.xml</a>:13</span>: <span class="message">The resource <code>R.color.gray_600</code> appears to be unused</span><br /><pre class="errorlines">
 <span class="lineno"> 10 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"light_blue_400"</span>>#FF29B6F6<span class="tag">&lt;/color></span>
 <span class="lineno"> 11 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"light_blue_600"</span>>#FF039BE5<span class="tag">&lt;/color></span>
 <span class="lineno"> 12 </span>    <span class="tag">&lt;color</span><span class="attribute"> name</span>=<span class="value">"gray_400"</span>>#FFBDBDBD<span class="tag">&lt;/color></span>
 <span class="caretline"><span class="lineno"> 13 </span>    <span class="tag">&lt;color</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"gray_600"</span></span>>#FF757575<span class="tag">&lt;/color></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 14 </span><span class="tag">&lt;/resources></span></pre>
-
-<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:10</span>: <span class="message">The resource <code>R.string.prompt_scan_qr_code</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno">  7 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"connect_via_entering_connect_uri"</span>>Connect via Entering Connect URI<span class="tag">&lt;/string></span>
-<span class="lineno">  8 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"share_connect_uri"</span>>Share connect URI<span class="tag">&lt;/string></span>
-<span class="lineno">  9 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"wifi_station_connection"</span>>Wifi Station (Client) Connection<span class="tag">&lt;/string></span>
-<span class="caretline"><span class="lineno"> 10 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"prompt_scan_qr_code"</span></span>>Scan another device to join the Mesh<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 11 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_status"</span>>Hotspot Status<span class="tag">&lt;/string></span>
-<span class="lineno"> 12 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_status_online"</span>>Online<span class="tag">&lt;/string></span>
-<span class="lineno"> 13 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_status_offline"</span>>Offline<span class="tag">&lt;/string></span></pre>
-
-<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:32</span>: <span class="message">The resource <code>R.string.completed</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno"> 29 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"send_file"</span>>Send File<span class="tag">&lt;/string></span>
-<span class="lineno"> 30 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"from"</span>>From<span class="tag">&lt;/string></span>
-<span class="lineno"> 31 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"status"</span>>Status<span class="tag">&lt;/string></span>
-<span class="caretline"><span class="lineno"> 32 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"completed"</span></span>>COMPLETED<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 33 </span>
-<span class="lineno"> 34 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"settings"</span>>Settings<span class="tag">&lt;/string></span>
-<span class="lineno"> 35 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"general"</span>>General<span class="tag">&lt;/string></span></pre>
-
-<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:50</span>: <span class="message">The resource <code>R.string.search_nearby_devices</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno"> 47 </span>
-<span class="lineno"> 48 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"band"</span>>Band<span class="tag">&lt;/string></span>
-<span class="lineno"> 49 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_type"</span>>Hotspot Type<span class="tag">&lt;/string></span>
-<span class="caretline"><span class="lineno"> 50 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"search_nearby_devices"</span></span>>Search Nearby Devices<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 51 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"searching"</span>>Searching<span class="tag">&lt;/string></span>
-<span class="lineno"> 52 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"cancel"</span>>Cancel<span class="tag">&lt;/string></span>
+<span class="lineno"> 14 </span><span class="tag">&lt;/resources></span>
 </pre>
 
-<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:51</span>: <span class="message">The resource <code>R.string.searching</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno"> 48 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"band"</span>>Band<span class="tag">&lt;/string></span>
-<span class="lineno"> 49 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_type"</span>>Hotspot Type<span class="tag">&lt;/string></span>
-<span class="lineno"> 50 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"search_nearby_devices"</span>>Search Nearby Devices<span class="tag">&lt;/string></span>
-<span class="caretline"><span class="lineno"> 51 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"searching"</span></span>>Searching<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 52 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"cancel"</span>>Cancel<span class="tag">&lt;/string></span>
-<span class="lineno"> 53 </span>
-<span class="lineno"> 54 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"elapsed_time"</span>>Elapsed time<span class="tag">&lt;/string></span></pre>
+<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:15</span>: <span class="message">The resource <code>R.string.prompt_scan_qr_code</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 12 </span><span class="attribute">    name</span>=<span class="value">"wifi_station_connection"</span>
+<span class="lineno"> 13 </span>  >Wifi Station (Client) Connection<span class="tag">&lt;/string></span>
+<span class="lineno"> 14 </span>    <span class="tag">&lt;string</span><span class="attribute">
+</span><span class="caretline"><span class="lineno"> 15 </span><span class="attribute">    </span><span class="warning"><span class="attribute">name</span>=<span class="value">"prompt_scan_qr_code"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 16 </span>  >Scan another device to join the Mesh<span class="tag">&lt;/string></span>
+<span class="lineno"> 17 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_status"</span>>Hotspot Status<span class="tag">&lt;/string></span>
+<span class="lineno"> 18 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_status_online"</span>>Online<span class="tag">&lt;/string></span></pre>
 
-<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:52</span>: <span class="message">The resource <code>R.string.cancel</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno"> 49 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_type"</span>>Hotspot Type<span class="tag">&lt;/string></span>
-<span class="lineno"> 50 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"search_nearby_devices"</span>>Search Nearby Devices<span class="tag">&lt;/string></span>
-<span class="lineno"> 51 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"searching"</span>>Searching<span class="tag">&lt;/string></span>
-<span class="caretline"><span class="lineno"> 52 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"cancel"</span></span>>Cancel<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 53 </span>
-<span class="lineno"> 54 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"elapsed_time"</span>>Elapsed time<span class="tag">&lt;/string></span>
-</pre>
+<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:40</span>: <span class="message">The resource <code>R.string.completed</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 37 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"send_file"</span>>Send File<span class="tag">&lt;/string></span>
+<span class="lineno"> 38 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"from"</span>>From<span class="tag">&lt;/string></span>
+<span class="lineno"> 39 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"status"</span>>Status<span class="tag">&lt;/string></span>
+<span class="caretline"><span class="lineno"> 40 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"completed"</span></span>>COMPLETED<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 41 </span>
+<span class="lineno"> 42 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"settings"</span>>Settings<span class="tag">&lt;/string></span>
+<span class="lineno"> 43 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"general"</span>>General<span class="tag">&lt;/string></span></pre>
 
-<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:57</span>: <span class="message">The resource <code>R.string.manual_test</code> appears to be unused</span><br /><pre class="errorlines">
-<span class="lineno"> 54 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"elapsed_time"</span>>Elapsed time<span class="tag">&lt;/string></span>
+<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:58</span>: <span class="message">The resource <code>R.string.search_nearby_devices</code> appears to be unused</span><br /><pre class="errorlines">
 <span class="lineno"> 55 </span>
-<span class="lineno"> 56 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"concurrency"</span>> STA/AP Concurrency<span class="tag">&lt;/string></span>
-<span class="caretline"><span class="lineno"> 57 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"manual_test"</span></span>>Manual Test<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 58 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"reset"</span>>Reset<span class="tag">&lt;/string></span>
-<span class="lineno"> 59 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"log"</span>>Log<span class="tag">&lt;/string></span>
+<span class="lineno"> 56 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"band"</span>>Band<span class="tag">&lt;/string></span>
+<span class="lineno"> 57 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_type"</span>>Hotspot Type<span class="tag">&lt;/string></span>
+<span class="caretline"><span class="lineno"> 58 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"search_nearby_devices"</span></span>>Search Nearby Devices<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 59 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"searching"</span>>Searching<span class="tag">&lt;/string></span>
+<span class="lineno"> 60 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"cancel"</span>>Cancel<span class="tag">&lt;/string></span>
+</pre>
+
+<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:59</span>: <span class="message">The resource <code>R.string.searching</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 56 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"band"</span>>Band<span class="tag">&lt;/string></span>
+<span class="lineno"> 57 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_type"</span>>Hotspot Type<span class="tag">&lt;/string></span>
+<span class="lineno"> 58 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"search_nearby_devices"</span>>Search Nearby Devices<span class="tag">&lt;/string></span>
+<span class="caretline"><span class="lineno"> 59 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"searching"</span></span>>Searching<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 60 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"cancel"</span>>Cancel<span class="tag">&lt;/string></span>
+<span class="lineno"> 61 </span>
+<span class="lineno"> 62 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"elapsed_time"</span>>Elapsed time<span class="tag">&lt;/string></span></pre>
+
+<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:60</span>: <span class="message">The resource <code>R.string.cancel</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 57 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"hotspot_type"</span>>Hotspot Type<span class="tag">&lt;/string></span>
+<span class="lineno"> 58 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"search_nearby_devices"</span>>Search Nearby Devices<span class="tag">&lt;/string></span>
+<span class="lineno"> 59 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"searching"</span>>Searching<span class="tag">&lt;/string></span>
+<span class="caretline"><span class="lineno"> 60 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"cancel"</span></span>>Cancel<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 61 </span>
+<span class="lineno"> 62 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"elapsed_time"</span>>Elapsed time<span class="tag">&lt;/string></span>
+</pre>
+
+<span class="location"><a href="../../src/main/res/values/strings.xml">../../src/main/res/values/strings.xml</a>:65</span>: <span class="message">The resource <code>R.string.manual_test</code> appears to be unused</span><br /><pre class="errorlines">
+<span class="lineno"> 62 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"elapsed_time"</span>>Elapsed time<span class="tag">&lt;/string></span>
+<span class="lineno"> 63 </span>
+<span class="lineno"> 64 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"concurrency"</span>> STA/AP Concurrency<span class="tag">&lt;/string></span>
+<span class="caretline"><span class="lineno"> 65 </span>    <span class="tag">&lt;string</span><span class="attribute"> </span><span class="warning"><span class="attribute">name</span>=<span class="value">"manual_test"</span></span>>Manual Test<span class="tag">&lt;/string></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 66 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"reset"</span>>Reset<span class="tag">&lt;/string></span>
+<span class="lineno"> 67 </span>    <span class="tag">&lt;string</span><span class="attribute"> name</span>=<span class="value">"log"</span>>Log<span class="tag">&lt;/string></span>
 </pre>
 
 <span class="location"><a href="../../src/main/res/values/styles.xml">../../src/main/res/values/styles.xml</a>:2</span>: <span class="message">The resource <code>R.style.Widget_Theme_AppCompat_MyView</code> appears to be unused</span><br /><pre class="errorlines">
@@ -1883,7 +1887,7 @@ Dismiss</button>            </div>
 <span class="lineno">  76 </span>    implementation(libs.androidx.ui)
 </pre>
 
-<button class="mdl-button mdl-js-button mdl-button--primary" id="UseTomlInsteadDivLink" onclick="reveal('UseTomlInsteadDiv');" />+ 25 More Occurrences...</button>
+<button class="mdl-button mdl-js-button mdl-button--primary" id="UseTomlInsteadDivLink" onclick="reveal('UseTomlInsteadDiv');" />+ 35 More Occurrences...</button>
 <div id="UseTomlInsteadDiv" style="display: none">
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:74</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
 <span class="lineno">  71 </span>    implementation(platform(libs.androidx.compose.bom))
@@ -1895,240 +1899,339 @@ Dismiss</button>            </div>
 <span class="lineno">  77 </span>    implementation(libs.androidx.ui.graphics)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:96</span>: <span class="message">Use version catalog instead (com.github.UstadMobile.Meshrabiya:lib-meshrabiya is already available as <code>lib-meshrabiya</code>, but using version 0.1-snapshot instead)</span><br /><pre class="errorlines">
-<span class="lineno">  93 </span>    androidTestImplementation(libs.androidx.ui.test.junit4)
-<span class="lineno">  94 </span>    debugImplementation(libs.androidx.ui.tooling)
-<span class="lineno">  95 </span>    debugImplementation(libs.androidx.ui.test.manifest)
-<span class="caretline"><span class="lineno">  96 </span>    implementation(<span class="warning">"com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  97 </span>    implementation("com.github.seancfoley:ipaddress:5.3.3")
-<span class="lineno">  98 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-<span class="lineno">  99 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:95</span>: <span class="message">Use the existing version catalog reference (<code>libs.junit</code>) instead</span><br /><pre class="errorlines">
+<span class="lineno">  92 </span>    // ===============================
+<span class="lineno">  93 </span>    // Unit testing (JVM) deps added
+<span class="lineno">  94 </span>    // ===============================
+<span class="caretline"><span class="lineno">  95 </span>    testImplementation(<span class="warning">"junit:junit:4.13.2"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  96 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="lineno">  97 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno">  98 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:96</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno">  93 </span>    // Unit testing (JVM) deps added
+<span class="lineno">  94 </span>    // ===============================
+<span class="lineno">  95 </span>    testImplementation("junit:junit:4.13.2")
+<span class="caretline"><span class="lineno">  96 </span>    testImplementation(<span class="warning">"org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  97 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno">  98 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="lineno">  99 </span>    testImplementation("androidx.test:core:1.6.1")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:97</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno">  94 </span>    debugImplementation(libs.androidx.ui.tooling)
-<span class="lineno">  95 </span>    debugImplementation(libs.androidx.ui.test.manifest)
-<span class="lineno">  96 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
-<span class="caretline"><span class="lineno">  97 </span>    implementation(<span class="warning">"com.github.seancfoley:ipaddress:5.3.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  98 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-<span class="lineno">  99 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
-<span class="lineno"> 100 </span>    implementation (libs.material)
+<span class="lineno">  94 </span>    // ===============================
+<span class="lineno">  95 </span>    testImplementation("junit:junit:4.13.2")
+<span class="lineno">  96 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="caretline"><span class="lineno">  97 </span>    testImplementation(<span class="warning">"io.mockk:mockk:1.13.12"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  98 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="lineno">  99 </span>    testImplementation("androidx.test:core:1.6.1")
+<span class="lineno"> 100 </span>    testImplementation("app.cash.turbine:turbine:1.1.0")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:98</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno">  95 </span>    debugImplementation(libs.androidx.ui.test.manifest)
-<span class="lineno">  96 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
-<span class="lineno">  97 </span>    implementation("com.github.seancfoley:ipaddress:5.3.3")
-<span class="caretline"><span class="lineno">  98 </span>    implementation(<span class="warning">"com.squareup.okhttp3:okhttp:4.10.0"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  99 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
-<span class="lineno"> 100 </span>    implementation (libs.material)
-<span class="lineno"> 101 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+<span class="lineno">  95 </span>    testImplementation("junit:junit:4.13.2")
+<span class="lineno">  96 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="lineno">  97 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="caretline"><span class="lineno">  98 </span>    testImplementation(<span class="warning">"org.robolectric:robolectric:4.12.2"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  99 </span>    testImplementation("androidx.test:core:1.6.1")
+<span class="lineno"> 100 </span>    testImplementation("app.cash.turbine:turbine:1.1.0")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:99</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno">  96 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
-<span class="lineno">  97 </span>    implementation("com.github.seancfoley:ipaddress:5.3.3")
-<span class="lineno">  98 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-<span class="caretline"><span class="lineno">  99 </span>    implementation(<span class="warning">"org.nanohttpd:nanohttpd:2.3.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 100 </span>    implementation (libs.material)
-<span class="lineno"> 101 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-<span class="lineno"> 102 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
+<span class="lineno">  96 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="lineno">  97 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno">  98 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="caretline"><span class="lineno">  99 </span>    testImplementation(<span class="warning">"androidx.test:core:1.6.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 100 </span>    testImplementation("app.cash.turbine:turbine:1.1.0")
+<span class="lineno"> 101 </span>
+<span class="lineno"> 102 </span>    androidTestImplementation(libs.androidx.junit)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:101</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno">  98 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-<span class="lineno">  99 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
-<span class="lineno"> 100 </span>    implementation (libs.material)
-<span class="caretline"><span class="lineno"> 101 </span>    implementation(<span class="warning">"org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 102 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
-<span class="lineno"> 103 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:100</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno">  97 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno">  98 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="lineno">  99 </span>    testImplementation("androidx.test:core:1.6.1")
+<span class="caretline"><span class="lineno"> 100 </span>    testImplementation(<span class="warning">"app.cash.turbine:turbine:1.1.0"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 101 </span>
+<span class="lineno"> 102 </span>    androidTestImplementation(libs.androidx.junit)
+<span class="lineno"> 103 </span>    androidTestImplementation(libs.androidx.espresso.core)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:102</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno">  99 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
-<span class="lineno"> 100 </span>    implementation (libs.material)
-<span class="lineno"> 101 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-<span class="caretline"><span class="lineno"> 102 </span>    implementation(<span class="warning">"com.github.yveskalume:compose-qrpainter:0.0.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 103 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
-<span class="lineno"> 105 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:108</span>: <span class="message">Use version catalog instead (com.github.UstadMobile.Meshrabiya:lib-meshrabiya is already available as <code>lib-meshrabiya</code>, but using version 0.1-snapshot instead)</span><br /><pre class="errorlines">
+<span class="lineno"> 105 </span>    androidTestImplementation(libs.androidx.ui.test.junit4)
+<span class="lineno"> 106 </span>    debugImplementation(libs.androidx.ui.tooling)
+<span class="lineno"> 107 </span>    debugImplementation(libs.androidx.ui.test.manifest)
+<span class="caretline"><span class="lineno"> 108 </span>    implementation(<span class="warning">"com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 109 </span>    implementation("com.github.seancfoley:ipaddress:5.3.3")
+<span class="lineno"> 110 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+<span class="lineno"> 111 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:103</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 100 </span>    implementation (libs.material)
-<span class="lineno"> 101 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-<span class="lineno"> 102 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
-<span class="caretline"><span class="lineno"> 103 </span>    implementation(<span class="warning">"com.journeyapps:zxing-android-embedded:4.3.0"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
-<span class="lineno"> 105 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
-<span class="lineno"> 106 </span>    implementation("androidx.compose.material3:material3:1.2.1")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:109</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 106 </span>    debugImplementation(libs.androidx.ui.tooling)
+<span class="lineno"> 107 </span>    debugImplementation(libs.androidx.ui.test.manifest)
+<span class="lineno"> 108 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
+<span class="caretline"><span class="lineno"> 109 </span>    implementation(<span class="warning">"com.github.seancfoley:ipaddress:5.3.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 110 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+<span class="lineno"> 111 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
+<span class="lineno"> 112 </span>    implementation (libs.material)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:105</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 102 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
-<span class="lineno"> 103 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
-<span class="caretline"><span class="lineno"> 105 </span>    implementation (<span class="warning">"io.coil-kt:coil-compose:1.4.0"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 106 </span>    implementation("androidx.compose.material3:material3:1.2.1")
-<span class="lineno"> 107 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
-<span class="lineno"> 108 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:110</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 107 </span>    debugImplementation(libs.androidx.ui.test.manifest)
+<span class="lineno"> 108 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
+<span class="lineno"> 109 </span>    implementation("com.github.seancfoley:ipaddress:5.3.3")
+<span class="caretline"><span class="lineno"> 110 </span>    implementation(<span class="warning">"com.squareup.okhttp3:okhttp:4.10.0"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 111 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
+<span class="lineno"> 112 </span>    implementation (libs.material)
+<span class="lineno"> 113 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:106</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 103 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
-<span class="lineno"> 105 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
-<span class="caretline"><span class="lineno"> 106 </span>    implementation(<span class="warning">"androidx.compose.material3:material3:1.2.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 107 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
-<span class="lineno"> 108 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
-<span class="lineno"> 109 </span>    // Core Kodein DI dependency
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:111</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 108 </span>    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
+<span class="lineno"> 109 </span>    implementation("com.github.seancfoley:ipaddress:5.3.3")
+<span class="lineno"> 110 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+<span class="caretline"><span class="lineno"> 111 </span>    implementation(<span class="warning">"org.nanohttpd:nanohttpd:2.3.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 112 </span>    implementation (libs.material)
+<span class="lineno"> 113 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+<span class="lineno"> 114 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:107</span>: <span class="message">Use the existing version catalog reference (<code>libs.androidx.navigation.compose</code>) instead</span><br /><pre class="errorlines">
-<span class="lineno"> 104 </span>    implementation(libs.androidx.appcompat)
-<span class="lineno"> 105 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
-<span class="lineno"> 106 </span>    implementation("androidx.compose.material3:material3:1.2.1")
-<span class="caretline"><span class="lineno"> 107 </span>    implementation(<span class="warning">"androidx.navigation:navigation-compose:2.7.7"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 108 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
-<span class="lineno"> 109 </span>    // Core Kodein DI dependency
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:113</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 110 </span>    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+<span class="lineno"> 111 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
+<span class="lineno"> 112 </span>    implementation (libs.material)
+<span class="caretline"><span class="lineno"> 113 </span>    implementation(<span class="warning">"org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 114 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
+<span class="lineno"> 115 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:108</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 105 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
-<span class="lineno"> 106 </span>    implementation("androidx.compose.material3:material3:1.2.1")
-<span class="lineno"> 107 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
-<span class="caretline"><span class="lineno"> 108 </span>    implementation(<span class="warning">"com.google.accompanist:accompanist-permissions:0.31.1-alpha"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 109 </span>    // Core Kodein DI dependency
-<span class="lineno"> 110 </span>
-<span class="lineno"> 111 </span>    // For Android-specific features
-</pre>
-
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:112</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 109 </span>    // Core Kodein DI dependency
-<span class="lineno"> 110 </span>
-<span class="lineno"> 111 </span>    // For Android-specific features
-<span class="caretline"><span class="lineno"> 112 </span>    implementation (<span class="warning">"org.kodein.di:kodein-di-framework-android-x:7.20.2"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 113 </span>
-<span class="lineno"> 114 </span>    // For Jetpack Compose support
-<span class="lineno"> 115 </span>    implementation ("org.kodein.di:kodein-di-framework-compose:7.20.2")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:114</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 111 </span>    implementation("org.nanohttpd:nanohttpd:2.3.1")
+<span class="lineno"> 112 </span>    implementation (libs.material)
+<span class="lineno"> 113 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+<span class="caretline"><span class="lineno"> 114 </span>    implementation(<span class="warning">"com.github.yveskalume:compose-qrpainter:0.0.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 115 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
+<span class="lineno"> 117 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:115</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 112 </span>    implementation ("org.kodein.di:kodein-di-framework-android-x:7.20.2")
-<span class="lineno"> 113 </span>
-<span class="lineno"> 114 </span>    // For Jetpack Compose support
-<span class="caretline"><span class="lineno"> 115 </span>    implementation (<span class="warning">"org.kodein.di:kodein-di-framework-compose:7.20.2"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 116 </span>
-<span class="lineno"> 117 </span>    val room_version = "2.6.1"
+<span class="lineno"> 112 </span>    implementation (libs.material)
+<span class="lineno"> 113 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+<span class="lineno"> 114 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
+<span class="caretline"><span class="lineno"> 115 </span>    implementation(<span class="warning">"com.journeyapps:zxing-android-embedded:4.3.0"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
+<span class="lineno"> 117 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
+<span class="lineno"> 118 </span>    implementation("androidx.compose.material3:material3:1.2.1")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:119</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 116 </span>
-<span class="lineno"> 117 </span>    val room_version = "2.6.1"
-<span class="lineno"> 118 </span>
-<span class="caretline"><span class="lineno"> 119 </span>    implementation(<span class="warning">"androidx.room:room-runtime:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 120 </span>    annotationProcessor("androidx.room:room-compiler:$room_version")
-<span class="lineno"> 121 </span>
-<span class="lineno"> 122 </span>    // To use Kotlin annotation processing tool (kapt)
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:117</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 114 </span>    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
+<span class="lineno"> 115 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
+<span class="caretline"><span class="lineno"> 117 </span>    implementation (<span class="warning">"io.coil-kt:coil-compose:1.4.0"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 118 </span>    implementation("androidx.compose.material3:material3:1.2.1")
+<span class="lineno"> 119 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
+<span class="lineno"> 120 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:118</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 115 </span>    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
+<span class="lineno"> 117 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
+<span class="caretline"><span class="lineno"> 118 </span>    implementation(<span class="warning">"androidx.compose.material3:material3:1.2.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 119 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
+<span class="lineno"> 120 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+<span class="lineno"> 121 </span>    // Core Kodein DI dependency
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:119</span>: <span class="message">Use the existing version catalog reference (<code>libs.androidx.navigation.compose</code>) instead</span><br /><pre class="errorlines">
+<span class="lineno"> 116 </span>    implementation(libs.androidx.appcompat)
+<span class="lineno"> 117 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
+<span class="lineno"> 118 </span>    implementation("androidx.compose.material3:material3:1.2.1")
+<span class="caretline"><span class="lineno"> 119 </span>    implementation(<span class="warning">"androidx.navigation:navigation-compose:2.7.7"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 120 </span>    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
+<span class="lineno"> 121 </span>    // Core Kodein DI dependency
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:120</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 117 </span>    val room_version = "2.6.1"
-<span class="lineno"> 118 </span>
-<span class="lineno"> 119 </span>    implementation("androidx.room:room-runtime:$room_version")
-<span class="caretline"><span class="lineno"> 120 </span>    annotationProcessor(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 121 </span>
-<span class="lineno"> 122 </span>    // To use Kotlin annotation processing tool (kapt)
-<span class="lineno"> 123 </span>    // kapt("androidx.room:room-compiler:$room_version")
+<span class="lineno"> 117 </span>    implementation ("io.coil-kt:coil-compose:1.4.0")
+<span class="lineno"> 118 </span>    implementation("androidx.compose.material3:material3:1.2.1")
+<span class="lineno"> 119 </span>    implementation("androidx.navigation:navigation-compose:2.7.7")
+<span class="caretline"><span class="lineno"> 120 </span>    implementation(<span class="warning">"com.google.accompanist:accompanist-permissions:0.31.1-alpha"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 121 </span>    // Core Kodein DI dependency
+<span class="lineno"> 122 </span>
+<span class="lineno"> 123 </span>    // For Android-specific features
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:125</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 122 </span>    // To use Kotlin annotation processing tool (kapt)
-<span class="lineno"> 123 </span>    // kapt("androidx.room:room-compiler:$room_version")
-<span class="lineno"> 124 </span>    // To use Kotlin Symbol Processing (KSP)
-<span class="caretline"><span class="lineno"> 125 </span>    ksp(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 126 </span>
-<span class="lineno"> 127 </span>    // optional - Kotlin Extensions and Coroutines support for Room
-<span class="lineno"> 128 </span>    implementation("androidx.room:room-ktx:$room_version")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:124</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 121 </span>    // Core Kodein DI dependency
+<span class="lineno"> 122 </span>
+<span class="lineno"> 123 </span>    // For Android-specific features
+<span class="caretline"><span class="lineno"> 124 </span>    implementation (<span class="warning">"org.kodein.di:kodein-di-framework-android-x:7.20.2"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 125 </span>
+<span class="lineno"> 126 </span>    // For Jetpack Compose support
+<span class="lineno"> 127 </span>    implementation ("org.kodein.di:kodein-di-framework-compose:7.20.2")
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:128</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 125 </span>    ksp("androidx.room:room-compiler:$room_version")
-<span class="lineno"> 126 </span>
-<span class="lineno"> 127 </span>    // optional - Kotlin Extensions and Coroutines support for Room
-<span class="caretline"><span class="lineno"> 128 </span>    implementation(<span class="warning">"androidx.room:room-ktx:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 129 </span>
-<span class="lineno"> 130 </span>    // optional - RxJava2 support for Room
-<span class="lineno"> 131 </span>    implementation("androidx.room:room-rxjava2:$room_version")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:127</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 124 </span>    implementation ("org.kodein.di:kodein-di-framework-android-x:7.20.2")
+<span class="lineno"> 125 </span>
+<span class="lineno"> 126 </span>    // For Jetpack Compose support
+<span class="caretline"><span class="lineno"> 127 </span>    implementation (<span class="warning">"org.kodein.di:kodein-di-framework-compose:7.20.2"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 128 </span>
+<span class="lineno"> 129 </span>    val room_version = "2.6.1"
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:131</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 128 </span>    implementation("androidx.room:room-ktx:$room_version")
-<span class="lineno"> 129 </span>
-<span class="lineno"> 130 </span>    // optional - RxJava2 support for Room
-<span class="caretline"><span class="lineno"> 131 </span>    implementation(<span class="warning">"androidx.room:room-rxjava2:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 132 </span>
-<span class="lineno"> 133 </span>    // optional - RxJava3 support for Room
-<span class="lineno"> 134 </span>    implementation("androidx.room:room-rxjava3:$room_version")
+<span class="lineno"> 128 </span>
+<span class="lineno"> 129 </span>    val room_version = "2.6.1"
+<span class="lineno"> 130 </span>
+<span class="caretline"><span class="lineno"> 131 </span>    implementation(<span class="warning">"androidx.room:room-runtime:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 132 </span>    annotationProcessor("androidx.room:room-compiler:$room_version")
+<span class="lineno"> 133 </span>
+<span class="lineno"> 134 </span>    // To use Kotlin annotation processing tool (kapt)
 </pre>
 
-<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:134</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 131 </span>    implementation("androidx.room:room-rxjava2:$room_version")
-<span class="lineno"> 132 </span>
-<span class="lineno"> 133 </span>    // optional - RxJava3 support for Room
-<span class="caretline"><span class="lineno"> 134 </span>    implementation(<span class="warning">"androidx.room:room-rxjava3:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 135 </span>
-<span class="lineno"> 136 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
-<span class="lineno"> 137 </span>    implementation("androidx.room:room-guava:$room_version")
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:132</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 129 </span>    val room_version = "2.6.1"
+<span class="lineno"> 130 </span>
+<span class="lineno"> 131 </span>    implementation("androidx.room:room-runtime:$room_version")
+<span class="caretline"><span class="lineno"> 132 </span>    annotationProcessor(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 133 </span>
+<span class="lineno"> 134 </span>    // To use Kotlin annotation processing tool (kapt)
+<span class="lineno"> 135 </span>    // kapt("androidx.room:room-compiler:$room_version")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:137</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 134 </span>    implementation("androidx.room:room-rxjava3:$room_version")
-<span class="lineno"> 135 </span>
-<span class="lineno"> 136 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
-<span class="caretline"><span class="lineno"> 137 </span>    implementation(<span class="warning">"androidx.room:room-guava:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 134 </span>    // To use Kotlin annotation processing tool (kapt)
+<span class="lineno"> 135 </span>    // kapt("androidx.room:room-compiler:$room_version")
+<span class="lineno"> 136 </span>    // To use Kotlin Symbol Processing (KSP)
+<span class="caretline"><span class="lineno"> 137 </span>    ksp(<span class="warning">"androidx.room:room-compiler:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 138 </span>
-<span class="lineno"> 139 </span>    // optional - Test helpers
-<span class="lineno"> 140 </span>    testImplementation("androidx.room:room-testing:$room_version")
+<span class="lineno"> 139 </span>    // optional - Kotlin Extensions and Coroutines support for Room
+<span class="lineno"> 140 </span>    implementation("androidx.room:room-ktx:$room_version")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:140</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 137 </span>    implementation("androidx.room:room-guava:$room_version")
+<span class="lineno"> 137 </span>    ksp("androidx.room:room-compiler:$room_version")
 <span class="lineno"> 138 </span>
-<span class="lineno"> 139 </span>    // optional - Test helpers
-<span class="caretline"><span class="lineno"> 140 </span>    testImplementation(<span class="warning">"androidx.room:room-testing:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 139 </span>    // optional - Kotlin Extensions and Coroutines support for Room
+<span class="caretline"><span class="lineno"> 140 </span>    implementation(<span class="warning">"androidx.room:room-ktx:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 141 </span>
-<span class="lineno"> 142 </span>    // optional - Paging 3 Integration
-<span class="lineno"> 143 </span>    implementation("androidx.room:room-paging:$room_version")
+<span class="lineno"> 142 </span>    // optional - RxJava2 support for Room
+<span class="lineno"> 143 </span>    implementation("androidx.room:room-rxjava2:$room_version")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:143</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 140 </span>    testImplementation("androidx.room:room-testing:$room_version")
+<span class="lineno"> 140 </span>    implementation("androidx.room:room-ktx:$room_version")
 <span class="lineno"> 141 </span>
-<span class="lineno"> 142 </span>    // optional - Paging 3 Integration
-<span class="caretline"><span class="lineno"> 143 </span>    implementation(<span class="warning">"androidx.room:room-paging:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 142 </span>    // optional - RxJava2 support for Room
+<span class="caretline"><span class="lineno"> 143 </span>    implementation(<span class="warning">"androidx.room:room-rxjava2:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 144 </span>
-<span class="lineno"> 145 </span>    // for crash scren
-<span class="lineno"> 146 </span>    implementation("com.google.code.gson:gson:2.10.1")
+<span class="lineno"> 145 </span>    // optional - RxJava3 support for Room
+<span class="lineno"> 146 </span>    implementation("androidx.room:room-rxjava3:$room_version")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:146</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 143 </span>    implementation("androidx.room:room-paging:$room_version")
+<span class="lineno"> 143 </span>    implementation("androidx.room:room-rxjava2:$room_version")
 <span class="lineno"> 144 </span>
-<span class="lineno"> 145 </span>    // for crash scren
-<span class="caretline"><span class="lineno"> 146 </span>    implementation(<span class="warning">"com.google.code.gson:gson:2.10.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 145 </span>    // optional - RxJava3 support for Room
+<span class="caretline"><span class="lineno"> 146 </span>    implementation(<span class="warning">"androidx.room:room-rxjava3:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
 <span class="lineno"> 147 </span>
-<span class="lineno"> 148 </span>    // For JSON serialisation
-<span class="lineno"> 149 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+<span class="lineno"> 148 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
+<span class="lineno"> 149 </span>    implementation("androidx.room:room-guava:$room_version")
 </pre>
 
 <span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:149</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
-<span class="lineno"> 146 </span>    implementation("com.google.code.gson:gson:2.10.1")
+<span class="lineno"> 146 </span>    implementation("androidx.room:room-rxjava3:$room_version")
 <span class="lineno"> 147 </span>
-<span class="lineno"> 148 </span>    // For JSON serialisation
-<span class="caretline"><span class="lineno"> 149 </span>    implementation(<span class="warning">"org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 150 </span>}</pre>
+<span class="lineno"> 148 </span>    // optional - Guava support for Room, including Optional and ListenableFuture
+<span class="caretline"><span class="lineno"> 149 </span>    implementation(<span class="warning">"androidx.room:room-guava:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 150 </span>
+<span class="lineno"> 151 </span>    // optional - Test helpers
+<span class="lineno"> 152 </span>    testImplementation("androidx.room:room-testing:$room_version")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:152</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 149 </span>    implementation("androidx.room:room-guava:$room_version")
+<span class="lineno"> 150 </span>
+<span class="lineno"> 151 </span>    // optional - Test helpers
+<span class="caretline"><span class="lineno"> 152 </span>    testImplementation(<span class="warning">"androidx.room:room-testing:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 153 </span>
+<span class="lineno"> 154 </span>    // Unit test libs (local JVM tests in app/src/test)
+<span class="lineno"> 155 </span>    testImplementation("io.mockk:mockk:1.13.12")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:155</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 152 </span>    testImplementation("androidx.room:room-testing:$room_version")
+<span class="lineno"> 153 </span>
+<span class="lineno"> 154 </span>    // Unit test libs (local JVM tests in app/src/test)
+<span class="caretline"><span class="lineno"> 155 </span>    testImplementation(<span class="warning">"io.mockk:mockk:1.13.12"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 156 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="lineno"> 157 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="lineno"> 158 </span>    testImplementation("androidx.test:core:1.6.1")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:156</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 153 </span>
+<span class="lineno"> 154 </span>    // Unit test libs (local JVM tests in app/src/test)
+<span class="lineno"> 155 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="caretline"><span class="lineno"> 156 </span>    testImplementation(<span class="warning">"org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 157 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="lineno"> 158 </span>    testImplementation("androidx.test:core:1.6.1")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:157</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 154 </span>    // Unit test libs (local JVM tests in app/src/test)
+<span class="lineno"> 155 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno"> 156 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="caretline"><span class="lineno"> 157 </span>    testImplementation(<span class="warning">"org.robolectric:robolectric:4.12.2"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 158 </span>    testImplementation("androidx.test:core:1.6.1")
+<span class="lineno"> 159 </span>
+<span class="lineno"> 160 </span>    // optional - Paging 3 Integration
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:158</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 155 </span>    testImplementation("io.mockk:mockk:1.13.12")
+<span class="lineno"> 156 </span>    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.1")
+<span class="lineno"> 157 </span>    testImplementation("org.robolectric:robolectric:4.12.2")
+<span class="caretline"><span class="lineno"> 158 </span>    testImplementation(<span class="warning">"androidx.test:core:1.6.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 159 </span>
+<span class="lineno"> 160 </span>    // optional - Paging 3 Integration
+<span class="lineno"> 161 </span>    implementation("androidx.room:room-paging:$room_version")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:161</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 158 </span>    testImplementation("androidx.test:core:1.6.1")
+<span class="lineno"> 159 </span>
+<span class="lineno"> 160 </span>    // optional - Paging 3 Integration
+<span class="caretline"><span class="lineno"> 161 </span>    implementation(<span class="warning">"androidx.room:room-paging:$room_version"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 162 </span>
+<span class="lineno"> 163 </span>    // for crash scren
+<span class="lineno"> 164 </span>    implementation("com.google.code.gson:gson:2.10.1")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:164</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 161 </span>    implementation("androidx.room:room-paging:$room_version")
+<span class="lineno"> 162 </span>
+<span class="lineno"> 163 </span>    // for crash scren
+<span class="caretline"><span class="lineno"> 164 </span>    implementation(<span class="warning">"com.google.code.gson:gson:2.10.1"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 165 </span>
+<span class="lineno"> 166 </span>    // For JSON serialisation
+<span class="lineno"> 167 </span>    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+</pre>
+
+<span class="location"><a href="../../build.gradle.kts">../../build.gradle.kts</a>:167</span>: <span class="message">Use version catalog instead</span><br /><pre class="errorlines">
+<span class="lineno"> 164 </span>    implementation("com.google.code.gson:gson:2.10.1")
+<span class="lineno"> 165 </span>
+<span class="lineno"> 166 </span>    // For JSON serialisation
+<span class="caretline"><span class="lineno"> 167 </span>    implementation(<span class="warning">"org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3"</span>)&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 168 </span>}
+</pre>
 
 </div>
 </div>
@@ -2168,24 +2271,23 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/res/layout/activity_crash_screen.xml">../../src/main/res/layout/activity_crash_screen.xml</a>:18</span>: <span class="message">Hardcoded string "TextView", should use <code>@string</code> resource</span><br /><pre class="errorlines">
-<span class="lineno"> 15 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginTop</span>=<span class="value">"9dp"</span>
-<span class="lineno"> 16 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginEnd</span>=<span class="value">"13dp"</span>
-<span class="lineno"> 17 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginBottom</span>=<span class="value">"9dp"</span>
-<span class="caretline"><span class="lineno"> 18 </span>        <span class="warning"><span class="prefix">android:</span><span class="attribute">text</span>=<span class="value">"TextView"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 19 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintBottom_toBottomOf</span>=<span class="value">"parent"</span>
-<span class="lineno"> 20 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintEnd_toEndOf</span>=<span class="value">"parent"</span>
-<span class="lineno"> 21 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintStart_toStartOf</span>=<span class="value">"parent"</span></pre>
+<span class="location"><a href="../../src/main/res/layout/activity_crash_screen.xml">../../src/main/res/layout/activity_crash_screen.xml</a>:20</span>: <span class="message">Hardcoded string "TextView", should use <code>@string</code> resource</span><br /><pre class="errorlines">
+<span class="lineno"> 17 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginTop</span>=<span class="value">"9dp"</span>
+<span class="lineno"> 18 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginEnd</span>=<span class="value">"13dp"</span>
+<span class="lineno"> 19 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginBottom</span>=<span class="value">"9dp"</span>
+<span class="caretline"><span class="lineno"> 20 </span>        <span class="warning"><span class="prefix">android:</span><span class="attribute">text</span>=<span class="value">"TextView"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 21 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintBottom_toBottomOf</span>=<span class="value">"parent"</span>
+<span class="lineno"> 22 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintEnd_toEndOf</span>=<span class="value">"parent"</span>
+<span class="lineno"> 23 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintStart_toStartOf</span>=<span class="value">"parent"</span></pre>
 
-<span class="location"><a href="../../src/main/res/layout/activity_main.xml">../../src/main/res/layout/activity_main.xml</a>:15</span>: <span class="message">Hardcoded string "Project Mesh", should use <code>@string</code> resource</span><br /><pre class="errorlines">
-<span class="lineno"> 12 </span>        <span class="prefix">android:</span><span class="attribute">layout_height</span>=<span class="value">"wrap_content"</span>
-<span class="lineno"> 13 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginStart</span>=<span class="value">"24dp"</span>
-<span class="lineno"> 14 </span>        <span class="prefix">android:</span><span class="attribute">layout_marginTop</span>=<span class="value">"24dp"</span>
-<span class="caretline"><span class="lineno"> 15 </span>        <span class="warning"><span class="prefix">android:</span><span class="attribute">text</span>=<span class="value">"Project Mesh"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 16 </span>        <span class="prefix">android:</span><span class="attribute">textSize</span>=<span class="value">"24sp"</span>
-<span class="lineno"> 17 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintStart_toStartOf</span>=<span class="value">"parent"</span>
-<span class="lineno"> 18 </span>        <span class="prefix">app:</span><span class="attribute">layout_constraintTop_toTopOf</span>=<span class="value">"parent"</span> />
-</pre>
+<span class="location"><a href="../../src/main/res/layout/activity_main.xml">../../src/main/res/layout/activity_main.xml</a>:16</span>: <span class="message">Hardcoded string "Project Mesh", should use <code>@string</code> resource</span><br /><pre class="errorlines">
+<span class="lineno"> 13 </span>    <span class="prefix">android:</span><span class="attribute">layout_height</span>=<span class="value">"wrap_content"</span>
+<span class="lineno"> 14 </span>    <span class="prefix">android:</span><span class="attribute">layout_marginStart</span>=<span class="value">"24dp"</span>
+<span class="lineno"> 15 </span>    <span class="prefix">android:</span><span class="attribute">layout_marginTop</span>=<span class="value">"24dp"</span>
+<span class="caretline"><span class="lineno"> 16 </span>    <span class="warning"><span class="prefix">android:</span><span class="attribute">text</span>=<span class="value">"Project Mesh"</span></span>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 17 </span>    <span class="prefix">android:</span><span class="attribute">textSize</span>=<span class="value">"24sp"</span>
+<span class="lineno"> 18 </span>    <span class="prefix">app:</span><span class="attribute">layout_constraintStart_toStartOf</span>=<span class="value">"parent"</span>
+<span class="lineno"> 19 </span>    <span class="prefix">app:</span><span class="attribute">layout_constraintTop_toTopOf</span>=<span class="value">"parent"</span></pre>
 
 </div>
 <div class="metadata"><div class="explanation" id="explanationHardcodedText" style="display: none;">
