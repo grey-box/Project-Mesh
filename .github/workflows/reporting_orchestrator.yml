@@ -123,20 +123,21 @@ jobs:
 
       - name: Commit Reports to Viewing Directory
         run: |
+          git switch "gh-pages"
           git add --force ./build_reports/
           git commit -m "Relocate reports for viewing"
           git push
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Upload Reports Viewer Directory to Pages
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: ./build_reports
+      # - name: Upload Reports Viewer Directory to Pages
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: ./build_reports
 
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+      # - name: Deploy to GitHub Pages
+      #   id: deployment
+      #   uses: actions/deploy-pages@v4
 
       - name: Link Pages in Build Summary
         run: |
