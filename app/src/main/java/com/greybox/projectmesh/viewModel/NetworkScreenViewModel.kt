@@ -32,8 +32,10 @@ data class NetworkScreenModel(
 class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewModel() {
     // _uiState will be updated whenever there is a change in the UI state
     private val _uiState = MutableStateFlow(NetworkScreenModel())
+
     // uiState is a read-only property that shows the current UI state
     val uiState: Flow<NetworkScreenModel> = _uiState.asStateFlow()
+
     // di is used to get the AndroidVirtualNode instance
     private val node: AndroidVirtualNode by di.instance()
     private val appServer: AppServer by di.instance()
@@ -54,7 +56,8 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
 
                 // For each disconnected node, notify DeviceStatusManager
                 disconnectedNodes.forEach { nodeAddress ->
-                    val ipAddress = InetAddress.getByAddress(nodeAddress.addressToByteArray()).hostAddress
+                    val ipAddress =
+                        InetAddress.getByAddress(nodeAddress.addressToByteArray()).hostAddress
                     DeviceStatusManager.handleNetworkDisconnect(ipAddress)
                     Log.d("NetworkScreenViewModel", "Detected disconnection of node: $ipAddress")
                 }
@@ -77,11 +80,11 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
                         allNodes = allNodesWithTest,
                         // update the ssid of the connecting station
                         connectingInProgressSsid =
-                        if (nodeState.wifiState.wifiStationState.status == WifiStationState.Status.CONNECTING) {
-                            nodeState.wifiState.wifiStationState.config?.ssid
-                        } else {
-                            null
-                        }
+                            if (nodeState.wifiState.wifiStationState.status == WifiStationState.Status.CONNECTING) {
+                                nodeState.wifiState.wifiStationState.config?.ssid
+                            } else {
+                                null
+                            }
                     )
                 }
 
@@ -187,13 +190,30 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
                 delay(30000)
             }
         }
-    }
+
     */
-        fun getDeviceName(wifiAddress: Int) {
-            viewModelScope.launch {
-                val inetAddress = InetAddress.getByAddress(wifiAddress.addressToByteArray())
-                appServer.sendDeviceName(inetAddress)
+    }
+
+    fun onNodeSelected(ipAddress: String) {
+        viewModelScope.launch {
+            try {
+                val addr = InetAddress.getByName(ipAddress)
+                appServer.requestRemoteUserInfo(addr)
+                appServer.pushUserInfoTo(addr)
+            } catch (e: Exception) {
+                Log.e("NetworkScreenViewModel", "Failed to request user info for $ipAddress", e)
             }
         }
     }
+
+    fun getDeviceName(wifiAddress: Int) {
+        viewModelScope.launch {
+            val inetAddress = InetAddress.getByAddress(wifiAddress.addressToByteArray())
+            appServer.sendDeviceName(inetAddress)
+        }
+    }
 }
+
+
+
+
