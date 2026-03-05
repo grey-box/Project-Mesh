@@ -1,0 +1,9 @@
+# IGNORE ALL
+*
+
+# EXCEPT
+!/build_reports
+!/.gitignore
+!/.prettierignore
+!/LICENSE
+!/README.md
