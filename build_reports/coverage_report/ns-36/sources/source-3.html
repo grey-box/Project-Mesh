@@ -1,0 +1,181 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > UriNameAndSize</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">release.com.greybox.projectmesh.extension</a>
+</div>
+
+<h1>Coverage Summary for Class: UriNameAndSize (release.com.greybox.projectmesh.extension)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">UriNameAndSize</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/12)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.extension
+&nbsp;
+&nbsp;import android.content.ContentResolver
+&nbsp;import android.net.Uri
+&nbsp;import android.provider.OpenableColumns
+&nbsp;import androidx.core.net.toFile
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents the name and size of a file referenced by a [Uri].
+&nbsp; *
+&nbsp; * @property name The display name of the file, or null if it cannot be determined.
+&nbsp; * @property size The size of the file in bytes, or -1 if unknown.
+&nbsp; */
+<b class="nc">&nbsp;data class UriNameAndSize(</b>
+<b class="nc">&nbsp;    val name: String?,</b>
+<b class="nc">&nbsp;    val size: Long,</b>
+&nbsp;)
+&nbsp;
+&nbsp;/*
+&nbsp;This is an extension function for ContentResolver class
+&nbsp;It will return a UriNameAndSize object that contains the name and size of the file
+&nbsp;Two Condition:
+&nbsp;1. The uri is a file uri
+&nbsp;2. The uri is a content uri
+&nbsp;*/
+&nbsp;
+&nbsp;/**
+&nbsp; * Retrieves the name and size of a file referenced by the given [uri].
+&nbsp; *
+&nbsp; * Supports both &quot;file&quot; scheme URIs and &quot;content&quot; scheme URIs.
+&nbsp; *
+&nbsp; * @receiver The [ContentResolver] used to query content URIs.
+&nbsp; * @param uri The [Uri] pointing to the file.
+&nbsp; * @return A [UriNameAndSize] object containing the file&#39;s name and size, or
+&nbsp; *         null name and -1 size if the information cannot be determined.
+&nbsp; */
+&nbsp;fun ContentResolver.getUriNameAndSize(uri: Uri): UriNameAndSize {
+&nbsp;    return if(uri.scheme == &quot;file&quot;) {
+&nbsp;        val uriFile = uri.toFile()
+&nbsp;        UriNameAndSize(uriFile.name, uriFile.length())
+&nbsp;    } else {
+&nbsp;        query(
+&nbsp;            uri, null, null, null, null
+&nbsp;        )?.use { cursor -&gt;
+&nbsp;            var nameIndex = 0
+&nbsp;            var sizeIndex = 0
+&nbsp;            if(cursor.moveToFirst() &amp;&amp;
+&nbsp;                cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME).also { nameIndex = it } &gt;= 1 &amp;&amp;
+&nbsp;                cursor.getColumnIndex(OpenableColumns.SIZE).also { sizeIndex = it } &gt;= 1
+&nbsp;            ) {
+&nbsp;                val size = if(cursor.isNull(sizeIndex)) { null } else {
+&nbsp;                    cursor.getString(sizeIndex)
+&nbsp;                }
+&nbsp;                UriNameAndSize(cursor.getString(nameIndex), size?.toLong() ?: -1L)
+&nbsp;            } else {
+&nbsp;                null
+&nbsp;            }
+&nbsp;        } ?: UriNameAndSize(null, -1)
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

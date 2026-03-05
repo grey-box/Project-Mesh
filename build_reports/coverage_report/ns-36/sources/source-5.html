@@ -1,0 +1,118 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > ListExtensionKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">release.com.greybox.projectmesh.extension</a>
+</div>
+
+<h1>Coverage Summary for Class: ListExtensionKt (release.com.greybox.projectmesh.extension)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">ListExtensionKt</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.extension
+&nbsp;
+&nbsp;/*
+&nbsp; This is an extension function on Kotlin&#39;s List class, allowing to apply an update to the
+&nbsp; first element in a list that matches a given condition, then returning a updated list
+&nbsp;*/
+&nbsp;
+&nbsp;/**
+&nbsp; * Returns a new list with the first element that satisfies [condition] updated by [function].
+&nbsp; *
+&nbsp; * If no element matches [condition], the original list is returned unchanged.
+&nbsp; *
+&nbsp; * @param condition A predicate to identify which element to update.
+&nbsp; * @param function A transformation function applied to the matching element.
+&nbsp; * @return A new [List] with the updated element, or the original list if no element matches.
+&nbsp; */
+&nbsp;inline fun &lt;T&gt; List&lt;T&gt;.updateItem(
+&nbsp;    condition: (T) -&gt; Boolean,
+&nbsp;    function: (T) -&gt; T,
+&nbsp;): List&lt;T&gt; {
+&nbsp;    // Find the index of the first element that matches the condition
+&nbsp;    val index = indexOfFirst(condition)
+&nbsp;    // If no such element is found, return the original list
+&nbsp;    return if(index == -1){
+&nbsp;        this
+&nbsp;    }
+&nbsp;    // Otherwise, create a new list with the element at the found index updated using the provided function
+&nbsp;    else{
+&nbsp;        toMutableList().also {
+&nbsp;                newList -&gt; newList[index] = function(this[index])
+&nbsp;        }.toList()
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

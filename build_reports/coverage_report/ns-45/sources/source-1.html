@@ -1,0 +1,381 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > HomeScreenModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">release.com.greybox.projectmesh.viewModel</a>
+</div>
+
+<h1>Coverage Summary for Class: HomeScreenModel (release.com.greybox.projectmesh.viewModel)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">HomeScreenModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/10)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/15)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/172)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.viewModel
+&nbsp;
+&nbsp;import android.content.SharedPreferences
+&nbsp;import android.os.Build
+&nbsp;import android.util.Log
+&nbsp;import androidx.lifecycle.SavedStateHandle
+&nbsp;import androidx.lifecycle.ViewModel
+&nbsp;import androidx.lifecycle.viewModelScope
+&nbsp;import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectConfig
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.state.MeshrabiyaWifiState
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.state.WifiStationState
+&nbsp;import kotlinx.coroutines.delay
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import kotlinx.coroutines.launch
+&nbsp;import kotlinx.coroutines.withTimeoutOrNull
+&nbsp;import org.kodein.di.DI
+&nbsp;import org.kodein.di.instance
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;data class HomeScreenModel(</b>
+<b class="nc">&nbsp;    val wifiState: MeshrabiyaWifiState? = null,</b>
+<b class="nc">&nbsp;    val connectUri: String? = null,</b>
+<b class="nc">&nbsp;    val localAddress: Int = 0,</b>
+<b class="nc">&nbsp;    val bandMenu: List&lt;ConnectBand&gt; = listOf(ConnectBand.BAND_2GHZ),</b>
+<b class="nc">&nbsp;    val band: ConnectBand = bandMenu.first(),</b>
+<b class="nc">&nbsp;    val hotspotTypeMenu: List&lt;HotspotType&gt; = listOf(HotspotType.AUTO,</b>
+<b class="nc">&nbsp;        HotspotType.WIFIDIRECT_GROUP,</b>
+<b class="nc">&nbsp;        HotspotType.LOCALONLY_HOTSPOT),</b>
+<b class="nc">&nbsp;    val hotspotTypeToCreate: HotspotType = hotspotTypeMenu.first(),</b>
+<b class="nc">&nbsp;    val hotspotStatus: Boolean = false,</b>
+<b class="nc">&nbsp;    val isWifiConnected: Boolean = false,</b>
+<b class="nc">&nbsp;    val nodesOnMesh: Set&lt;Int&gt; = emptySet(),</b>
+&nbsp;){
+&nbsp;    val wifiConnectionEnabled: Boolean
+<b class="nc">&nbsp;        get() = wifiState?.connectConfig != null</b>
+&nbsp;    val connectBandVisible: Boolean
+<b class="nc">&nbsp;        get() = Build.VERSION.SDK_INT &gt;= 29 &amp;&amp; wifiState?.connectConfig == null</b>
+&nbsp;}
+&nbsp;
+&nbsp;class HomeScreenViewModel(di: DI,
+&nbsp;                          savedStateHandle: SavedStateHandle): ViewModel(){
+&nbsp;    // inject SharedPreferences
+&nbsp;    private val settingPrefs: SharedPreferences by di.instance(tag = &quot;settings&quot;)
+&nbsp;    // _uiState will be updated whenever there is a change in the UI state
+&nbsp;    private val _uiState = MutableStateFlow(HomeScreenModel())
+&nbsp;    // uiState is a read-only property that shows the current UI state
+&nbsp;    val uiState: Flow&lt;HomeScreenModel&gt; = _uiState.asStateFlow()
+&nbsp;    // di is used to get the AndroidVirtualNode instance
+&nbsp;    private val node: AndroidVirtualNode by di.instance()
+&nbsp;    // Concurrency Known State
+&nbsp;    private val _concurrencyKnown = MutableStateFlow(loadConcurrencyKnown())
+&nbsp;    val concurrencyKnown: StateFlow&lt;Boolean&gt; = _concurrencyKnown
+&nbsp;    // Concurrency Supported State
+&nbsp;    private val _concurrencySupported = MutableStateFlow(loadConcurrencySupported())
+&nbsp;    val concurrencySupported: StateFlow&lt;Boolean&gt; = _concurrencySupported
+&nbsp;
+&nbsp;    private val sharedPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key -&gt;
+&nbsp;        if (key == CONCURRENCY_KNOWN_KEY || key == CONCURRENCY_SUPPORTED_KEY) {
+&nbsp;            _concurrencyKnown.value = loadConcurrencyKnown()
+&nbsp;            _concurrencySupported.value = loadConcurrencySupported()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // control the visibility of the STA/AP concurrency doesn&#39;t support warning popup
+&nbsp;    private val _showNoConcurrencyWarning = MutableStateFlow(false)
+&nbsp;    val showNoConcurrencyWarning: StateFlow&lt;Boolean&gt; = _showNoConcurrencyWarning.asStateFlow()
+&nbsp;
+&nbsp;    // control the visibility of the STA/AP concurrency support warning popup
+&nbsp;    private val _showConcurrencyWarning = MutableStateFlow(false)
+&nbsp;    val showConcurrencyWarning: StateFlow&lt;Boolean&gt; = _showConcurrencyWarning.asStateFlow()
+&nbsp;
+&nbsp;    init {
+&nbsp;        // launch a coroutine
+&nbsp;        viewModelScope.launch {
+&nbsp;            // collect the state flow of the AndroidVirtualNode
+&nbsp;            node.state.collect {
+&nbsp;                // update the UI state with the new state
+&nbsp;                _uiState.update { prev -&gt;
+&nbsp;                    // Creates a new instance of the state,
+&nbsp;                    // copying the existing properties and updating only the ones specified.
+&nbsp;                    prev.copy(
+&nbsp;                        wifiState = it.wifiState,
+&nbsp;                        connectUri = it.connectUri,
+&nbsp;                        localAddress = it.address,
+&nbsp;                        hotspotStatus = it.wifiState.hotspotIsStarted,
+&nbsp;                        nodesOnMesh = it.originatorMessages.keys
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;        if (node.meshrabiyaWifiManager.is5GhzSupported){
+&nbsp;            _uiState.update { prev -&gt;
+&nbsp;                prev.copy(
+&nbsp;                    bandMenu = listOf(ConnectBand.BAND_5GHZ, ConnectBand.BAND_2GHZ),
+&nbsp;                    band = ConnectBand.BAND_5GHZ
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;        settingPrefs.registerOnSharedPreferenceChangeListener(sharedPrefsListener)
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadConcurrencyKnown(): Boolean {
+&nbsp;        return settingPrefs.getBoolean(CONCURRENCY_KNOWN_KEY, false)
+&nbsp;    }
+&nbsp;
+&nbsp;    fun saveConcurrencyKnown(concurrencyKnown: Boolean) {
+&nbsp;        _concurrencyKnown.value = concurrencyKnown
+&nbsp;        settingPrefs.edit().putBoolean(CONCURRENCY_KNOWN_KEY, concurrencyKnown).apply()
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadConcurrencySupported(): Boolean {
+&nbsp;        return settingPrefs.getBoolean(CONCURRENCY_SUPPORTED_KEY, true)
+&nbsp;    }
+&nbsp;
+&nbsp;    fun saveConcurrencySupported(concurrencySupported: Boolean) {
+&nbsp;        _concurrencySupported.value = concurrencySupported
+&nbsp;        settingPrefs.edit().putBoolean(CONCURRENCY_SUPPORTED_KEY, concurrencySupported).apply()
+&nbsp;    }
+&nbsp;
+&nbsp;    fun onConnectBandChanged(band: ConnectBand) {
+&nbsp;        _uiState.update { prev -&gt;
+&nbsp;            prev.copy(
+&nbsp;                band = band
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    fun onSetHotspotTypeToCreate(hotspotType: HotspotType) {
+&nbsp;        _uiState.update { prev -&gt;
+&nbsp;            prev.copy(
+&nbsp;                hotspotTypeToCreate = hotspotType
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    fun onSetIncomingConnectionsEnabled(enable: Boolean) {
+&nbsp;        viewModelScope.launch {
+&nbsp;            val wasWifiConnected = _uiState.value.wifiState?.wifiStationState?.status
+&nbsp;            try {
+&nbsp;                Log.d(&quot;HotspotDebug&quot;, &quot;Attempt 1: Setting Hotspot to $enable&quot;)
+&nbsp;                val response = withTimeoutOrNull(1500) {
+&nbsp;                    node.setWifiHotspotEnabled(
+&nbsp;                        enabled = enable,
+&nbsp;                        preferredBand = _uiState.value.band,
+&nbsp;                        hotspotType = _uiState.value.hotspotTypeToCreate
+&nbsp;                    )
+&nbsp;                }
+&nbsp;                if (response == null) {
+&nbsp;                    Log.w(&quot;HotspotDebug&quot;, &quot;No response within 1500ms, Retrying...&quot;)
+&nbsp;                    // Retry once
+&nbsp;                    val retryResponse = node.setWifiHotspotEnabled(
+&nbsp;                        enabled = enable,
+&nbsp;                        preferredBand = _uiState.value.band,
+&nbsp;                        hotspotType = _uiState.value.hotspotTypeToCreate
+&nbsp;                    )
+&nbsp;                    Log.d(&quot;HotspotDebug&quot;, &quot;Retry successful: $retryResponse&quot;)
+&nbsp;                }
+&nbsp;                else {
+&nbsp;                    Log.d(&quot;HotspotDebug&quot;, &quot;Hotspot set successfully: $response&quot;)
+&nbsp;                }
+&nbsp;                if (!_concurrencyKnown.value &amp;&amp; Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.R){
+&nbsp;                    delay(500)
+&nbsp;                    val isWifiStillConnected = _uiState.value.wifiState?.wifiStationState?.status
+&nbsp;                    if (wasWifiConnected == WifiStationState.Status.AVAILABLE)
+&nbsp;                    {
+&nbsp;                        if(isWifiStillConnected == WifiStationState.Status.INACTIVE || isWifiStillConnected == null){
+&nbsp;                            markStaApConcurrencyUnsupported()
+&nbsp;                            Log.d(&quot;HotspotDebug&quot;, &quot;Wi-Fi disconnected after enabling hotspot. STA/AP concurrency NOT supported.&quot;)
+&nbsp;                        }
+&nbsp;                        else{
+&nbsp;                            markStaApConcurrencySupported()
+&nbsp;                            Log.d(&quot;HotspotDebug&quot;, &quot;Wi-Fi still connected after enabling hotspot. STA/AP concurrency supported.&quot;)
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } catch (e: Exception) {
+&nbsp;                Log.e(&quot;HotspotDebug&quot;, &quot;Failed to set hotspot: ${e.message}&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // This function is responsible for connecting to a wifi network as a station (Client Mode)
+&nbsp;    fun onConnectWifi(
+&nbsp;        hotSpotConfig: WifiConnectConfig
+&nbsp;    ){
+&nbsp;        viewModelScope.launch {
+&nbsp;            try{
+&nbsp;                val wasHotspotOnline = _uiState.value.hotspotStatus
+&nbsp;                node.connectAsStation(hotSpotConfig)
+&nbsp;                if(!_concurrencyKnown.value &amp;&amp; Build.VERSION.SDK_INT &lt; Build.VERSION_CODES.R){
+&nbsp;                    delay(500)
+&nbsp;                    val isHotspotStillOnline = _uiState.value.hotspotStatus
+&nbsp;                    if(wasHotspotOnline){
+&nbsp;                        if(!isHotspotStillOnline){
+&nbsp;                            markStaApConcurrencyUnsupported()
+&nbsp;                        }
+&nbsp;                        else{
+&nbsp;                            markStaApConcurrencySupported()
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;            catch (e: Exception){
+&nbsp;                Log.e(&quot;HomeScreenViewModel&quot;, &quot;onConnectWifi: ${e.message}&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // disconnect the wifi station
+&nbsp;    fun onClickDisconnectStation(){
+&nbsp;        viewModelScope.launch {
+&nbsp;            node.disconnectWifiStation()
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun markStaApConcurrencyUnsupported(){
+&nbsp;        saveConcurrencyKnown(true)
+&nbsp;        saveConcurrencySupported(false)
+&nbsp;        _showNoConcurrencyWarning.value = true
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun markStaApConcurrencySupported(){
+&nbsp;        saveConcurrencyKnown(true)
+&nbsp;        saveConcurrencySupported(true)
+&nbsp;        _showConcurrencyWarning.value = true
+&nbsp;    }
+&nbsp;
+&nbsp;    fun dismissNoConcurrencyWarning() {
+&nbsp;        _showNoConcurrencyWarning.value = false
+&nbsp;    }
+&nbsp;
+&nbsp;    fun dismissConcurrencyWarning() {
+&nbsp;        _showConcurrencyWarning.value = false
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun onCleared() {
+&nbsp;        super.onCleared()
+&nbsp;        // Unregister the listener when ViewModel is cleared
+&nbsp;        settingPrefs.unregisterOnSharedPreferenceChangeListener(sharedPrefsListener)
+&nbsp;    }
+&nbsp;
+&nbsp;    companion object{
+&nbsp;        private const val CONCURRENCY_KNOWN_KEY = &quot;concurrency_known&quot;
+&nbsp;        private const val CONCURRENCY_SUPPORTED_KEY = &quot;concurrency_supported&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

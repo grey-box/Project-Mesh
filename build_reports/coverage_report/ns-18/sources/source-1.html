@@ -1,0 +1,161 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > ConversationUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">debug.com.greybox.projectmesh.messaging.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: ConversationUtils (debug.com.greybox.projectmesh.messaging.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConversationUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.messaging.utils
+&nbsp;
+&nbsp;import com.greybox.projectmesh.testing.TestDeviceService
+&nbsp;
+&nbsp;/**
+&nbsp; * Centralized utility class for conversation-related operations.
+&nbsp; * This ensures consistent conversation ID generation across the application.
+&nbsp; */
+&nbsp;
+&nbsp;object ConversationUtils {
+&nbsp;    /**
+&nbsp;     * Creates a consistent conversation ID from two UUIDs.
+&nbsp;     * This method ensures that the same conversation ID is generated
+&nbsp;     * regardless of which user initiates the conversation.
+&nbsp;     *
+&nbsp;     * @param uuid1 The UUID of the first user
+&nbsp;     * @param uuid2 The UUID of the second user
+&nbsp;     * @return A standardized conversation ID
+&nbsp;     */
+&nbsp;
+&nbsp;    fun createConversationId(uuid1: String, uuid2: String): String {
+&nbsp;        //special cases for test devices
+<b class="nc">&nbsp;        if (uuid2 == &quot;test-device-uuid&quot;) {</b>
+<b class="nc">&nbsp;            return &quot;local-user-test-device-uuid&quot;</b>
+&nbsp;        }
+<b class="nc">&nbsp;        if (uuid2 == &quot;offline-test-device-uuid&quot;) {</b>
+<b class="nc">&nbsp;            return &quot;local-user-offline-test-device-uuid&quot;</b>
+&nbsp;        }
+&nbsp;
+&nbsp;        //sort UUIDs to ensure the same ID is generated regardless of order
+<b class="nc">&nbsp;        return listOf(uuid1, uuid2).sorted().joinToString(&quot;-&quot;)</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

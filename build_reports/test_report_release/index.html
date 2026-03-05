@@ -20,13 +20,13 @@
 <tr>
 <td>
 <div class="infoBox" id="tests">
-<div class="counter">1</div>
+<div class="counter">282</div>
 <p>tests</p>
 </div>
 </td>
 <td>
 <div class="infoBox" id="failures">
-<div class="counter">0</div>
+<div class="counter">3</div>
 <p>failures</p>
 </div>
 </td>
@@ -38,7 +38,7 @@
 </td>
 <td>
 <div class="infoBox" id="duration">
-<div class="counter">0.002s</div>
+<div class="counter">26.692s</div>
 <p>duration</p>
 </div>
 </td>
@@ -47,8 +47,8 @@
 </div>
 </td>
 <td>
-<div class="infoBox success" id="successRate">
-<div class="percent">100%</div>
+<div class="infoBox failures" id="successRate">
+<div class="percent">98%</div>
 <p>successful</p>
 </div>
 </td>
@@ -58,13 +58,33 @@
 <div id="tabs">
 <ul class="tabLinks">
 <li>
-<a href="#tab0">Packages</a>
+<a href="#tab0">Failed tests</a>
 </li>
 <li>
-<a href="#tab1">Classes</a>
+<a href="#tab1">Packages</a>
+</li>
+<li>
+<a href="#tab2">Classes</a>
 </li>
 </ul>
 <div id="tab0" class="tab">
+<h2>Failed tests</h2>
+<ul class="linkList">
+<li>
+<a href="classes/com.greybox.projectmesh.debug.CrashScreenActivityTest.html">CrashScreenActivityTest</a>.
+<a href="classes/com.greybox.projectmesh.debug.CrashScreenActivityTest.html#getThrowableFromIntent_returnsNull_whenInvalidJsonProvided">getThrowableFromIntent_returnsNull_whenInvalidJsonProvided</a>
+</li>
+<li>
+<a href="classes/com.greybox.projectmesh.debug.CrashScreenActivityTest.html">CrashScreenActivityTest</a>.
+<a href="classes/com.greybox.projectmesh.debug.CrashScreenActivityTest.html#getThrowableFromIntent_returnsNull_whenNoCrashDataProvided">getThrowableFromIntent_returnsNull_whenNoCrashDataProvided</a>
+</li>
+<li>
+<a href="classes/com.greybox.projectmesh.debug.CrashScreenActivityTest.html">CrashScreenActivityTest</a>.
+<a href="classes/com.greybox.projectmesh.debug.CrashScreenActivityTest.html#getThrowableFromIntent_returnsThrowable_whenValidJsonProvided">getThrowableFromIntent_returnsThrowable_whenValidJsonProvided</a>
+</li>
+</ul>
+</div>
+<div id="tab1" class="tab">
 <h2>Packages</h2>
 <table>
 <thead>
@@ -82,16 +102,186 @@
 <td class="success">
 <a href="packages/com.greybox.projectmesh.html">com.greybox.projectmesh</a>
 </td>
-<td>1</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>7.561s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.components.html">com.greybox.projectmesh.components</a>
+</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0.008s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.db.html">com.greybox.projectmesh.db</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.006s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="packages/com.greybox.projectmesh.debug.html">com.greybox.projectmesh.debug</a>
+</td>
+<td>7</td>
+<td>3</td>
+<td>0</td>
+<td>0.126s</td>
+<td class="failures">57%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.extension.html">com.greybox.projectmesh.extension</a>
+</td>
+<td>11</td>
+<td>0</td>
+<td>0</td>
+<td>4.034s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.messaging.data.dao.html">com.greybox.projectmesh.messaging.data.dao</a>
+</td>
+<td>16</td>
+<td>0</td>
+<td>0</td>
+<td>2.786s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.messaging.data.entities.html">com.greybox.projectmesh.messaging.data.entities</a>
+</td>
+<td>19</td>
+<td>0</td>
+<td>0</td>
+<td>0.212s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.messaging.network.html">com.greybox.projectmesh.messaging.network</a>
+</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>2.436s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.messaging.repository.html">com.greybox.projectmesh.messaging.repository</a>
+</td>
+<td>13</td>
+<td>0</td>
+<td>0</td>
+<td>1.028s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.messaging.utils.html">com.greybox.projectmesh.messaging.utils</a>
+</td>
+<td>12</td>
 <td>0</td>
 <td>0</td>
 <td>0.002s</td>
 <td class="success">100%</td>
 </tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.navigation.html">com.greybox.projectmesh.navigation</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0.103s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.server.html">com.greybox.projectmesh.server</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0.002s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.ui.theme.html">com.greybox.projectmesh.ui.theme</a>
+</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0.077s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.user.html">com.greybox.projectmesh.user</a>
+</td>
+<td>21</td>
+<td>0</td>
+<td>0</td>
+<td>0.564s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.util.html">com.greybox.projectmesh.util</a>
+</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>3.502s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.utils.html">com.greybox.projectmesh.utils</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.002s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.viewModel.html">com.greybox.projectmesh.viewModel</a>
+</td>
+<td>37</td>
+<td>0</td>
+<td>0</td>
+<td>4.194s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="packages/com.greybox.projectmesh.views.html">com.greybox.projectmesh.views</a>
+</td>
+<td>102</td>
+<td>0</td>
+<td>0</td>
+<td>0.049s</td>
+<td class="success">100%</td>
+</tr>
 </tbody>
 </table>
 </div>
-<div id="tab1" class="tab">
+<div id="tab2" class="tab">
 <h2>Classes</h2>
 <table>
 <thead>
@@ -107,12 +297,502 @@
 <tbody>
 <tr>
 <td class="success">
+<a href="classes/com.greybox.projectmesh.DeviceStatusManagerTest.html">com.greybox.projectmesh.DeviceStatusManagerTest</a>
+</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>7.560s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
 <a href="classes/com.greybox.projectmesh.ExampleUnitTest.html">com.greybox.projectmesh.ExampleUnitTest</a>
 </td>
 <td>1</td>
 <td>0</td>
 <td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.components.WifiConnectionTest.html">com.greybox.projectmesh.components.WifiConnectionTest</a>
+</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0.008s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.db.MeshDatabaseTest.html">com.greybox.projectmesh.db.MeshDatabaseTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.006s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.debug.CrashHandlerTest.html">com.greybox.projectmesh.debug.CrashHandlerTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.122s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="failures">
+<a href="classes/com.greybox.projectmesh.debug.CrashScreenActivityTest.html">com.greybox.projectmesh.debug.CrashScreenActivityTest</a>
+</td>
+<td>3</td>
+<td>3</td>
+<td>0</td>
+<td>0.004s</td>
+<td class="failures">0%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.extension.ContentResolverExtensionTest.html">com.greybox.projectmesh.extension.ContentResolverExtensionTest</a>
+</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>4.034s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.extension.ListExtensionTest.html">com.greybox.projectmesh.extension.ListExtensionTest</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.data.dao.ConversationDaoTest.html">com.greybox.projectmesh.messaging.data.dao.ConversationDaoTest</a>
+</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>2.513s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.data.dao.MessageDaoTest.html">com.greybox.projectmesh.messaging.data.dao.MessageDaoTest</a>
+</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0.273s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.data.entities.ConversationTest.html">com.greybox.projectmesh.messaging.data.entities.ConversationTest</a>
+</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.data.entities.FileEncoderTest.html">com.greybox.projectmesh.messaging.data.entities.FileEncoderTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.010s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.data.entities.JSONSchemaTest.html">com.greybox.projectmesh.messaging.data.entities.JSONSchemaTest</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0.091s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.data.entities.MessageTest.html">com.greybox.projectmesh.messaging.data.entities.MessageTest</a>
+</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0.110s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.network.MessageNetworkHandlerTest.html">com.greybox.projectmesh.messaging.network.MessageNetworkHandlerTest</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>2.166s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.network.MessageServiceTest.html">com.greybox.projectmesh.messaging.network.MessageServiceTest</a>
+</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0.270s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.repository.ConversationRepositoryTest.html">com.greybox.projectmesh.messaging.repository.ConversationRepositoryTest</a>
+</td>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>0.888s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.repository.MessageRepositoryTest.html">com.greybox.projectmesh.messaging.repository.MessageRepositoryTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.140s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.utils.ConversationUtilsTest.html">com.greybox.projectmesh.messaging.utils.ConversationUtilsTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.utils.MessageMigrationUtilsTest.html">com.greybox.projectmesh.messaging.utils.MessageMigrationUtilsTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.messaging.utils.MessageUtilsTest.html">com.greybox.projectmesh.messaging.utils.MessageUtilsTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.navigation.BottomNavItemTest.html">com.greybox.projectmesh.navigation.BottomNavItemTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.102s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.navigation.NavigationItemTest.html">com.greybox.projectmesh.navigation.NavigationItemTest</a>
+</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.server.InputStreamCounterTest.html">com.greybox.projectmesh.server.InputStreamCounterTest</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
 <td>0.002s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.ui.theme.ThemeLayerTest.html">com.greybox.projectmesh.ui.theme.ThemeLayerTest</a>
+</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0.077s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.user.UserDaoTest.html">com.greybox.projectmesh.user.UserDaoTest</a>
+</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0.252s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.user.UserEntityTest.html">com.greybox.projectmesh.user.UserEntityTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.user.UserRepositoryTest.html">com.greybox.projectmesh.user.UserRepositoryTest</a>
+</td>
+<td>10</td>
+<td>0</td>
+<td>0</td>
+<td>0.311s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.util.NotificationHelperTest.html">com.greybox.projectmesh.util.NotificationHelperTest</a>
+</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>3.502s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.utils.LoggerTest.html">com.greybox.projectmesh.utils.LoggerTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.002s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.HomeScreenViewModelTest.html">com.greybox.projectmesh.viewModel.HomeScreenViewModelTest</a>
+</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>1.333s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.LogScreenViewModelTest.html">com.greybox.projectmesh.viewModel.LogScreenViewModelTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.206s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.NetworkScreenViewModelTest.html">com.greybox.projectmesh.viewModel.NetworkScreenViewModelTest</a>
+</td>
+<td>3</td>
+<td>0</td>
+<td>0</td>
+<td>0.900s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.OnboardingViewModelTest.html">com.greybox.projectmesh.viewModel.OnboardingViewModelTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.364s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.PingScreenViewModelTest.html">com.greybox.projectmesh.viewModel.PingScreenViewModelTest</a>
+</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0.631s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.ReceiveScreenViewModelTest.html">com.greybox.projectmesh.viewModel.ReceiveScreenViewModelTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.154s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.SelectDestNodeScreenViewModelTest.html">com.greybox.projectmesh.viewModel.SelectDestNodeScreenViewModelTest</a>
+</td>
+<td>1</td>
+<td>0</td>
+<td>0</td>
+<td>0.107s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.SendScreenViewModelTest.html">com.greybox.projectmesh.viewModel.SendScreenViewModelTest</a>
+</td>
+<td>4</td>
+<td>0</td>
+<td>0</td>
+<td>0.136s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.SettingsScreenViewModelTest.html">com.greybox.projectmesh.viewModel.SettingsScreenViewModelTest</a>
+</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0.163s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.viewModel.SharedUriViewModelTest.html">com.greybox.projectmesh.viewModel.SharedUriViewModelTest</a>
+</td>
+<td>2</td>
+<td>0</td>
+<td>0</td>
+<td>0.200s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.HomeScreenUiLogicTest.html">com.greybox.projectmesh.views.HomeScreenUiLogicTest</a>
+</td>
+<td>9</td>
+<td>0</td>
+<td>0</td>
+<td>0.001s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.LogScreenUiLogicTest.html">com.greybox.projectmesh.views.LogScreenUiLogicTest</a>
+</td>
+<td>11</td>
+<td>0</td>
+<td>0</td>
+<td>0.011s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.NetworkScreenUiLogicTest.html">com.greybox.projectmesh.views.NetworkScreenUiLogicTest</a>
+</td>
+<td>6</td>
+<td>0</td>
+<td>0</td>
+<td>0.006s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.OnboardingUiLogicTest.html">com.greybox.projectmesh.views.OnboardingUiLogicTest</a>
+</td>
+<td>8</td>
+<td>0</td>
+<td>0</td>
+<td>0.006s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.PingScreenUiLogicTest.html">com.greybox.projectmesh.views.PingScreenUiLogicTest</a>
+</td>
+<td>5</td>
+<td>0</td>
+<td>0</td>
+<td>0.004s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.ReceiveScreenUiLogicTest.html">com.greybox.projectmesh.views.ReceiveScreenUiLogicTest</a>
+</td>
+<td>13</td>
+<td>0</td>
+<td>0</td>
+<td>0.004s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.RequestPermissionsUiLogicTest.html">com.greybox.projectmesh.views.RequestPermissionsUiLogicTest</a>
+</td>
+<td>20</td>
+<td>0</td>
+<td>0</td>
+<td>0.006s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.SelectDestNodeScreenUiLogicTest.html">com.greybox.projectmesh.views.SelectDestNodeScreenUiLogicTest</a>
+</td>
+<td>7</td>
+<td>0</td>
+<td>0</td>
+<td>0.003s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.SendScreenUiLogicTest.html">com.greybox.projectmesh.views.SendScreenUiLogicTest</a>
+</td>
+<td>11</td>
+<td>0</td>
+<td>0</td>
+<td>0.004s</td>
+<td class="success">100%</td>
+</tr>
+<tr>
+<td class="success">
+<a href="classes/com.greybox.projectmesh.views.SettingsScreenUiLogicTest.html">com.greybox.projectmesh.views.SettingsScreenUiLogicTest</a>
+</td>
+<td>12</td>
+<td>0</td>
+<td>0</td>
+<td>0.004s</td>
 <td class="success">100%</td>
 </tr>
 </tbody>
@@ -126,7 +806,7 @@
 <input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
 </label>
 </div>Generated by 
-<a href="http://www.gradle.org">Gradle 8.9</a> at Feb 24, 2026, 1:00:06 AM</p>
+<a href="http://www.gradle.org">Gradle 8.9</a> at Mar 5, 2026, 8:12:42 PM</p>
 </div>
 </div>
 </body>

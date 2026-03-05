@@ -1,0 +1,211 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > NotificationHelper</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">release.com.greybox.projectmesh.util</a>
+</div>
+
+<h1>Coverage Summary for Class: NotificationHelper (release.com.greybox.projectmesh.util)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">NotificationHelper</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/33)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/112)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.util
+&nbsp;
+&nbsp;import android.app.NotificationChannel
+&nbsp;import android.app.NotificationManager
+&nbsp;import android.app.PendingIntent
+&nbsp;import android.content.Context
+&nbsp;import android.content.Intent
+&nbsp;import android.os.Build
+&nbsp;import androidx.core.app.NotificationCompat
+&nbsp;import com.greybox.projectmesh.MainActivity
+&nbsp;import com.greybox.projectmesh.R
+&nbsp;import com.greybox.projectmesh.navigation.BottomNavItem
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility object for creating and showing system notifications related to file receiving.
+&nbsp; */
+&nbsp;object NotificationHelper {
+&nbsp;
+&nbsp;    // Notification channel identifiers
+&nbsp;    private const val CHANNEL_ID = &quot;file_receive_channel&quot;
+&nbsp;    private const val CHANNEL_NAME = &quot;File Receive Notifications&quot;
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Creates the notification channel if the device runs Android O or higher.
+&nbsp;     *
+&nbsp;     * @param context Application context used to access the system NotificationManager
+&nbsp;     */
+&nbsp;    fun createNotificationChannel(context: Context) {
+<b class="nc">&nbsp;        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) {</b>
+<b class="nc">&nbsp;            val channel = NotificationChannel(</b>
+<b class="nc">&nbsp;                CHANNEL_ID,</b>
+<b class="nc">&nbsp;                CHANNEL_NAME,</b>
+<b class="nc">&nbsp;                NotificationManager.IMPORTANCE_HIGH</b>
+<b class="nc">&nbsp;            ).apply {</b>
+<b class="nc">&nbsp;                description = &quot;Notifications for receiving file&quot;</b>
+<b class="nc">&nbsp;            }</b>
+<b class="nc">&nbsp;            val notificationManager = context.getSystemService(NotificationManager::class.java)</b>
+<b class="nc">&nbsp;            notificationManager.createNotificationChannel(channel)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Displays a notification that informs the user a file has been received.
+&nbsp;     * Tapping the notification opens the Receive screen inside MainActivity.
+&nbsp;     *
+&nbsp;     * @param context Context for creating intents and notifications
+&nbsp;     * @param fileName Name of the received file to display in the message
+&nbsp;     */
+&nbsp;    fun showFileReceivedNotification(context: Context, fileName: String) {
+&nbsp;
+&nbsp;        // Intent that navigates user into MainActivity → Receive screen
+<b class="nc">&nbsp;        val intent = Intent(context, MainActivity::class.java).apply {</b>
+<b class="nc">&nbsp;            action = &quot;OPEN_RECEIVE_SCREEN&quot;</b>
+<b class="nc">&nbsp;            putExtra(&quot;navigateTo&quot;, BottomNavItem.Receive.route) // Set target screen</b>
+<b class="nc">&nbsp;            putExtra(&quot;from_notification&quot;, true) // Skip permission prompt when opened from notif</b>
+<b class="nc">&nbsp;            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP</b>
+<b class="nc">&nbsp;        }</b>
+&nbsp;
+&nbsp;        // PendingIntent for launching the activity from the notification
+<b class="nc">&nbsp;        val pendingIntent = PendingIntent.getActivity(</b>
+<b class="nc">&nbsp;            context,</b>
+<b class="nc">&nbsp;            1003,</b>
+<b class="nc">&nbsp;            intent,</b>
+<b class="nc">&nbsp;            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE</b>
+&nbsp;        )
+&nbsp;
+&nbsp;        // Construct the actual notification UI
+<b class="nc">&nbsp;        val notification = NotificationCompat.Builder(context, CHANNEL_ID)</b>
+<b class="nc">&nbsp;            .setSmallIcon(R.drawable.ic_launcher_foreground)</b>
+<b class="nc">&nbsp;            .setContentTitle(&quot;File Received&quot;)</b>
+<b class="nc">&nbsp;            .setContentText(&quot;Tap to view $fileName&quot;)</b>
+<b class="nc">&nbsp;            .setPriority(NotificationCompat.PRIORITY_HIGH)</b>
+<b class="nc">&nbsp;            .setDefaults(NotificationCompat.DEFAULT_ALL)</b>
+<b class="nc">&nbsp;            .setContentIntent(pendingIntent)</b>
+<b class="nc">&nbsp;            .setAutoCancel(true)</b>
+<b class="nc">&nbsp;            .build()</b>
+&nbsp;
+&nbsp;        // Trigger the notification
+<b class="nc">&nbsp;        val notificationManager =</b>
+<b class="nc">&nbsp;            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager</b>
+<b class="nc">&nbsp;        notificationManager.notify(1003, notification)</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

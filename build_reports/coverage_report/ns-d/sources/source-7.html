@@ -1,0 +1,202 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > MNetLoggerAndroid</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">debug.com.greybox.projectmesh</a>
+</div>
+
+<h1>Coverage Summary for Class: MNetLoggerAndroid (debug.com.greybox.projectmesh)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+  <tr>
+    <td class="name">MNetLoggerAndroid$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/6)
+  </span>
+</td>
+    <td class="coverageStat"/>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh
+&nbsp;
+&nbsp;import android.content.Context
+&nbsp;import android.util.Log
+&nbsp;import com.greybox.projectmesh.extension.deviceInfo
+&nbsp;import com.ustadmobile.meshrabiya.MeshrabiyaConstants
+&nbsp;import com.ustadmobile.meshrabiya.ext.trimIfExceeds
+&nbsp;import com.ustadmobile.meshrabiya.log.LogLine
+&nbsp;import com.ustadmobile.meshrabiya.log.MNetLogger
+&nbsp;import kotlinx.coroutines.CoroutineScope
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.Job
+&nbsp;import kotlinx.coroutines.channels.Channel
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import kotlinx.coroutines.launch
+&nbsp;import java.io.File
+&nbsp;import java.text.DateFormat
+&nbsp;import java.util.Date
+&nbsp;
+&nbsp;class MNetLoggerAndroid(
+&nbsp;    private val deviceInfo: String,
+&nbsp;    private val minLogLevel: Int = Log.VERBOSE,
+&nbsp;    private val logHistoryLines: Int = 300,
+&nbsp;    private val logFile: File? = null,
+&nbsp;): MNetLogger() {
+&nbsp;    val epochTime = System.currentTimeMillis()
+&nbsp;
+&nbsp;    private val _recentLogs = MutableStateFlow(emptyList&lt;LogLine&gt;())
+&nbsp;
+&nbsp;    val recentLogs: Flow&lt;List&lt;LogLine&gt;&gt; = _recentLogs.asStateFlow()
+&nbsp;
+&nbsp;    private val logScope = CoroutineScope(Dispatchers.IO + Job())
+&nbsp;
+&nbsp;    private val logChannel = Channel&lt;LogLine&gt;(Channel.UNLIMITED)
+&nbsp;
+&nbsp;    init {
+&nbsp;        logScope.launch {
+&nbsp;            logFile?.parentFile?.takeIf { !it.exists() }?.mkdirs()
+&nbsp;            val startTime = DateFormat.getTimeInstance().format(Date())
+&nbsp;            logFile?.appendText(&quot;Meshrabiya Session start: $startTime\n$deviceInfo\n&quot;)
+&nbsp;
+&nbsp;            for(logLine in logChannel) {
+&nbsp;                val time = (System.currentTimeMillis() - epochTime) / 1000.toFloat()
+&nbsp;                val rounded = (time * 100).toInt() / 100.toFloat()
+&nbsp;                logFile?.appendText(&quot;${priorityLabel(logLine.priority)}: t+${rounded}s : ${logLine.line}\n&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun doLog(priority: Int, message: String, exception: Exception?) {
+&nbsp;        when (priority) {
+&nbsp;            Log.VERBOSE -&gt; Log.v(MeshrabiyaConstants.LOG_TAG, message, exception)
+&nbsp;            Log.DEBUG -&gt; Log.d(MeshrabiyaConstants.LOG_TAG, message, exception)
+&nbsp;            Log.INFO -&gt; Log.i(MeshrabiyaConstants.LOG_TAG, message, exception)
+&nbsp;            Log.WARN -&gt; Log.w(MeshrabiyaConstants.LOG_TAG, message, exception)
+&nbsp;            Log.ERROR -&gt; Log.e(MeshrabiyaConstants.LOG_TAG, message, exception)
+&nbsp;            Log.ASSERT -&gt; Log.wtf(MeshrabiyaConstants.LOG_TAG, message, exception)
+&nbsp;        }
+&nbsp;
+&nbsp;        val logDisplay = buildString {
+&nbsp;            append(message)
+&nbsp;            if (exception != null) {
+&nbsp;                append(&quot; Exception: &quot;)
+&nbsp;                append(exception.toString())
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        val logLine = LogLine(logDisplay, priority, System.currentTimeMillis())
+&nbsp;        _recentLogs.update { prev -&gt;
+&nbsp;            buildList {
+&nbsp;                add(logLine)
+&nbsp;                addAll(prev.trimIfExceeds(logHistoryLines - 1))
+&nbsp;            }
+&nbsp;        }
+&nbsp;        logChannel.takeIf { logFile != null }?.trySend(logLine)
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun invoke(priority: Int, message: () -&gt; String, exception: Exception?) {
+&nbsp;        if(priority &gt;= minLogLevel)
+&nbsp;            doLog(priority, message(), exception)
+&nbsp;    }
+&nbsp;
+&nbsp;    override fun invoke(priority: Int, message: String, exception: Exception?) {
+&nbsp;        if(priority &gt;= minLogLevel)
+&nbsp;            doLog(priority, message, exception)
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Export logs with time/date stamp, device info, etc.
+&nbsp;     */
+&nbsp;    fun exportAsString(context: Context): String {
+&nbsp;        return buildString {
+&nbsp;            append(context.deviceInfo())
+&nbsp;            append(&quot;==Logs==\n&quot;)
+&nbsp;
+&nbsp;            _recentLogs.value.reversed().forEach {
+&nbsp;                append(it.toString(epochTime))
+&nbsp;                append(&quot;\n&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

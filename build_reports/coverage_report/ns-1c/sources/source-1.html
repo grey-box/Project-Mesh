@@ -1,0 +1,186 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > AppTheme</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">debug.com.greybox.projectmesh.ui.theme</a>
+</div>
+
+<h1>Coverage Summary for Class: AppTheme (debug.com.greybox.projectmesh.ui.theme)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">AppTheme</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/24)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.ui.theme
+&nbsp;
+&nbsp;import androidx.compose.foundation.isSystemInDarkTheme
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.material3.*
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;
+&nbsp;/**
+&nbsp; * Dark color scheme for the app.
+&nbsp; */
+&nbsp;private val DarkColorScheme = darkColorScheme(
+&nbsp;    primary = Color(0xFFBB86FC),
+&nbsp;    secondary = Color(0xFF03DAC5),
+&nbsp;    background = Color(0xFF121212),
+&nbsp;    surface = Color(0xFF121212),
+&nbsp;    onPrimary = Color.Black,
+&nbsp;    onSecondary = Color.Black,
+&nbsp;    onBackground = Color.White,
+&nbsp;    onSurface = Color.White
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Light color scheme for the app.
+&nbsp; */
+&nbsp;private val LightColorScheme = lightColorScheme(
+&nbsp;    primary = Color(0xFF6200EE),
+&nbsp;    secondary = Color(0xFF03DAC5),
+&nbsp;    background = Color(0xFFFFFFFF),
+&nbsp;    surface = Color(0xFFFFFFFF),
+&nbsp;    onPrimary = Color.White,
+&nbsp;    onSecondary = Color.Black,
+&nbsp;    onBackground = Color.Black,
+&nbsp;    onSurface = Color.Black
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Enum to represent the app&#39;s theme choice.
+&nbsp; */
+&nbsp;enum class AppTheme {
+<b class="nc">&nbsp;    SYSTEM, LIGHT, DARK</b>
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Apply ProjectMesh theme with the chosen AppTheme.
+&nbsp; *
+&nbsp; * @param appTheme The selected theme (System, Light, Dark)
+&nbsp; * @param content The composable content to wrap with this theme
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun ProjectMeshTheme(
+&nbsp;    appTheme: AppTheme,
+&nbsp;    content: @Composable () -&gt; Unit
+&nbsp;) {
+&nbsp;    val darkTheme = when (appTheme) {
+&nbsp;        AppTheme.SYSTEM -&gt; isSystemInDarkTheme() // Follow system setting
+&nbsp;        AppTheme.LIGHT -&gt; false
+&nbsp;        AppTheme.DARK -&gt; true
+&nbsp;    }
+&nbsp;
+&nbsp;    MaterialTheme(
+&nbsp;        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+&nbsp;        typography = Typography, // Apply predefined typography
+&nbsp;        content = content
+&nbsp;    )
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

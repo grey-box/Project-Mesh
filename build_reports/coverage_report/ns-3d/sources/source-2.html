@@ -1,0 +1,155 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > MessageUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">release.com.greybox.projectmesh.messaging.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: MessageUtils (release.com.greybox.projectmesh.messaging.utils)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">MessageUtils</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/2)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/36)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.messaging.utils
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility functions for formatting message metadata and generating stable
+&nbsp; * chat identifiers used throughout the messaging system.
+&nbsp; */
+&nbsp;object MessageUtils {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Formats a Unix timestamp into a human-readable time string.
+&nbsp;     *
+&nbsp;     * @param timestamp The timestamp in milliseconds.
+&nbsp;     * @return A formatted time string in `&quot;HH:mm&quot;` format.
+&nbsp;     */
+&nbsp;    fun formatTimestamp(timestamp: Long): String {
+&nbsp;        //Adding timestamp formatting logic
+<b class="nc">&nbsp;        return java.text.SimpleDateFormat(&quot;HH:mm&quot;).format(timestamp)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a stable, deterministic chat ID from two user identifiers.
+&nbsp;     *
+&nbsp;     * The two identifiers are sorted alphabetically so both users
+&nbsp;     * will always compute the same ID for the same pair.
+&nbsp;     *
+&nbsp;     * @param sender The identifier of the sender.
+&nbsp;     * @param receiver The identifier of the receiver.
+&nbsp;     * @return A hyphen-joined chat ID such as `&quot;userA-userB&quot;`.
+&nbsp;     */
+&nbsp;    fun generateChatId(sender: String, receiver: String): String {
+&nbsp;        //Create a consistent chat ID for two users
+<b class="nc">&nbsp;        return listOf(sender, receiver).sorted().joinToString(&quot;-&quot;)</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

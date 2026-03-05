@@ -1,0 +1,459 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > ChatScreenViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.greybox.projectmesh.messaging.ui.viewmodels</a>
+</div>
+
+<h1>Coverage Summary for Class: ChatScreenViewModel (com.greybox.projectmesh.messaging.ui.viewmodels)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+  <tr>
+    <td class="name">ChatScreenViewModel$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">ChatScreenViewModel$2</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">ChatScreenViewModel$2$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">ChatScreenViewModel$sendChatMessage$1</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">ChatScreenViewModel$sendChatMessage$1$delivered$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+    <td class="coverageStat"/>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.messaging.ui.viewmodels
+&nbsp;
+&nbsp;import android.net.Uri
+&nbsp;import androidx.lifecycle.ViewModel
+&nbsp;import androidx.lifecycle.viewModelScope
+&nbsp;import com.greybox.projectmesh.GlobalApp
+&nbsp;import com.greybox.projectmesh.db.MeshDatabase
+&nbsp;import com.greybox.projectmesh.messaging.data.entities.Message
+&nbsp;import com.greybox.projectmesh.messaging.ui.models.ChatScreenModel
+&nbsp;import com.greybox.projectmesh.testing.TestDeviceService
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import org.kodein.di.DI
+&nbsp;import com.greybox.projectmesh.server.AppServer
+&nbsp;import com.greybox.projectmesh.server.AppServer.Companion.DEFAULT_PORT
+&nbsp;import com.greybox.projectmesh.server.AppServer.OutgoingTransferInfo
+&nbsp;import com.greybox.projectmesh.server.AppServer.Status
+&nbsp;import com.ustadmobile.meshrabiya.ext.addressToDotNotation
+&nbsp;import com.ustadmobile.meshrabiya.ext.requireAddressAsInt
+&nbsp;import com.greybox.projectmesh.messaging.utils.ConversationUtils
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.withContext
+&nbsp;import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
+&nbsp;import kotlinx.coroutines.coroutineScope
+&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import kotlinx.coroutines.launch
+&nbsp;import kotlinx.coroutines.runBlocking
+&nbsp;import org.kodein.di.instance
+&nbsp;import java.net.InetAddress
+&nbsp;import com.greybox.projectmesh.messaging.repository.ConversationRepository
+&nbsp;import com.greybox.projectmesh.user.UserEntity
+&nbsp;import android.content.SharedPreferences
+&nbsp;import android.util.Log
+&nbsp;import androidx.lifecycle.SavedStateHandle
+&nbsp;import com.greybox.projectmesh.DeviceStatusManager
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import kotlinx.coroutines.withTimeoutOrNull
+&nbsp;import java.net.URI
+&nbsp;
+&nbsp;/**
+&nbsp; * ViewModel for the Chat Screen.
+&nbsp; *
+&nbsp; * Responsible for managing chat messages, device status, and conversation information.
+&nbsp; *
+&nbsp; * @param di Dependency Injection container to provide required services and repositories.
+&nbsp; * @param savedStateHandle Handles saved state, including virtualAddress and conversationId.
+&nbsp; */
+&nbsp;class ChatScreenViewModel(
+&nbsp;    di: DI,
+&nbsp;    savedStateHandle: SavedStateHandle
+&nbsp;) : ViewModel() {
+&nbsp;
+&nbsp;    private val virtualAddress: InetAddress = savedStateHandle.get&lt;InetAddress&gt;(&quot;virtualAddress&quot;)!!
+&nbsp;
+&nbsp;    // _uiState will be updated whenever there is a change in the UI state
+&nbsp;    private val ipStr: String = virtualAddress.hostAddress
+&nbsp;
+&nbsp;    //get conversation id
+&nbsp;    private val passedConversationId = savedStateHandle.get&lt;String&gt;(&quot;conversationId&quot;)
+&nbsp;
+&nbsp;    //Get User info
+&nbsp;    private val userEntity = runBlocking {
+&nbsp;        GlobalApp.GlobalUserRepo.userRepository.getUserByIp(ipStr)
+&nbsp;    }
+&nbsp;
+&nbsp;    // Use the retrieved user name (fallback to &quot;Unknown&quot; if no user is found)
+&nbsp;    private val deviceName = userEntity?.name ?: &quot;Unknown&quot;
+&nbsp;
+&nbsp;    private val sharedPrefs: SharedPreferences by di.instance(tag = &quot;settings&quot;)
+&nbsp;    private val localUuid = sharedPrefs.getString(&quot;UUID&quot;, null) ?: &quot;local-user&quot;
+&nbsp;
+&nbsp;    private val userUuid: String = when {
+&nbsp;        passedConversationId != null &amp;&amp; passedConversationId.contains(&quot;-&quot;) -&gt; {
+&nbsp;            // Extract the UUID that&#39;s not the local UUID
+&nbsp;            val uuids = passedConversationId.split(&quot;-&quot;)
+&nbsp;            uuids.find { it != localUuid } ?: &quot;unknown-${virtualAddress.hostAddress}&quot;
+&nbsp;        }
+&nbsp;        // Otherwise use the standard logic
+&nbsp;        TestDeviceService.isOnlineTestDevice(virtualAddress) -&gt; &quot;test-device-uuid&quot;
+&nbsp;        ipStr == TestDeviceService.TEST_DEVICE_IP_OFFLINE ||
+&nbsp;                userEntity?.name == TestDeviceService.TEST_DEVICE_NAME_OFFLINE -&gt; &quot;offline-test-device-uuid&quot;
+&nbsp;        else -&gt; userEntity?.uuid ?: &quot;unknown-${virtualAddress.hostAddress}&quot;
+&nbsp;    }
+&nbsp;
+&nbsp;    private val savedConversationId = savedStateHandle.get&lt;String&gt;(&quot;conversationId&quot;)
+&nbsp;    //Log.d(&quot;ChatDebug&quot;, &quot;GOT CONVERSATION ID FROM SAVED STATE: $savedConversationId&quot;)
+&nbsp;
+&nbsp;    private val conversationId = passedConversationId ?:
+&nbsp;        ConversationUtils.createConversationId(localUuid, userUuid)
+&nbsp;
+&nbsp;    private val chatName = savedConversationId ?: conversationId
+&nbsp;    //Log.d(&quot;ChatDebug&quot;, &quot;USING CHAT NAME: $chatName (saved: $savedConversationId, generated: $conversationId)&quot;)
+&nbsp;
+&nbsp;    private val addressDotNotation = virtualAddress.requireAddressAsInt().addressToDotNotation()
+&nbsp;
+&nbsp;    private val conversationRepository: ConversationRepository by di.instance()
+&nbsp;
+&nbsp;    private val _uiState = MutableStateFlow(
+&nbsp;        ChatScreenModel(
+&nbsp;            deviceName = deviceName,
+&nbsp;            virtualAddress = virtualAddress
+&nbsp;        )
+&nbsp;    )
+&nbsp;
+&nbsp;    // uiState is a read-only property that shows the current UI state
+&nbsp;    val uiState: Flow&lt;ChatScreenModel&gt; = _uiState.asStateFlow()
+&nbsp;
+&nbsp;    // di is used to get the AndroidVirtualNode instance
+&nbsp;    private val db: MeshDatabase by di.instance()
+&nbsp;
+&nbsp;    private val appServer: AppServer by di.instance()
+&nbsp;
+&nbsp;    private val _deviceOnlineStatus = MutableStateFlow(false)
+&nbsp;    val deviceOnlineStatus: StateFlow&lt;Boolean&gt; = _deviceOnlineStatus.asStateFlow()
+&nbsp;
+&nbsp;    // launch a coroutine
+&nbsp;    init {
+&nbsp;
+&nbsp;        val savedConversationId = savedStateHandle.get&lt;String&gt;(&quot;conversationId&quot;)
+&nbsp;
+&nbsp;        // If we have a conversation ID from navigation, use it directly
+&nbsp;        val effectiveChatName = if (savedConversationId != null) {
+&nbsp;            Log.d(&quot;ChatDebug&quot;, &quot;USING SAVED CONVERSATION ID: $savedConversationId INSTEAD OF GENERATED: $chatName&quot;)
+&nbsp;            savedConversationId
+&nbsp;        } else {
+&nbsp;            chatName
+&nbsp;        }
+&nbsp;
+&nbsp;        viewModelScope.launch {
+&nbsp;            // Debug logs
+&nbsp;            Log.d(&quot;ChatDebug&quot;, &quot;Will query messages with chatName: $chatName&quot;)
+&nbsp;            Log.d(&quot;ChatDebug&quot;, &quot;Using Conversation ID for messages: $conversationId&quot;)
+&nbsp;            Log.d(&quot;ChatDebug&quot;, &quot;User UUID: $userUuid&quot;)
+&nbsp;
+&nbsp;            //check database content in background
+&nbsp;            withContext(Dispatchers.IO) {
+&nbsp;                val allMessages = db.messageDao().getAll()
+&nbsp;                Log.d(&quot;ChatDebug&quot;, &quot;All messages in database: ${allMessages.size}&quot;)
+&nbsp;                for (msg in allMessages) {
+&nbsp;                    Log.d(
+&nbsp;                        &quot;ChatDebug&quot;,
+&nbsp;                        &quot;Message: id=${msg.id}, chat=${msg.chat}, content=${msg.content}, sender=${msg.sender}&quot;
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            //determine which flow to collect from
+&nbsp;            val isTestDevice =
+&nbsp;                (userUuid == &quot;test-device-uuid&quot; || userUuid == &quot;offline-test-device-uuid&quot;)
+&nbsp;
+&nbsp;            //load messages synchronously for offline access
+&nbsp;            val initialChatName = chatName // Use consistent chat name
+&nbsp;
+&nbsp;            try {
+&nbsp;                // Get messages immediately without waiting for Flow
+&nbsp;                val initialMessages = withContext(Dispatchers.IO) {
+&nbsp;                    // We&#39;ll need to add this method to MessageDao in Step 3
+&nbsp;                    db.messageDao().getChatMessagesSync(chatName)
+&nbsp;                }
+&nbsp;
+&nbsp;                // Update UI immediately with initial messages
+&nbsp;                if (initialMessages.isNotEmpty()) {
+&nbsp;                    _uiState.update { prev -&gt;
+&nbsp;                        prev.copy(allChatMessages = initialMessages)
+&nbsp;                    }
+&nbsp;                    Log.d(&quot;ChatDebug&quot;, &quot;IMMEDIATELY LOADED ${initialMessages.size} MESSAGES FOR OFFLINE ACCESS&quot;)
+&nbsp;                } else {
+&nbsp;                    Log.d(&quot;ChatDebug&quot;, &quot;NO INITIAL MESSAGES FOUND FOR CHAT: $chatName&quot;)
+&nbsp;                }
+&nbsp;
+&nbsp;            } catch (e: Exception) {
+&nbsp;                Log.e(&quot;ChatDebug&quot;, &quot;ERROR LOADING INITIAL MESSAGES: ${e.message}&quot;, e)
+&nbsp;            }
+&nbsp;
+&nbsp;            val messagesFlow = if (isTestDevice) {
+&nbsp;                val testDeviceName = when (userUuid) {
+&nbsp;                    &quot;test-device-uuid&quot; -&gt; TestDeviceService.TEST_DEVICE_NAME
+&nbsp;                    &quot;offline-test-device-uuid&quot; -&gt; TestDeviceService.TEST_DEVICE_NAME_OFFLINE
+&nbsp;                    else -&gt; null
+&nbsp;                }
+&nbsp;
+&nbsp;                if (testDeviceName != null) {
+&nbsp;                    Log.d(&quot;ChatDebug&quot;, &quot;Using multi-name query with: [$chatName, $testDeviceName]&quot;)
+&nbsp;                    db.messageDao().getChatMessagesFlowMultipleNames(
+&nbsp;                        listOf(chatName, testDeviceName)
+&nbsp;                    )
+&nbsp;                } else {
+&nbsp;                    db.messageDao().getChatMessagesFlow(chatName)
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                db.messageDao().getChatMessagesFlow(chatName)
+&nbsp;            }
+&nbsp;
+&nbsp;            //collect messages from the chosen flow
+&nbsp;            messagesFlow.collect { newChatMessages -&gt;
+&nbsp;                Log.d(&quot;ChatDebug&quot;, &quot;Received ${newChatMessages.size} messages&quot;)
+&nbsp;                _uiState.update { prev -&gt;
+&nbsp;                    prev.copy(allChatMessages = newChatMessages)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        viewModelScope.launch {
+&nbsp;            // If this is a real device (not placeholder address)
+&nbsp;            if (virtualAddress.hostAddress != &quot;0.0.0.0&quot; &amp;&amp;
+&nbsp;                virtualAddress.hostAddress != TestDeviceService.TEST_DEVICE_IP_OFFLINE
+&nbsp;            ) {
+&nbsp;                DeviceStatusManager.deviceStatusMap.collect { statusMap -&gt;
+&nbsp;                    val ipAddress = virtualAddress.hostAddress
+&nbsp;                    val isOnline = statusMap[ipAddress] ?: false
+&nbsp;
+&nbsp;                    // Only update if status changed
+&nbsp;                    if (_deviceOnlineStatus.value != isOnline) {
+&nbsp;                        Log.d(
+&nbsp;                            &quot;ChatDebug&quot;,
+&nbsp;                            &quot;Device status changed: $ipAddress is now ${if (isOnline) &quot;online&quot; else &quot;offline&quot;}&quot;
+&nbsp;                        )
+&nbsp;                        _deviceOnlineStatus.value = isOnline
+&nbsp;
+&nbsp;                        if (isOnline) {
+&nbsp;                            Log.d(&quot;ChatDebug&quot;, &quot;Device came back online - refreshing message history&quot;)
+&nbsp;                            // Force refresh messages from database
+&nbsp;                            withContext(Dispatchers.IO) {
+&nbsp;                                val refreshedMessages = db.messageDao().getChatMessagesSync(chatName)
+&nbsp;                                _uiState.update { prev -&gt;
+&nbsp;                                    prev.copy(
+&nbsp;                                        allChatMessages = refreshedMessages,
+&nbsp;                                        offlineWarning = null // Clear offline warning
+&nbsp;                                    )
+&nbsp;                                }
+&nbsp;                            }
+&nbsp;                        } else {
+&nbsp;                            // Update the UI state with offline warning
+&nbsp;                            _uiState.update { prev -&gt;
+&nbsp;                                prev.copy(
+&nbsp;                                    offlineWarning = &quot;Device appears to be offline. Messages will be saved locally.&quot;
+&nbsp;                                )
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    private suspend fun markConversationAsRead() {
+&nbsp;        try {
+&nbsp;            if (userEntity != null) {
+&nbsp;                //Create a convo id using both UUIDs
+&nbsp;                val conversationId =
+&nbsp;                    ConversationUtils.createConversationId(localUuid, userEntity.uuid)
+&nbsp;
+&nbsp;                //Mark this conversation as read
+&nbsp;                conversationRepository.markAsRead(conversationId)
+&nbsp;                Log.d(&quot;ChatScreenViewModel&quot;, &quot;Marked conversation as read: $conversationId&quot;)
+&nbsp;            }
+&nbsp;        } catch (e: Exception) {
+&nbsp;            Log.e(&quot;ChatScreenViewModel&quot;, &quot;Error marking conversation as read&quot;, e)
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Sends a chat message to a virtual device.
+&nbsp;     *
+&nbsp;     * @param virtualAddress IP address of the target device.
+&nbsp;     * @param message Message content as String.
+&nbsp;     * @param file Optional file attachment as [URI].
+&nbsp;     */
+&nbsp;    fun sendChatMessage(
+&nbsp;        virtualAddress: InetAddress,
+&nbsp;        message: String,
+&nbsp;        file: URI?
+&nbsp;    ) {//add file field here
+&nbsp;        val ipAddress = virtualAddress.hostAddress
+&nbsp;        val sendTime: Long = System.currentTimeMillis()
+&nbsp;
+&nbsp;        //check if device is online first
+&nbsp;        val isOnline = DeviceStatusManager.isDeviceOnline(ipAddress)
+&nbsp;
+&nbsp;        //use same conversationid as chat name
+&nbsp;        val messageEntity = Message(0, sendTime, message, &quot;Me&quot;, chatName, file)
+&nbsp;
+&nbsp;        Log.d(&quot;ChatDebug&quot;, &quot;Sending message to chat: $chatName&quot;)
+&nbsp;        viewModelScope.launch {
+&nbsp;            //save to local database
+&nbsp;            db.messageDao().addMessage(messageEntity)
+&nbsp;
+&nbsp;            //update convo with the new message
+&nbsp;            if (userEntity != null) {
+&nbsp;                try {
+&nbsp;                    //get or create conversation
+&nbsp;                    val remoteUser = UserEntity(
+&nbsp;                        uuid = userUuid,
+&nbsp;                        name = userEntity.name,
+&nbsp;                        address = userEntity.address
+&nbsp;                    )
+&nbsp;
+&nbsp;                    val conversation = conversationRepository.getOrCreateConversation(
+&nbsp;                        localUuid = localUuid,
+&nbsp;                        remoteUser = remoteUser
+&nbsp;                    )
+&nbsp;
+&nbsp;                    //update conversation with the message
+&nbsp;                    conversationRepository.updateWithMessage(
+&nbsp;                        conversationId = conversation.id,
+&nbsp;                        message = messageEntity
+&nbsp;                    )
+&nbsp;
+&nbsp;                    Log.d(&quot;ChatScreenViewModel&quot;, &quot;Updated conversation with sent message&quot;)
+&nbsp;                } catch (e: Exception) {
+&nbsp;                    Log.e(
+&nbsp;                        &quot;ChatScreenViewModel&quot;,
+&nbsp;                        &quot;Failed to update conversation with sent message&quot;,
+&nbsp;                        e
+&nbsp;                    )
+&nbsp;                }
+&nbsp;            }
+&nbsp;
+&nbsp;            if (isOnline) {
+&nbsp;                try {
+&nbsp;                    // Use withContext to ensure network operations run on IO thread
+&nbsp;                    val delivered = withContext(Dispatchers.IO) {
+&nbsp;                        // Try with a timeout to prevent blocking
+&nbsp;                        withTimeoutOrNull(5000) {
+&nbsp;                            appServer.sendChatMessageWithStatus(virtualAddress, sendTime, message, file)
+&nbsp;                        } ?: false
+&nbsp;                    }
+&nbsp;
+&nbsp;                    // Update UI based on delivery status
+&nbsp;                    if (!delivered) {
+&nbsp;                        Log.d(&quot;ChatDebug&quot;, &quot;Message delivery failed&quot;)
+&nbsp;                        _uiState.update { prev -&gt;
+&nbsp;                            prev.copy(offlineWarning = &quot;Message delivery failed. Device may be offline.&quot;)
+&nbsp;                        }
+&nbsp;                        // Force device status verification
+&nbsp;                        DeviceStatusManager.verifyDeviceStatus(ipAddress)
+&nbsp;                    } else {
+&nbsp;                        Log.d(&quot;ChatDebug&quot;, &quot;Message delivered successfully&quot;)
+&nbsp;                    }
+&nbsp;                } catch (e: Exception) {
+&nbsp;                    Log.e(&quot;ChatScreenViewModel&quot;, &quot;Error sending message: ${e.message}&quot;, e)
+&nbsp;                    _uiState.update { prev -&gt;
+&nbsp;                        prev.copy(offlineWarning = &quot;Error sending message: ${e.message}&quot;)
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                Log.d(&quot;ChatScreenViewModel&quot;, &quot;Device $ipAddress appears to be offline, message saved locally only&quot;)
+&nbsp;                _uiState.update { prev -&gt;
+&nbsp;                    prev.copy(offlineWarning = &quot;Device appears to be offline. Message saved locally only.&quot;)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Adds an outgoing file transfer for a given device.
+&nbsp;     *
+&nbsp;     * @param fileUri [Uri] of the file to send.
+&nbsp;     * @param toAddress IP address of the target device.
+&nbsp;     * @return [OutgoingTransferInfo] containing details of the transfer.
+&nbsp;     */
+&nbsp;    fun addOutgoingTransfer(fileUri: Uri, toAddress: InetAddress): OutgoingTransferInfo {
+&nbsp;        return appServer.addOutgoingTransfer(fileUri, toAddress)
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

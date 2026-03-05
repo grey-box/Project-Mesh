@@ -1,0 +1,136 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > CrashScreenActivity</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.greybox.projectmesh.debug</a>
+</div>
+
+<h1>Coverage Summary for Class: CrashScreenActivity (com.greybox.projectmesh.debug)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+  <tr>
+    <td class="name">CrashScreenActivity$Crash$1</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+    <td class="coverageStat"/>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.debug
+&nbsp;
+&nbsp;import android.os.Bundle
+&nbsp;import android.widget.Button
+&nbsp;import android.widget.TextView
+&nbsp;import androidx.activity.compose.setContent
+&nbsp;import androidx.activity.enableEdgeToEdge
+&nbsp;import androidx.appcompat.app.AppCompatActivity
+&nbsp;import androidx.compose.foundation.background
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.rememberScrollState
+&nbsp;import androidx.compose.foundation.verticalScroll
+&nbsp;import androidx.compose.material3.Surface
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.Button
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.unit.TextUnit
+&nbsp;import androidx.core.view.ViewCompat
+&nbsp;import androidx.core.view.WindowInsetsCompat
+&nbsp;import com.greybox.projectmesh.R
+&nbsp;import java.io.PrintWriter
+&nbsp;import java.io.StringWriter
+&nbsp;
+&nbsp;class CrashScreenActivity : AppCompatActivity() {
+&nbsp;    override fun onCreate(savedInstanceState: Bundle?) {
+&nbsp;        super.onCreate(savedInstanceState)
+&nbsp;//        enableEdgeToEdge()
+&nbsp;//        setContentView(R.layout.activity_crash_screen)
+&nbsp;//        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets -&gt;
+&nbsp;//            val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+&nbsp;//            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+&nbsp;//            insets
+&nbsp;//        }
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;        // Load content
+&nbsp;        setContent {
+&nbsp;            Crash()
+&nbsp;        }
+&nbsp;
+&nbsp;    }
+&nbsp;    @Composable
+&nbsp;    fun Crash()
+&nbsp;    {
+&nbsp;        Surface(modifier = Modifier.background(color = Color.White).fillMaxSize()) {
+&nbsp;            Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+&nbsp;                Text(text=&quot;Crash! Please screenshot and send to george.varvaris@grey-box.ca&quot;,Modifier.background(Color.White), color = Color.Red)
+&nbsp;                Button(content = {Text(&quot;Exit app&quot;)}, onClick = { finish() } )
+&nbsp;                CrashHandler.getThrowableFromIntent(intent).let {
+&nbsp;                    Text(&quot;Message: &quot; + it?.message + &quot;\nStack trace:\n&quot; + it?.stackTraceToString(),Modifier.background(Color.White), color = Color.Red)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>
