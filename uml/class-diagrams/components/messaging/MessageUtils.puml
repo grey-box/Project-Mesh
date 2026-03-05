@@ -1,0 +1,24 @@
+@startuml MessageUtils
+
+package "com.greybox.projectmesh.messaging.utils" {
+
+    object MessageUtils {
+
+        + formatTimestamp(timestamp: Long): String
+        + generateChatId(sender: String, receiver: String): String
+    }
+}
+
+package "java.text" {
+    class SimpleDateFormat
+}
+
+MessageUtils --> SimpleDateFormat : uses
+
+note right of MessageUtils
+    - Formats timestamps as "HH:mm"
+    - Generates consistent chat IDs
+    - Sorting ensures order independence
+end note
+
+@enduml

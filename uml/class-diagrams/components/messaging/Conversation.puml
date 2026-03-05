@@ -1,0 +1,20 @@
+@startuml Conversation
+skinparam classAttributeIconSize 0
+
+class Conversation <<Entity>> {
+  +id: String
+  +userUuid: String
+  +userName: String
+  +userAddress: String?
+  +lastMessage: String?
+  +lastMessageTime: Long
+  +unreadCount: Int = 0
+  +isOnline: Boolean = false
+}
+
+note right of Conversation
+@Entity(tableName = "conversations")
+@PrimaryKey id
+end note
+
+@enduml

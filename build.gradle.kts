@@ -12,6 +12,8 @@ plugins {
 java {
     toolchain {
         // version must be at least 11, 
+        //  but can be any higher as source and target compatibility are 
+        //  both specified in app/build.gradle.kts
         languageVersion = JavaLanguageVersion.of(17)
     }
 }

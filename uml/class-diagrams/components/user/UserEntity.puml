@@ -1,0 +1,16 @@
+@startuml UserEntity
+skinparam classAttributeIconSize 0
+
+class UserEntity <<Entity, Serializable>> {
+  +uuid: String
+  +name: String
+  +address: String? = null
+  +lastSeen: Long? = null
+}
+
+note right of UserEntity
+@Entity(tableName = "users")
+@PrimaryKey uuid
+end note
+
+@enduml

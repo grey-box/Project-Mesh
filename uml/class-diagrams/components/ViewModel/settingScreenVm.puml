@@ -1,0 +1,81 @@
+@startuml
+title SettingsScreenViewModel - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+package "com.greybox.projectmesh.viewModel" {
+
+  class SettingsScreenViewModel <<ViewModel>> {
+    -settingPrefs: SharedPreferences
+    --
+    -_theme: MutableStateFlow<AppTheme>
+    +theme: StateFlow<AppTheme>
+    --
+    -_lang: MutableStateFlow<String>
+    +lang: StateFlow<String>
+    --
+    -_deviceName: MutableStateFlow<String>
+    +deviceName: StateFlow<String>
+    --
+    -_autoFinish: MutableStateFlow<Boolean>
+    +autoFinish: StateFlow<Boolean>
+    --
+    -_saveToFolder: MutableStateFlow<String>
+    +saveToFolder: StateFlow<String>
+    --
+    -loadTheme(): AppTheme
+    +saveTheme(theme: AppTheme)
+    --
+    -loadLang(): String
+    +saveLang(languageCode: String)
+    --
+    -loadDeviceName(): String
+    +saveDeviceName(deviceName: String)
+    --
+    -loadAutoFinish(): Boolean
+    +saveAutoFinish(autoFinish: Boolean)
+    --
+    -loadSaveToFolder(): String
+    +saveSaveToFolder(saveToFolder: String)
+    --
+    +updateConcurrencySettings(concurrencyKnown: Boolean, concurrencySupported: Boolean)
+  }
+
+  class SharedPreferences
+  class AppTheme
+  class MutableStateFlow
+  class StateFlow
+  class SavedStateHandle
+  class DI
+  class Build
+  class Environment
+}
+
+SettingsScreenViewModel ..> SharedPreferences : reads/writes prefs
+SettingsScreenViewModel ..> AppTheme
+SettingsScreenViewModel ..> MutableStateFlow
+SettingsScreenViewModel ..> StateFlow
+SettingsScreenViewModel ..> Build : default device name
+SettingsScreenViewModel ..> Environment : default save folder
+
+note right of SettingsScreenViewModel
+init:
+- loads persisted values into:
+  theme, lang, deviceName,
+  autoFinish, saveToFolder
+end note
+
+note bottom of SettingsScreenViewModel
+Keys:
+- app_theme
+- language
+- device_name
+- auto_finish
+- save_to_folder
+- concurrency_known
+- concurrency_supported
+end note
+
+@enduml

@@ -1,0 +1,54 @@
+@startuml
+title SendScreenViewModel - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+package "com.greybox.projectmesh.viewModel" {
+
+  class SendScreenModel <<data>> {
+    +outgoingTransfers: List<OutgoingTransferInfo>
+  }
+
+  class SendScreenViewModel <<ViewModel>> {
+    -onSwitchToSelectDestNode: CallbackUris
+    --
+    -_uiState: MutableStateFlow<SendScreenModel>
+    +uiState: Flow<SendScreenModel>
+    -appServer: AppServer
+    --
+    +onFileChosen(uris: List<Uri>)
+    +onDelete(transfer: OutgoingTransferInfo)
+  }
+
+  class AppServer
+  class OutgoingTransferInfo
+  class Uri
+  class SavedStateHandle
+  class DI
+  class Flow
+  class MutableStateFlow
+  class CallbackUris
+}
+
+SendScreenViewModel --> SendScreenModel : updates
+SendScreenViewModel ..> AppServer : uses
+SendScreenViewModel ..> Uri : param
+SendScreenModel ..> OutgoingTransferInfo
+
+note right of SendScreenViewModel
+init:
+- collect appServer.outgoingTransfers
+- update _uiState.outgoingTransfers
+end note
+
+note bottom of SendScreenViewModel
+onFileChosen:
+- onSwitchToSelectDestNode(uris)
+
+onDelete:
+- appServer.removeOutgoingTransfer(transfer.id)
+end note
+
+@enduml

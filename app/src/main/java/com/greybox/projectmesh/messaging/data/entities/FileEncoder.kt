@@ -71,18 +71,14 @@ class FileEncoder { //Made by Craig. Encodes via base64.
      */
     @OptIn(ExperimentalEncodingApi::class)
     fun encodebase64(ctxt: Context, inputuri: Uri): String? {
-        try {
+        return try {
             val encodedstrm: InputStream? = ctxt.contentResolver.openInputStream(inputuri)
             val bytes = encodedstrm?.readBytes()
             encodedstrm?.close()
-            return if (bytes != null) {
-                Base64.encode(bytes)
-            } else {
-                "Cannot encode file"
-            }
-        } catch(e: Exception){
+            encodeBytesBase64(bytes)
+        } catch (e: Exception) {
             e.printStackTrace()
-            return "Cannot encode file"
+            "Cannot encode file"
         }
     }
 
@@ -101,6 +97,17 @@ class FileEncoder { //Made by Craig. Encodes via base64.
         decodedstrm.close()
         return output
     }
+    
+    @OptIn(ExperimentalEncodingApi::class)
+    internal fun encodeBytesBase64(bytes: ByteArray?): String? {
+        return if (bytes != null) {
+            Base64.encode(bytes)
+        } else {
+            "Cannot encode file"
+        }
+    }
+
+
 
     /**
      * Sends an image file to a target host and port using HTTP POST with Base64 encoding.
@@ -132,14 +139,13 @@ class FileEncoder { //Made by Craig. Encodes via base64.
                     }
                     outstream.close()
                     instream?.close()
-
                 } else {
                     return false
                 }
             } else {
                 return false
             }
-        } catch(e: Exception) {
+        } catch (e: Exception) {
             e.printStackTrace()
             return false
         }

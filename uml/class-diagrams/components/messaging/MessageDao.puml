@@ -1,0 +1,18 @@
+@startuml MessageDao
+skinparam classAttributeIconSize 0
+
+interface MessageDao <<Dao>> {
+  +getAll(): List<Message>
+  +getAllFlow(): Flow<List<Message>>
+  +getChatMessagesFlow(chat: String): Flow<List<Message>>
+  +clearTable(): Unit
+  +getChatMessagesFlowMultipleNames(chatNames: List<String>): Flow<List<Message>>
+  +getChatMessagesSync(chat: String): List<Message>
+  +addMessage(m: Message): Unit
+  +delete(m: Message): Unit
+  +deleteAll(messages: List<Message>): Unit
+}
+
+MessageDao ..> Message
+
+@enduml

@@ -1,0 +1,133 @@
+@startuml
+title SendScreen.kt (Compose) - File Picker + Outgoing Transfers List + Swipe-to-Delete + Formatting Helpers
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class SendScreen <<Composable>> {
+    +SendScreen(onSwitchToSelectDestNode: (List<Uri>)->Unit, viewModel: SendScreenViewModel)
+  }
+
+  class DisplayAllPendingTransfers <<Composable>> {
+    +DisplayAllPendingTransfers(viewModel: SendScreenViewModel, uiState: SendScreenModel)
+  }
+
+  class autoConvertByte <<Function>> {
+    +autoConvertByte(byteSize: Int): String
+  }
+
+  class autoConvertMS <<Function>> {
+    +autoConvertMS(ms: Int): String
+  }
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class SendScreenViewModel <<ViewModel>> {
+    +uiState: StateFlow<SendScreenModel>
+    +onFileChosen(uris: List<Uri>)
+    +onDelete(transfer: OutgoingTransfer)
+    <<constructed with onSwitchToSelectDestNode>>
+  }
+
+  class SendScreenModel <<State>> {
+    +outgoingTransfers: List<OutgoingTransfer>
+  }
+
+  class OutgoingTransfer <<Model>> {
+    +id: Any
+    +name: String
+    +toHost: InetAddress
+    +size: Int
+    +transferred: Int
+    +status: Any
+  }
+}
+
+package "Global / Repo" as Global {
+  class GlobalApp {
+    +GlobalUserRepo
+  }
+  class UserRepository {
+    +getUserByIp(ip: String): User?
+  }
+  class User {
+    +name: String
+  }
+}
+
+package "Android / Compose" as Android {
+  class Uri
+  class ActivityResultContractsOpenMultipleDocuments as "ActivityResultContracts.OpenMultipleDocuments"
+  class rememberLauncherForActivityResult
+  class runBlocking
+}
+
+package "Compose UI / Material3" as UI {
+  class Box
+  class Column
+  class LazyColumn
+  class ListItem
+  class Text
+  class TransparentButton
+  class AnimatedVisibility
+  class fadeOut
+  class SwipeToDismissBox
+  class rememberSwipeToDismissBoxState
+  class HorizontalDivider
+  class Icon
+  class rememberCoroutineScope
+  class delay
+}
+
+package "DI" as DI {
+  class localDI
+  class ViewModelFactory
+  class LocalSavedStateRegistryOwner
+}
+
+' --- Wiring ---
+Views.SendScreen ..> DI.localDI : provide DI
+Views.SendScreen ..> DI.LocalSavedStateRegistryOwner : owner
+Views.SendScreen ..> DI.ViewModelFactory : creates SendScreenViewModel(di, savedStateHandle, onSwitchToSelectDestNode)
+Views.SendScreen ..> VM.SendScreenViewModel : viewModel(factory)
+Views.SendScreen ..> VM.SendScreenModel : collectAsState(uiState)
+
+Views.SendScreen ..> Android.rememberLauncherForActivityResult : openDocumentLauncher(OpenMultipleDocuments)
+Views.SendScreen ..> Android.ActivityResultContractsOpenMultipleDocuments : pick files
+Views.SendScreen ..> VM.SendScreenViewModel : onFileChosen(uris)\n(if uris not empty)
+
+Views.SendScreen --> Views.DisplayAllPendingTransfers : render list section
+Views.SendScreen --> UI.TransparentButton : "Send File"\nlaunch(arrayOf("*/*"))
+
+' --- List + swipe delete ---
+Views.DisplayAllPendingTransfers --> UI.LazyColumn : items(outgoingTransfers, key=id)
+
+UI.rememberSwipeToDismissBoxState ..> VM.SendScreenViewModel : onDelete(transfer)\n(after 300ms delay)
+UI.AnimatedVisibility ..> UI.fadeOut : exit animation 300ms
+UI.SwipeToDismissBox --> UI.ListItem : content
+UI.SwipeToDismissBox --> UI.Icon : backgroundContent (red + delete icon)
+UI.SwipeToDismissBox ..> UI.rememberCoroutineScope : launch { delay(300); onDelete() }
+
+note right of Views.DisplayAllPendingTransfers
+Swipe behavior:
+- Only EndToStart allowed (right->left)
+- On confirm EndToStart:
+   isVisible=false (fadeOut 300ms)
+   delay(300)
+   viewModel.onDelete(transfer)
+end note
+
+' --- Device name lookup ---
+note bottom of UI.ListItem
+For each transfer:
+- toHostAddress = transfer.toHost.hostAddress
+- deviceName resolved via runBlocking:
+   GlobalApp.GlobalUserRepo.userRepository.getUserByIp(toHostAddress)?.name
+UI shows:
+- "To: {deviceName} ({ip})" or "To: Loading... ({ip})"
+- status
+- send progress using autoConvertByte(transferred/size)
+end note
+
+@enduml

@@ -4,10 +4,16 @@
     <string name="start_hotspot">Start Hotspot</string>
     <string name="stop_hotspot">Stop Hotspot</string>
     <string name="connect_via_qr_code_scan">Connect via QR Code Scan</string>
-    <string name="connect_via_entering_connect_uri">Connect via Entering Connect URI</string>
+    <string
+    name="connect_via_entering_connect_uri"
+  >Connect via Entering Connect URI</string>
     <string name="share_connect_uri">Share connect URI</string>
-    <string name="wifi_station_connection">Wifi Station (Client) Connection</string>
-    <string name="prompt_scan_qr_code">Scan another device to join the Mesh</string>
+    <string
+    name="wifi_station_connection"
+  >Wifi Station (Client) Connection</string>
+    <string
+    name="prompt_scan_qr_code"
+  >Scan another device to join the Mesh</string>
     <string name="hotspot_status">Hotspot Status</string>
     <string name="hotspot_status_online">Online</string>
     <string name="hotspot_status_offline">Offline</string>
@@ -24,7 +30,9 @@
                         "3. Select Quick Share\n"
                         "4. Choose a nearby device you want to share the URI with"
     </string>
-    <string name="prompt_enter_uri">Enter Connect URI (Starts with "meshrabiya://")</string>
+    <string
+    name="prompt_enter_uri"
+  >Enter Connect URI (Starts with "meshrabiya://")</string>
 
     <string name="send_file">Send File</string>
     <string name="from">From</string>

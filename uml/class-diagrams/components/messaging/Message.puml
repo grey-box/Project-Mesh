@@ -1,0 +1,32 @@
+@startuml Message
+skinparam classAttributeIconSize 0
+
+class URIConverter {
+  +convfromURI(theuri: URI?): String?
+  +convtoURI(uristring: String?): URI?
+}
+
+class URISerializable <<KSerializer<URI>>> {
+  +descriptor: SerialDescriptor
+  +serialize(enc: Encoder, vals: URI): Unit
+  +deserialize(dec: Decoder): URI
+}
+
+class Message <<Entity>> {
+  +id: Int
+  +dateReceived: Long
+  +content: String
+  +sender: String
+  +chat: String
+  +file: URI? = null
+}
+
+Message ..> URIConverter : @TypeConverters
+Message ..> URISerializable : @Serializable(with)
+
+note right of Message
+@Entity(tableName = "message")
+@PrimaryKey(autoGenerate = true) id
+end note
+
+@enduml

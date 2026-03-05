@@ -7,8 +7,16 @@ import android.util.Log
  * Provides consistent logging with standardized tags and can be disabled in production.
  */
 object Logger {
+    internal const val TAG_PREFIX = "MeshChat_"
     private const val LOGGING_ENABLED = true
-    private const val TAG_PREFIX = "MeshChat_"
+
+    internal fun buildTag(tag: String): String {
+        return "$TAG_PREFIX$tag"
+    }
+
+    internal fun buildCriticalTag(tag: String): String {
+        return "${TAG_PREFIX}${tag}_CRITICAL"
+    }
 
     /**
      * Logs a debug-level message.
@@ -18,7 +26,7 @@ object Logger {
      */
     fun d(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.d("$TAG_PREFIX$tag", message)
+            Log.d(buildTag(tag), message)
         }
     }
 
@@ -30,7 +38,7 @@ object Logger {
      */
     fun i(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.i("$TAG_PREFIX$tag", message)
+            Log.i(buildTag(tag), message)
         }
     }
 
@@ -42,7 +50,7 @@ object Logger {
      */
     fun w(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.w("$TAG_PREFIX$tag", message)
+            Log.w(buildTag(tag), message)
         }
     }
 
@@ -56,9 +64,9 @@ object Logger {
     fun e(tag: String, message: String, throwable: Throwable? = null) {
         if (LOGGING_ENABLED) {
             if (throwable != null) {
-                Log.e("$TAG_PREFIX$tag", message, throwable)
+                Log.e(buildTag(tag), message, throwable)
             } else {
-                Log.e("$TAG_PREFIX$tag", message)
+                Log.e(buildTag(tag), message)
             }
         }
     }
@@ -71,10 +79,11 @@ object Logger {
      * @param throwable Optional exception to include in the log output.
      */
     fun critical(tag: String, message: String, throwable: Throwable? = null) {
+        val criticalTag = buildCriticalTag(tag)
         if (throwable != null) {
-            Log.e("$TAG_PREFIX${tag}_CRITICAL", message, throwable)
+            Log.e(criticalTag, message, throwable)
         } else {
-            Log.e("$TAG_PREFIX${tag}_CRITICAL", message)
+            Log.e(criticalTag, message)
         }
     }
 }

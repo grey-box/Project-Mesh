@@ -3,17 +3,31 @@
     <string name="ip_address">Dirección IP</string>
     <string name="start_hotspot">Iniciar Punto de Acceso</string>
     <string name="stop_hotspot">Detener Punto de Acceso</string>
-    <string name="connect_via_qr_code_scan">Conectar mediante Escaneo de Código QR</string>
-    <string name="connect_via_entering_connect_uri">Conectar ingresando URI de Conexión</string>
+    <string
+    name="connect_via_qr_code_scan"
+  >Conectar mediante Escaneo de Código QR</string>
+    <string
+    name="connect_via_entering_connect_uri"
+  >Conectar ingresando URI de Conexión</string>
     <string name="share_connect_uri">Compartir URI de Conexión</string>
-    <string name="wifi_station_connection">Conexión de Estación Wifi (Cliente)</string>
-    <string name="prompt_scan_qr_code">Escanea otro dispositivo para unirse a la red Mesh</string>
+    <string
+    name="wifi_station_connection"
+  >Conexión de Estación Wifi (Cliente)</string>
+    <string
+    name="prompt_scan_qr_code"
+  >Escanea otro dispositivo para unirse a la red Mesh</string>
     <string name="hotspot_status">Estado del Punto de Acceso</string>
     <string name="hotspot_status_online">En línea</string>
     <string name="hotspot_status_offline">Desconectado</string>
-    <string name="instruction">O, ingrese el URI de conexión a continuación:\n1. Asegúrese de que el Bluetooth esté activado\n2. Permita que todos compartan datos mediante Quick Share\n3. Después de obtener el URI, haga clic en copiar\n4. Pegue el URI en el campo de texto a continuación\n5. Haga clic en "Conectar ingresando URI de Conexión"</string>
-    <string name="instruction_start_hotspot">Para compartir el URI de conexión:\n1. Asegúrese de que Bluetooth esté habilitado en este dispositivo\n2. Haga clic en "Compartir URI de Conexión"\n3. Seleccione Quick Share\n4. Elija un dispositivo cercano con el que desea compartir el URI</string>
-    <string name="prompt_enter_uri">Ingrese URI de Conexión (Empieza con "meshrabiya://")</string>
+    <string
+    name="instruction"
+  >O, ingrese el URI de conexión a continuación:\n1. Asegúrese de que el Bluetooth esté activado\n2. Permita que todos compartan datos mediante Quick Share\n3. Después de obtener el URI, haga clic en copiar\n4. Pegue el URI en el campo de texto a continuación\n5. Haga clic en "Conectar ingresando URI de Conexión"</string>
+    <string
+    name="instruction_start_hotspot"
+  >Para compartir el URI de conexión:\n1. Asegúrese de que Bluetooth esté habilitado en este dispositivo\n2. Haga clic en "Compartir URI de Conexión"\n3. Seleccione Quick Share\n4. Elija un dispositivo cercano con el que desea compartir el URI</string>
+    <string
+    name="prompt_enter_uri"
+  >Ingrese URI de Conexión (Empieza con "meshrabiya://")</string>
     <string name="send_file">Enviar Archivo</string>
     <string name="from">De</string>
     <string name="status">Estado</string>
