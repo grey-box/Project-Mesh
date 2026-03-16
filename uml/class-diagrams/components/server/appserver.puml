@@ -1,0 +1,53 @@
+@startuml
+title AppServer - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+class AppServer {
+  -appContext: Context
+  -httpClient: OkHttpClient
+  -mLogger: MNetLogger
+  -localVirtualAddr: InetAddress
+  -receiveDir: File
+  -json: Json
+  -db: MeshDatabase
+  -userRepository: UserRepository
+  +serve(session: IHTTPSession): Response
+  +addOutgoingTransfer(uri: Uri, toNode: InetAddress, toPort: Int): OutgoingTransferInfo
+  +sendChatMessageWithStatus(address: InetAddress, time: Long, message: String, f: URI?): Boolean
+  +checkDeviceReachable(remoteAddr: InetAddress, port: Int): Boolean
+}
+
+class OutgoingTransferInfo <<data>>
+class IncomingTransferInfo <<data>>
+class MeshDatabase
+class MessageDao
+class UserRepository
+class OkHttpClient
+class JSONSchema
+class MessageNetworkHandler
+class NotificationHelper
+class SharedPreferences
+
+AppServer --> OkHttpClient
+AppServer --> MeshDatabase
+AppServer --> MessageDao
+AppServer --> UserRepository
+AppServer --> JSONSchema
+AppServer --> MessageNetworkHandler
+AppServer --> NotificationHelper
+AppServer --> SharedPreferences
+AppServer --> OutgoingTransferInfo
+AppServer --> IncomingTransferInfo
+
+note right of AppServer
+Key behaviors covered by tests:
+- route handling for /ping, /myinfo, /updateUserInfo, /chat
+- outgoing transfer tracking
+- reachability checks
+- chat send success/failure paths
+end note
+
+@enduml

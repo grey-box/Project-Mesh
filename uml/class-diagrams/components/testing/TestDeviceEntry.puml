@@ -1,0 +1,33 @@
+@startuml
+title TestDeviceEntry - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+class TestDeviceEntry {
+  + createTestEntry(): Pair<Int, LastOriginatorMessage>
+}
+
+class TestDeviceService
+class TestMNetLogger
+class TestVirtualRouter
+class MmcpOriginatorMessage
+class "VirtualNode.LastOriginatorMessage" as LastOriginatorMessage
+class VirtualNodeDatagramSocket
+
+TestDeviceEntry --> TestDeviceService
+TestDeviceEntry --> TestMNetLogger
+TestDeviceEntry --> TestVirtualRouter
+TestDeviceEntry --> MmcpOriginatorMessage
+TestDeviceEntry --> LastOriginatorMessage
+TestDeviceEntry --> VirtualNodeDatagramSocket
+
+note right of TestDeviceEntry
+Tests verify:
+- generated address metadata
+- originator ping and hop values
+- bound socket availability for the fake device entry
+end note
+
+@enduml

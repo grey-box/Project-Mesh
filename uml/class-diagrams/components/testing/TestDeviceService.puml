@@ -1,0 +1,42 @@
+@startuml
+title TestDeviceService - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+class TestDeviceService {
+  + TEST_DEVICE_IP: String
+  + TEST_DEVICE_NAME: String
+  + TEST_DEVICE_IP_OFFLINE: String
+  + TEST_DEVICE_NAME_OFFLINE: String
+  + initialize(): Unit
+  + initializeOfflineDevice(): Unit
+  + isOnlineTestDevice(address: InetAddress): Boolean
+  + isOfflineTestDevice(address: InetAddress): Boolean
+  + getTestDeviceAddress(): InetAddress
+  + isTestDevice(address: InetAddress): Boolean
+  + createEchoResponse(originalMessage: Message): Message
+}
+
+class GlobalUserRepo
+class UserRepository
+class UserEntity
+class Message
+class InetAddress
+
+TestDeviceService --> GlobalUserRepo
+TestDeviceService --> UserRepository
+TestDeviceService --> UserEntity
+TestDeviceService --> Message
+TestDeviceService --> InetAddress
+
+note right of TestDeviceService
+Tests cover:
+- first-time initialization
+- update-vs-insert behavior
+- idempotency across repeated init calls
+- helper IP classification and echo message generation
+end note
+
+@enduml
