@@ -125,7 +125,7 @@ jobs:
 
       - name: Commit Reports to Viewing Directory
         run: |
-          git switch gh-pages
+          git switch --force gh-pages
           git add --force ./build_reports/
           git commit -m "Relocate reports for viewing"
           git push
