@@ -62,6 +62,8 @@ jobs:
     steps:
       - name: Check Out Code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # necessary to allow branch switching
 
       - name: Ensure Report Dir is empty
         run: |
@@ -123,7 +125,7 @@ jobs:
 
       - name: Commit Reports to Viewing Directory
         run: |
-          git switch "gh-pages"
+          git switch gh-pages
           git add --force ./build_reports/
           git commit -m "Relocate reports for viewing"
           git push
