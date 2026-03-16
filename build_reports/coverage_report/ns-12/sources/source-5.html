@@ -1,0 +1,177 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > URIConverter</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">debug.com.greybox.projectmesh.messaging.data.entities</a>
+</div>
+
+<h1>Coverage Summary for Class: URIConverter (debug.com.greybox.projectmesh.messaging.data.entities)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">URIConverter</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.messaging.data.entities
+&nbsp;
+&nbsp;import androidx.room.ColumnInfo
+&nbsp;import androidx.room.Entity
+&nbsp;import androidx.room.PrimaryKey
+&nbsp;import androidx.room.TypeConverter
+&nbsp;import androidx.room.TypeConverters
+&nbsp;import kotlinx.serialization.KSerializer
+&nbsp;import kotlinx.serialization.Serializable
+&nbsp;import kotlinx.serialization.descriptors.PrimitiveKind
+&nbsp;import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
+&nbsp;import kotlinx.serialization.descriptors.SerialDescriptor
+&nbsp;import kotlinx.serialization.encoding.Decoder
+&nbsp;import kotlinx.serialization.encoding.Encoder
+&nbsp;import java.net.URI
+&nbsp;
+&nbsp;/**
+&nbsp; * Room type converter to convert between [URI] and [String] for database storage.
+&nbsp; */
+&nbsp;class URIConverter {
+&nbsp;    /**
+&nbsp;     * Converts a [URI] to a [String] for database storage.
+&nbsp;     *
+&nbsp;     * @param theuri The URI to convert.
+&nbsp;     * @return The string representation of the URI, or null if input is null.
+&nbsp;     */
+&nbsp;    @TypeConverter
+&nbsp;    fun convfromURI(theuri: URI?): String? {
+&nbsp;        return theuri?.toString()
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Converts a [String] back to a [URI].
+&nbsp;     *
+&nbsp;     * @param uristring The string to convert.
+&nbsp;     * @return The corresponding URI, or null if input is null.
+&nbsp;     */
+&nbsp;    @TypeConverter
+&nbsp;    fun convtoURI(uristring: String?): URI? {
+&nbsp;        return uristring?.let { URI.create(it) }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Serializer to make [URI] serializable for Kotlinx serialization (e.g., JSON).
+&nbsp; */
+&nbsp;object URISerializable : KSerializer&lt;URI&gt; {
+&nbsp;    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor(&quot;URI&quot;, PrimitiveKind.STRING)
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Serializes a [URI] into a string.
+&nbsp;     *
+&nbsp;     * @param enc The encoder.
+&nbsp;     * @param vals The URI to serialize.
+&nbsp;     */
+&nbsp;    override fun serialize(enc: Encoder, vals: URI) {
+&nbsp;        enc.encodeString(vals.toString())
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Deserializes a string into a [URI].
+&nbsp;     *
+&nbsp;     * @param dec The decoder.
+&nbsp;     * @return The deserialized URI.
+&nbsp;     */
+&nbsp;    override fun deserialize(dec: Decoder): URI {
+&nbsp;        return URI.create(dec.decodeString())
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Room entity representing a message in a chat.
+&nbsp; *
+&nbsp; * @property id Unique message ID (auto-generated).
+&nbsp; * @property dateReceived Timestamp when the message was received.
+&nbsp; * @property content The text content of the message.
+&nbsp; * @property sender The identifier of the sender.
+&nbsp; * @property chat The chat/conversation ID this message belongs to.
+&nbsp; * @property file Optional file attached to the message, stored as a [URI].
+&nbsp; */
+&nbsp;@Serializable
+&nbsp;@Entity(tableName = &quot;message&quot;)
+&nbsp;@TypeConverters(URIConverter::class)
+&nbsp;data class Message(
+&nbsp;    @PrimaryKey(autoGenerate = true) val id: Int,
+&nbsp;    @ColumnInfo(name = &quot;dateReceived&quot;) val dateReceived: Long,
+&nbsp;    @ColumnInfo(name = &quot;content&quot;) val content: String,
+&nbsp;    @ColumnInfo(name = &quot;sender&quot;) val sender: String,
+&nbsp;    @ColumnInfo(name = &quot;chat&quot;) val chat: String,
+&nbsp;    @ColumnInfo(name = &quot;file&quot;) @Serializable(with = URISerializable::class) val file: URI? = null
+&nbsp;    // @ColumnInfo(name = &quot;file&quot;) @Serializable(with=URISerializable::class) val file: List&lt;URI?&gt;
+&nbsp;)
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

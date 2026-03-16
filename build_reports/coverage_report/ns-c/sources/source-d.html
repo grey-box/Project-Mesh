@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > RequestPermissionScreenKt</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.greybox.projectmesh.views</a>
+</div>
+
+<h1>Coverage Summary for Class: RequestPermissionScreenKt (com.greybox.projectmesh.views)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">RequestPermissionScreenKt</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.views
+&nbsp;
+&nbsp;import android.Manifest
+&nbsp;import android.app.AlertDialog
+&nbsp;import android.content.Context
+&nbsp;import android.content.Intent
+&nbsp;import android.content.pm.PackageManager
+&nbsp;import android.graphics.Typeface
+&nbsp;import android.os.Build
+&nbsp;import android.os.PowerManager
+&nbsp;import android.provider.Settings
+&nbsp;import android.text.SpannableString
+&nbsp;import android.text.Spanned
+&nbsp;import android.text.style.StyleSpan
+&nbsp;import androidx.activity.compose.rememberLauncherForActivityResult
+&nbsp;import androidx.activity.result.contract.ActivityResultContracts
+&nbsp;import androidx.compose.runtime.*
+&nbsp;import androidx.compose.ui.platform.LocalContext
+&nbsp;import androidx.core.content.ContextCompat
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun RequestPermissionsScreen(skipPermissions: Boolean) {
+&nbsp;    val context = LocalContext.current
+&nbsp;
+&nbsp;    // Track permission states
+&nbsp;    var currentStep by remember { mutableIntStateOf(if (skipPermissions) 6 else 0) }
+&nbsp;
+&nbsp;    val nearbyWifiPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) {
+&nbsp;        // Move to next permission
+&nbsp;        currentStep = 1
+&nbsp;    }
+&nbsp;
+&nbsp;    val locationPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) {
+&nbsp;        // Move to next permission
+&nbsp;        currentStep = 2
+&nbsp;    }
+&nbsp;
+&nbsp;    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) {
+&nbsp;        // Move to next permission
+&nbsp;        currentStep = 3
+&nbsp;    }
+&nbsp;
+&nbsp;    val storagePermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestMultiplePermissions()
+&nbsp;    ) {
+&nbsp;        // Move to next step permission
+&nbsp;        currentStep = 4
+&nbsp;    }
+&nbsp;    
+&nbsp;    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) {
+&nbsp;        // Move to next step (Battery Optimization)
+&nbsp;        currentStep = 5
+&nbsp;    }
+&nbsp;
+&nbsp;    LaunchedEffect(currentStep) {
+&nbsp;        if (currentStep == 6) return@LaunchedEffect
+&nbsp;        when (currentStep) {
+&nbsp;            0 -&gt; { // Request Nearby Wi-Fi Permission
+&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M &amp;&amp;
+&nbsp;                    !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
+&nbsp;                    nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
+&nbsp;                } else {
+&nbsp;                    currentStep = 1
+&nbsp;                }
+&nbsp;            }
+&nbsp;            1 -&gt; { // Request Location Permission
+&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M &amp;&amp;
+&nbsp;                    !hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+&nbsp;                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+&nbsp;                } else {
+&nbsp;                    currentStep = 2
+&nbsp;                }
+&nbsp;            }
+&nbsp;            2 -&gt; { // Request Notification Permission (Android 13+)
+&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU &amp;&amp;
+&nbsp;                    !hasPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {
+&nbsp;                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+&nbsp;                } else {
+&nbsp;                    currentStep = 3
+&nbsp;                }
+&nbsp;            }
+&nbsp;            3 -&gt; { // Request Storage Permission (Android 13+ has different permissions)
+&nbsp;                val storagePermissions = if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU) {
+&nbsp;                    arrayOf(
+&nbsp;                        Manifest.permission.READ_MEDIA_IMAGES,
+&nbsp;                        Manifest.permission.READ_MEDIA_VIDEO
+&nbsp;                    )
+&nbsp;                } else {
+&nbsp;                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+&nbsp;                }
+&nbsp;
+&nbsp;                if (!hasAnyPermission(context, storagePermissions)) {
+&nbsp;                    storagePermissionLauncher.launch(storagePermissions)
+&nbsp;                } else {
+&nbsp;                    currentStep = 4
+&nbsp;                }
+&nbsp;            }
+&nbsp;            4 -&gt; { // Request Camera Permission
+&nbsp;                if (!hasPermission(context, Manifest.permission.CAMERA)) {
+&nbsp;                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+&nbsp;                } else {
+&nbsp;                    currentStep = 5
+&nbsp;                }
+&nbsp;            }
+&nbsp;            5 -&gt; { // Handle Battery Optimization
+&nbsp;                if (!isBatteryOptimizationDisabled(context)) {
+&nbsp;                    promptDisableBatteryOptimization(context)
+&nbsp;                }
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Function to Check If Permission is Granted */
+&nbsp;fun hasPermission(context: Context, permission: String): Boolean {
+&nbsp;    return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
+&nbsp;}
+&nbsp;
+&nbsp;/** Function to Check If Any Permission from a List is Granted */
+&nbsp;fun hasAnyPermission(context: Context, permissions: Array&lt;String&gt;): Boolean {
+&nbsp;    return permissions.any { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
+&nbsp;}
+&nbsp;
+&nbsp;/** Function to Check If Battery Optimization is Disabled */
+&nbsp;fun isBatteryOptimizationDisabled(context: Context): Boolean {
+&nbsp;    val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+&nbsp;    return if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
+&nbsp;        powerManager.isIgnoringBatteryOptimizations(context.packageName)
+&nbsp;    } else {
+&nbsp;        true // Battery optimization doesn&#39;t apply below Android 6.0
+&nbsp;    }
+&nbsp;}
+&nbsp;
+&nbsp;/** Function to Prompt User to Disable Battery Optimization */
+&nbsp;fun promptDisableBatteryOptimization(context: Context) {
+&nbsp;    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
+&nbsp;        val message = SpannableString(
+&nbsp;            &quot;To ensure uninterrupted background functionality and maintain a stable connection, &quot; +
+&nbsp;                    &quot;please disable battery optimization for this app.\n\n&quot; +
+&nbsp;                    &quot;1. Tap Open Settings below\n\n&quot; +
+&nbsp;                    &quot;2. Tap the dropdown menu at top of page and select All Apps\n\n&quot; +
+&nbsp;                    &quot;3. Scroll to Project Mesh and tap to turn off battery optimization.\n&quot;
+&nbsp;        )
+&nbsp;
+&nbsp;        fun boldify(text: String) {
+&nbsp;            val start = message.indexOf(text)
+&nbsp;            if (start &gt;= 0) {
+&nbsp;                message.setSpan(
+&nbsp;                    StyleSpan(Typeface.BOLD),  // Apply bold
+&nbsp;                    start,
+&nbsp;                    start + text.length,
+&nbsp;                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+&nbsp;                )
+&nbsp;            }
+&nbsp;        }
+&nbsp;
+&nbsp;        // Bold specific words
+&nbsp;        boldify(&quot;Open Settings&quot;)
+&nbsp;        boldify(&quot;dropdown&quot;)
+&nbsp;        boldify(&quot;All Apps&quot;)
+&nbsp;        boldify(&quot;turn off battery optimization&quot;)
+&nbsp;
+&nbsp;        AlertDialog.Builder(context)
+&nbsp;            .setTitle(&quot;Disable Battery Optimization&quot;)
+&nbsp;            .setMessage(message)
+&nbsp;            .setPositiveButton(&quot;OPEN SETTINGS&quot;) { _, _ -&gt;
+&nbsp;                try {
+&nbsp;                    // Navigate to Battery Optimization Settings
+&nbsp;                    val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+&nbsp;                    context.startActivity(intent)
+&nbsp;                } catch (e: Exception) {
+&nbsp;                    // Fallback to App Info screen
+&nbsp;                    val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+&nbsp;                        .setData(android.net.Uri.fromParts(&quot;package&quot;, context.packageName, null))
+&nbsp;                    context.startActivity(appSettingsIntent)
+&nbsp;                }
+&nbsp;            }
+&nbsp;            .setNegativeButton(&quot;CANCEL&quot;, null)
+&nbsp;            .show()
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

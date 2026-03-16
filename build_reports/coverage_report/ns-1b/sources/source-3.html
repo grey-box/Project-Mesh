@@ -1,0 +1,169 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > TestMNetLogger</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">debug.com.greybox.projectmesh.testing</a>
+</div>
+
+<h1>Coverage Summary for Class: TestMNetLogger (debug.com.greybox.projectmesh.testing)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+<th class="coverageStat 
+">
+  Instruction, %
+</th>
+</tr>
+<tr>
+  <td class="name">TestMNetLogger</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/4)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.testing
+&nbsp;
+&nbsp;import android.util.Log
+&nbsp;import com.ustadmobile.meshrabiya.log.MNetLogger
+&nbsp;
+&nbsp;/**
+&nbsp; * Logger implementation for test devices.
+&nbsp; *
+&nbsp; * Redirects all log messages to Android&#39;s Log system with a fixed &quot;TestDevice&quot; tag.
+&nbsp; * Supports both direct message strings and lambda message providers.
+&nbsp; */
+<b class="nc">&nbsp;class TestMNetLogger : MNetLogger() {</b>
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Logs a message and optional exception with a given priority.
+&nbsp;     *
+&nbsp;     * @param priority the log priority (Log.VERBOSE, Log.DEBUG, etc.)
+&nbsp;     * @param message the message to log
+&nbsp;     * @param exception optional exception to log
+&nbsp;     */
+&nbsp;    override fun invoke(priority: Int, message: String, exception: Exception?) {
+<b class="nc">&nbsp;        Log.println(priority, &quot;TestDevice&quot;, message)</b>
+<b class="nc">&nbsp;        exception?.let {</b>
+<b class="nc">&nbsp;            Log.println(priority, &quot;TestDevice&quot;, it.toString())</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Logs a lazily evaluated message and optional exception with a given priority.
+&nbsp;     *
+&nbsp;     * @param priority the log priority (Log.VERBOSE, Log.DEBUG, etc.)
+&nbsp;     * @param message lambda returning the message to log
+&nbsp;     * @param exception optional exception to log
+&nbsp;     */
+&nbsp;    override fun invoke(priority: Int, message: () -&gt; String, exception: Exception?) {
+<b class="nc">&nbsp;        Log.println(priority, &quot;TestDevice&quot;, message())</b>
+<b class="nc">&nbsp;        exception?.let {</b>
+<b class="nc">&nbsp;            Log.println(priority, &quot;TestDevice&quot;, it.toString())</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

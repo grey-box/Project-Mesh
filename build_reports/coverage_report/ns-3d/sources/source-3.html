@@ -1,0 +1,245 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > MessageMigrationUtils</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">release.com.greybox.projectmesh.messaging.utils</a>
+</div>
+
+<h1>Coverage Summary for Class: MessageMigrationUtils (release.com.greybox.projectmesh.messaging.utils)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+  <tr>
+    <td class="name">MessageMigrationUtils$migrateMessagesToChatIds$2</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">MessageMigrationUtils$special$$inlined$instance$default$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/5)
+  </span>
+</td>
+    <td class="coverageStat"/>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;//script to help migrate existing messages
+&nbsp;package com.greybox.projectmesh.messaging.utils
+&nbsp;
+&nbsp;import android.content.Context
+&nbsp;import android.util.Log
+&nbsp;import com.greybox.projectmesh.GlobalApp
+&nbsp;import com.greybox.projectmesh.db.MeshDatabase
+&nbsp;import com.greybox.projectmesh.testing.TestDeviceService
+&nbsp;import kotlinx.coroutines.Dispatchers
+&nbsp;import kotlinx.coroutines.withContext
+&nbsp;import org.kodein.di.DI
+&nbsp;import org.kodein.di.DIAware
+&nbsp;import org.kodein.di.instance
+&nbsp;
+&nbsp;/**
+&nbsp; * Utility responsible for migrating legacy messages to the newer
+&nbsp; * conversation-ID–based chat naming format.
+&nbsp; *
+&nbsp; * It inspects all existing messages, infers correct conversation IDs,
+&nbsp; * and rewrites their `chat` field when necessary.
+&nbsp; *
+&nbsp; * This allows older installations to transition cleanly to the
+&nbsp; * standardized conversation model.
+&nbsp; */
+&nbsp;class MessageMigrationUtils(
+&nbsp;    override val di: DI
+&nbsp;): DIAware {
+&nbsp;
+&nbsp;    private val db: MeshDatabase by di.instance()
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Migrates all historical messages so that each message&#39;s `chat`
+&nbsp;     * value follows the modern conversation ID format.
+&nbsp;     *
+&nbsp;     * Steps performed:
+&nbsp;     * - Loads all messages
+&nbsp;     * - Groups them by legacy chat name
+&nbsp;     * - Determines correct UUID association for each chat group
+&nbsp;     * - Generates a conversation ID using local + remote UUIDs
+&nbsp;     * - Rewrites messages with updated chat names
+&nbsp;     *
+&nbsp;     * Errors are logged but do not stop the migration process.
+&nbsp;     */
+&nbsp;    suspend fun migrateMessagesToChatIds() {
+&nbsp;        withContext(Dispatchers.IO){
+&nbsp;            try {
+&nbsp;                //get all messages by id
+&nbsp;                val messages = db.messageDao().getAll()
+&nbsp;                Log.d(&quot;MessageMigration&quot;, &quot;Found ${messages.size} messages to check for migration&quot;)
+&nbsp;
+&nbsp;                //group messages by their current chat names
+&nbsp;                val messagesByChat = messages.groupBy { it.chat }
+&nbsp;
+&nbsp;                //process each chat group
+&nbsp;                messagesByChat.forEach { (chatName, messagesInChat) -&gt;
+&nbsp;                    //skip messages that already appear by using convo id format
+&nbsp;                    if (chatName.contains(&quot;-&quot;) &amp;&amp; (chatName.count { it == &#39;-&#39; } &gt;= 1)){
+&nbsp;                        Log.d(&quot;MessageMigration&quot;, &quot;Chat $chatName already appears to use conversation ID format&quot;)
+&nbsp;                        return@forEach
+&nbsp;                    }
+&nbsp;
+&nbsp;                    //determine the Uuid for this chat
+&nbsp;                    val userUuid = when (chatName) {
+&nbsp;                        TestDeviceService.TEST_DEVICE_NAME -&gt; &quot;test-device-uuid&quot;
+&nbsp;                        TestDeviceService.TEST_DEVICE_NAME_OFFLINE -&gt; &quot;offline-test-device-uuid&quot;
+&nbsp;                        else -&gt; {
+&nbsp;                            try {
+&nbsp;                                //try to find users by checking connected users first
+&nbsp;                                val allUsers = GlobalApp.GlobalUserRepo.userRepository.getAllUsers()
+&nbsp;                                val matchingUser = allUsers.find { user -&gt; user.name == chatName }
+&nbsp;
+&nbsp;                                if (matchingUser != null) {
+&nbsp;                                    matchingUser.uuid
+&nbsp;                                } else {
+&nbsp;                                    // If not found in connected users, create a placeholder UUID
+&nbsp;                                    &quot;unknown-${chatName}&quot;
+&nbsp;                                }
+&nbsp;                            }catch (e: Exception) {
+&nbsp;                                Log.e(
+&nbsp;                                    &quot;MessageMigration&quot;,
+&nbsp;                                    &quot;Error finding user for chat $chatName&quot;,
+&nbsp;                                    e
+&nbsp;                                )
+&nbsp;                                &quot;unknown-${chatName}&quot;
+&nbsp;                            }
+&nbsp;                        }
+&nbsp;                    }
+&nbsp;
+&nbsp;                    //create the new conversation ID
+&nbsp;                    val localUuid = GlobalApp.GlobalUserRepo.prefs.getString(&quot;UUID&quot;, null) ?: &quot;local-user&quot;
+&nbsp;                    val newChatName = createConversationId(localUuid, userUuid)
+&nbsp;
+&nbsp;                    if (chatName != newChatName) {
+&nbsp;                        Log.d(&quot;MessageMigration&quot;, &quot;Migrating ${messagesInChat.size} messages from &#39;$chatName&#39; to &#39;$newChatName&#39;&quot;)
+&nbsp;
+&nbsp;                        //Create new messages with the updated chat name
+&nbsp;                        val updatedMessages = messagesInChat.map {
+&nbsp;                            it.copy (chat = newChatName)
+&nbsp;                        }
+&nbsp;
+&nbsp;                        //Delete old messages and insert updated ones
+&nbsp;                        db.messageDao().deleteAll(messagesInChat)
+&nbsp;                        for (message in updatedMessages) {
+&nbsp;                            db.messageDao().addMessage(message)
+&nbsp;                        }
+&nbsp;
+&nbsp;                        Log.d(&quot;MessageMigration&quot;, &quot;Successfully migrated messages for chat &#39;chatName&#39;&quot;)
+&nbsp;                    }
+&nbsp;                }
+&nbsp;            }catch (e:Exception){
+&nbsp;                Log.e(&quot;MessageMigration&quot;, &quot;Error during message migration&quot;, e)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Generates a consistent conversation ID using two UUIDs.
+&nbsp;     *
+&nbsp;     * Special cases:
+&nbsp;     * - Test device UUIDs map to fixed, readable conversation IDs.
+&nbsp;     *
+&nbsp;     * @param uuid1 Local UUID.
+&nbsp;     * @param uuid2 Remote UUID.
+&nbsp;     * @return A stable, sorted, hyphen-joined conversation ID.
+&nbsp;     */
+&nbsp;    internal fun createConversationId(uuid1: String, uuid2: String): String {
+&nbsp;        // Special cases for test devices
+&nbsp;        if (uuid2 == &quot;test-device-uuid&quot;) {
+&nbsp;            return &quot;local-user-test-device-uuid&quot;
+&nbsp;        }
+&nbsp;        if (uuid2 == &quot;offline-test-device-uuid&quot;) {
+&nbsp;            return &quot;local-user-offline-test-device-uuid&quot;
+&nbsp;        }
+&nbsp;        return listOf(uuid1, uuid2).sorted().joinToString(&quot;-&quot;)
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,262 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > ConversationRepository</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.greybox.projectmesh.messaging.repository</a>
+</div>
+
+<h1>Coverage Summary for Class: ConversationRepository (com.greybox.projectmesh.messaging.repository)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConversationRepository</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    85.7%
+  </span>
+  <span class="absValue">
+    (6/7)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    87.5%
+  </span>
+  <span class="absValue">
+    (7/8)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    97.7%
+  </span>
+  <span class="absValue">
+    (43/44)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.messaging.repository
+&nbsp;
+&nbsp;import android.util.Log
+&nbsp;import com.greybox.projectmesh.messaging.data.dao.ConversationDao
+&nbsp;import com.greybox.projectmesh.messaging.data.entities.Conversation
+&nbsp;import com.greybox.projectmesh.messaging.data.entities.Message
+&nbsp;import com.greybox.projectmesh.messaging.utils.ConversationUtils
+&nbsp;import com.greybox.projectmesh.user.UserEntity
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import org.kodein.di.DI
+&nbsp;import org.kodein.di.DIAware
+&nbsp;
+&nbsp;/**
+&nbsp; * Repository for managing conversations.
+&nbsp; * Handles retrieval, creation, updating, and user status tracking for conversations.
+&nbsp; *
+&nbsp; * @property conversationDao DAO for database operations related to conversations.
+&nbsp; * @property di Kodein DI container for dependency injection.
+&nbsp; */
+<b class="fc">&nbsp;class ConversationRepository(</b>
+<b class="fc">&nbsp;    private val conversationDao: ConversationDao,</b>
+<b class="fc">&nbsp;    override val di: DI</b>
+&nbsp;) : DIAware {
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Returns a [Flow] emitting the list of all conversations.
+&nbsp;     *
+&nbsp;     * @return A [Flow] of [List] of [Conversation].
+&nbsp;     */
+&nbsp;    fun getAllConversations(): Flow&lt;List&lt;Conversation&gt;&gt;{
+<b class="nc">&nbsp;        return conversationDao.getAllConversationsFlow()</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves a conversation by its unique ID.
+&nbsp;     *
+&nbsp;     * @param conversationId The unique ID of the conversation.
+&nbsp;     * @return The [Conversation] if found, null otherwise.
+&nbsp;     */
+&nbsp;    suspend fun getConversationById(conversationId: String): Conversation? {
+<b class="fc">&nbsp;        Log.d(&quot;ConversationRepository&quot;, &quot;Getting conversation by ID: $conversationId&quot;)</b>
+<b class="fc">&nbsp;        val result = conversationDao.getConversationById(conversationId)</b>
+<b class="fc">&nbsp;        Log.d(&quot;ConversationRepository&quot;, &quot;Result for ID $conversationId: ${result != null}&quot;)</b>
+<b class="fc">&nbsp;        return result</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Retrieves an existing conversation or creates a new one if it does not exist.
+&nbsp;     *
+&nbsp;     * @param localUuid The UUID of the local user.
+&nbsp;     * @param remoteUser The remote user entity to associate with the conversation.
+&nbsp;     * @return The existing or newly created [Conversation].
+&nbsp;     */
+&nbsp;    suspend fun getOrCreateConversation(localUuid: String, remoteUser: UserEntity): Conversation {
+&nbsp;        //create a unique conversation ID using both UUIDs in order to ensure consistency
+<b class="fc">&nbsp;        val conversationId = ConversationUtils.createConversationId(localUuid, remoteUser.uuid)</b>
+&nbsp;
+<b class="fc">&nbsp;        Log.d(&quot;ConversationRepository&quot;, &quot;Looking for conversation with ID: $conversationId&quot;)</b>
+<b class="fc">&nbsp;        Log.d(&quot;ConversationRepository&quot;, &quot;Local UUID: $localUuid, Remote UUID: ${remoteUser.uuid}&quot;)</b>
+&nbsp;
+&nbsp;        //try to get an existing conversation
+<b class="fc">&nbsp;        var conversation = conversationDao.getConversationById(conversationId)</b>
+&nbsp;
+&nbsp;        //if no conversation exists, create a new one
+<b class="fc">&nbsp;        if(conversation == null){</b>
+<b class="fc">&nbsp;            Log.d(&quot;ConversationRepository&quot;, &quot;Conversation not found, creating new one with ${remoteUser.name}&quot;)</b>
+&nbsp;
+<b class="fc">&nbsp;            conversation = Conversation(</b>
+<b class="fc">&nbsp;                id = conversationId,</b>
+<b class="fc">&nbsp;                userUuid = remoteUser.uuid,</b>
+<b class="fc">&nbsp;                userName = remoteUser.name,</b>
+<b class="fc">&nbsp;                userAddress = remoteUser.address,</b>
+<b class="fc">&nbsp;                lastMessage = null,</b>
+<b class="fc">&nbsp;                lastMessageTime = System.currentTimeMillis(),</b>
+<b class="fc">&nbsp;                unreadCount = 0,</b>
+<b class="pc">&nbsp;                isOnline = remoteUser.address != null</b>
+&nbsp;            )
+<b class="fc">&nbsp;            conversationDao.insertConversation(conversation)</b>
+<b class="fc">&nbsp;            Log.d(&quot;ConversationRepository&quot;, &quot;Created new conversation with ${remoteUser.name}&quot;)</b>
+&nbsp;        } else {
+<b class="fc">&nbsp;            Log.d(&quot;ConversationRepository&quot;, &quot;Found existing conversation with ${remoteUser.name}&quot;)</b>
+&nbsp;        }
+<b class="fc">&nbsp;        return conversation</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates the conversation with the latest message.
+&nbsp;     * Increments unread count if the message is from another user.
+&nbsp;     *
+&nbsp;     * @param conversationId The unique ID of the conversation.
+&nbsp;     * @param message The [Message] to update in the conversation.
+&nbsp;     */
+&nbsp;    suspend fun updateWithMessage(conversationId: String, message: Message) {
+&nbsp;
+<b class="fc">&nbsp;        conversationDao.updateLastMessage(</b>
+<b class="fc">&nbsp;            conversationId = conversationId,</b>
+<b class="fc">&nbsp;            lastMessage = message.content,</b>
+<b class="fc">&nbsp;            timestamp = message.dateReceived</b>
+&nbsp;        )
+&nbsp;
+&nbsp;        //if this is a received message (not sent by self) increment unread count
+<b class="fc">&nbsp;        if (message.sender != &quot;Me&quot;) {</b>
+<b class="fc">&nbsp;            conversationDao.incrementUnreadCount(conversationId)</b>
+&nbsp;        }
+&nbsp;
+<b class="fc">&nbsp;        conversationDao.updateLastMessage(</b>
+<b class="fc">&nbsp;            conversationId = conversationId,</b>
+<b class="fc">&nbsp;            lastMessage = message.content,</b>
+<b class="fc">&nbsp;            timestamp = message.dateReceived</b>
+&nbsp;        )
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Marks a conversation as read by clearing its unread count.
+&nbsp;     *
+&nbsp;     * @param conversationId The unique ID of the conversation.
+&nbsp;     */
+&nbsp;    suspend fun markAsRead(conversationId: String) {
+<b class="fc">&nbsp;        conversationDao.clearUnreadCount(conversationId)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    /**
+&nbsp;     * Updates a user&#39;s online status and associated address.
+&nbsp;     *
+&nbsp;     * @param userUuid The UUID of the user.
+&nbsp;     * @param isOnline True if the user is online, false otherwise.
+&nbsp;     * @param userAddress The current address of the user, if available.
+&nbsp;     */
+&nbsp;    suspend fun updateUserStatus(userUuid: String, isOnline: Boolean, userAddress: String?) {
+&nbsp;        try {
+&nbsp;            // Update in database
+<b class="fc">&nbsp;            conversationDao.updateUserConnectionStatus(</b>
+<b class="fc">&nbsp;                userUuid = userUuid,</b>
+<b class="fc">&nbsp;                isOnline = isOnline,</b>
+<b class="fc">&nbsp;                userAddress = userAddress</b>
+&nbsp;            )
+&nbsp;
+&nbsp;            // Log for debugging
+<b class="fc">&nbsp;            Log.d(&quot;ConversationRepository&quot;, &quot;Updated user $userUuid connection status: online=$isOnline, address=$userAddress&quot;)</b>
+&nbsp;        } catch (e: Exception) {
+<b class="fc">&nbsp;            Log.e(&quot;ConversationRepository&quot;, &quot;Failed to update user connection status&quot;, e)</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

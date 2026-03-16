@@ -1,0 +1,349 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > ConnectWifiLauncher</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">debug.com.greybox.projectmesh.components</a>
+</div>
+
+<h1>Coverage Summary for Class: ConnectWifiLauncher (debug.com.greybox.projectmesh.components)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+<tr>
+  <td class="name">ConnectWifiLauncher</td>
+    <td class="coverageStat"/>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.components
+&nbsp;
+&nbsp;import android.app.Activity
+&nbsp;import android.companion.AssociationRequest
+&nbsp;import android.companion.CompanionDeviceManager
+&nbsp;import android.companion.WifiDeviceFilter
+&nbsp;import android.content.Context
+&nbsp;import android.content.IntentSender
+&nbsp;import android.net.wifi.ScanResult
+&nbsp;import android.net.wifi.WifiManager
+&nbsp;import androidx.activity.compose.rememberLauncherForActivityResult
+&nbsp;import androidx.activity.result.IntentSenderRequest
+&nbsp;import androidx.activity.result.contract.ActivityResultContracts
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.LaunchedEffect
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectConfig
+&nbsp;import androidx.compose.runtime.setValue
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.ui.platform.LocalContext
+&nbsp;import com.greybox.projectmesh.extension.NEARBY_WIFI_PERMISSION_NAME
+&nbsp;import com.ustadmobile.meshrabiya.log.MNetLogger
+&nbsp;import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
+&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectException
+&nbsp;import java.util.regex.Pattern
+&nbsp;import android.util.Log
+&nbsp;
+&nbsp;// This File is to pre-check the wifi connection, reusing from Meshrabiya test app
+&nbsp;/*
+&nbsp;WorkFlow:
+&nbsp;1. When the user tries to connect to a Wi-Fi network, it will first check if permission to access
+&nbsp;   nearby Wi-Fi devices is granted.
+&nbsp;2. If permission is granted, it will check if it already knows the network&#39;s BSSID
+&nbsp;   (unique identifier of the Wi-Fi access point).
+&nbsp;3. If the BSSID is known, it will directly attempt the connection. If not,
+&nbsp;   it uses CompanionDeviceManager to find and associate with the network.
+&nbsp;4. It handles the result (successful connection or error) and updates the UI as needed.
+&nbsp; */
+&nbsp;
+&nbsp;/**
+&nbsp; * Functional interface representing a launcher for Wi-Fi connections.
+&nbsp; */
+&nbsp;fun interface ConnectWifiLauncher {
+&nbsp;    /**
+&nbsp;     * Launch a connection attempt with the specified Wi-Fi configuration.
+&nbsp;     *
+&nbsp;     * @param config The Wi-Fi configuration to connect to.
+&nbsp;     */
+&nbsp;    fun launch(config: WifiConnectConfig)
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Represents a request to connect to a Wi-Fi network.
+&nbsp; *
+&nbsp; * @property receivedTime The timestamp when the request was created.
+&nbsp; * @property connectConfig The configuration of the Wi-Fi network to connect to.
+&nbsp; */
+&nbsp;data class ConnectRequest(
+&nbsp;    val receivedTime: Long = 0,
+&nbsp;    val connectConfig: WifiConnectConfig,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Result of a Wi-Fi connection attempt.
+&nbsp; *
+&nbsp; * @property hotspotConfig The configuration of the hotspot connected to, or null if failed.
+&nbsp; * @property exception Any exception that occurred during connection, or null if successful.
+&nbsp; * @property isWifiConnected True if the connection was successful, false otherwise.
+&nbsp; */
+&nbsp;data class ConnectWifiLauncherResult(
+&nbsp;    val hotspotConfig: WifiConnectConfig?,
+&nbsp;    val exception: Exception? = null,
+&nbsp;    val isWifiConnected: Boolean = false,
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Status of the ConnectWifiLauncher during a Wi-Fi connection attempt.
+&nbsp; */
+&nbsp;enum class ConnectWifiLauncherStatus {
+&nbsp;    INACTIVE, REQUESTING_PERMISSION, LOOKING_FOR_NETWORK, REQUESTING_LINK,
+&nbsp;}
+&nbsp;
+&nbsp;/**
+&nbsp; * Composable function that provides a [ConnectWifiLauncher] for managing Wi-Fi connections.
+&nbsp; *
+&nbsp; * It handles permission requests, network association via [CompanionDeviceManager],
+&nbsp; * and provides status updates and connection results.
+&nbsp; *
+&nbsp; * @param node The [AndroidVirtualNode] representing the local virtual node.
+&nbsp; * @param logger Optional logger for debugging messages.
+&nbsp; * @param onStatusChange Optional callback invoked when the launcher status changes.
+&nbsp; * @param onResult Callback invoked with the result of the Wi-Fi connection attempt.
+&nbsp; *
+&nbsp; * @return A [ConnectWifiLauncher] that can be used to initiate Wi-Fi connections.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun meshrabiyaConnectLauncher(
+&nbsp;    node: AndroidVirtualNode,
+&nbsp;    logger: MNetLogger? = null,
+&nbsp;    onStatusChange: ((ConnectWifiLauncherStatus) -&gt; Unit)?= null,
+&nbsp;    onResult: (ConnectWifiLauncherResult) -&gt; Unit,
+&nbsp;): ConnectWifiLauncher {
+&nbsp;    val context = LocalContext.current
+&nbsp;    val wifiManager: WifiManager = remember{
+&nbsp;        context.getSystemService(WifiManager::class.java)
+&nbsp;    }
+&nbsp;    var pendingPermissionRequest: ConnectRequest? by remember { mutableStateOf(null) }
+&nbsp;    var pendingAssociationRequest: ConnectRequest? by remember { mutableStateOf(null) }
+&nbsp;    val intentSenderLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.StartIntentSenderForResult()
+&nbsp;    ) { result -&gt;
+&nbsp;        val deviceManager: CompanionDeviceManager =
+&nbsp;            context.getSystemService(Context.COMPANION_DEVICE_SERVICE) as CompanionDeviceManager
+&nbsp;        val associations = deviceManager.associations
+&nbsp;        logger?.invoke(Log.INFO, &quot;associations = ${associations.joinToString()}&quot;)
+&nbsp;        val request = pendingAssociationRequest ?: return@rememberLauncherForActivityResult
+&nbsp;        pendingAssociationRequest = null
+&nbsp;
+&nbsp;        onStatusChange?.invoke(ConnectWifiLauncherStatus.INACTIVE)
+&nbsp;        if (result.resultCode == Activity.RESULT_OK) {
+&nbsp;            val scanResult: ScanResult? = result.data?.getParcelableExtra(
+&nbsp;                CompanionDeviceManager.EXTRA_DEVICE
+&nbsp;            )
+&nbsp;
+&nbsp;            logger?.invoke(Log.INFO, &quot;rememberConnectWifiLauncher: Got scan result: bssid = ${scanResult?.BSSID}&quot;)
+&nbsp;            node.storeBssid(request.connectConfig.ssid, scanResult?.BSSID)
+&nbsp;
+&nbsp;            onResult(
+&nbsp;                ConnectWifiLauncherResult(
+&nbsp;                    hotspotConfig = request.connectConfig.copy(
+&nbsp;                        bssid = scanResult?.BSSID
+&nbsp;                    ),
+&nbsp;                    isWifiConnected = true,
+&nbsp;                )
+&nbsp;            )
+&nbsp;        } else {
+&nbsp;            onResult(
+&nbsp;                ConnectWifiLauncherResult(
+&nbsp;                    hotspotConfig = null,
+&nbsp;                    exception = WifiConnectException(&quot;CompanionDeviceManager: device not found / not selected&quot;),
+&nbsp;                    isWifiConnected = false,
+&nbsp;                )
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;    val requestPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) { granted -&gt;
+&nbsp;        val connectRequestVal = pendingPermissionRequest ?: return@rememberLauncherForActivityResult
+&nbsp;        pendingPermissionRequest = null
+&nbsp;        if(granted) {
+&nbsp;            logger?.invoke(Log.DEBUG, &quot;ConnectWifiLauncher: permission granted&quot;)
+&nbsp;            pendingAssociationRequest = connectRequestVal
+&nbsp;        }else {
+&nbsp;            onResult(
+&nbsp;                ConnectWifiLauncherResult(
+&nbsp;                    hotspotConfig = null,
+&nbsp;                    exception = WifiConnectException(&quot;Permission denied: permission not granted&quot;),
+&nbsp;                    isWifiConnected = false,
+&nbsp;                )
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    LaunchedEffect(pendingAssociationRequest) {
+&nbsp;        val connectRequestVal = pendingAssociationRequest ?: return@LaunchedEffect
+&nbsp;        val ssid = connectRequestVal.connectConfig.ssid
+&nbsp;        val macAddr = connectRequestVal.connectConfig.linkLocalToMacAddress
+&nbsp;
+&nbsp;        val knownBssid: String? = connectRequestVal.connectConfig.bssid ?: macAddr?.toString()
+&nbsp;        ?: node.lookupStoredBssid(connectRequestVal.connectConfig.ssid)
+&nbsp;
+&nbsp;        val deviceManager : CompanionDeviceManager =
+&nbsp;            context.getSystemService(Context.COMPANION_DEVICE_SERVICE) as CompanionDeviceManager
+&nbsp;
+&nbsp;        if(knownBssid != null) {
+&nbsp;            logger?.invoke(Log.DEBUG, &quot;ConnectWifiLauncher: already associated with $ssid (bssid=$knownBssid)&quot;)
+&nbsp;            onStatusChange?.invoke(ConnectWifiLauncherStatus.INACTIVE)
+&nbsp;            onResult(
+&nbsp;                ConnectWifiLauncherResult(
+&nbsp;                    hotspotConfig = connectRequestVal.connectConfig.copy(
+&nbsp;                        bssid = knownBssid
+&nbsp;                    ),
+&nbsp;                    isWifiConnected = true,
+&nbsp;                )
+&nbsp;            )
+&nbsp;        }else {
+&nbsp;            logger?.invoke(Log.DEBUG,
+&nbsp;                &quot;ConnectWifiLauncher: requesting association for $ssid&quot;
+&nbsp;            )
+&nbsp;            onStatusChange?.invoke(ConnectWifiLauncherStatus.LOOKING_FOR_NETWORK)
+&nbsp;            val deviceFilter = WifiDeviceFilter.Builder()
+&nbsp;                .setNamePattern(Pattern.compile(Pattern.quote(connectRequestVal.connectConfig.ssid)))
+&nbsp;                .build()
+&nbsp;
+&nbsp;            val associationRequest: AssociationRequest = AssociationRequest.Builder()
+&nbsp;                .addDeviceFilter(deviceFilter)
+&nbsp;                .setSingleDevice(true)
+&nbsp;                .build()
+&nbsp;
+&nbsp;
+&nbsp;            deviceManager.associate(
+&nbsp;                associationRequest,
+&nbsp;                object: CompanionDeviceManager.Callback() {
+&nbsp;                    @Deprecated(&quot;Deprecated in Java&quot;)
+&nbsp;                    override fun onDeviceFound(intentSender: IntentSender) {
+&nbsp;                        logger?.invoke(Log.DEBUG, &quot;ConnectWifiLauncher: onDeviceFound for $ssid&quot;)
+&nbsp;                        onStatusChange?.invoke(ConnectWifiLauncherStatus.REQUESTING_LINK)
+&nbsp;                        intentSenderLauncher.launch(
+&nbsp;                            IntentSenderRequest.Builder(intentSender).build()
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;
+&nbsp;                    override fun onFailure(reason: CharSequence?) {
+&nbsp;                        logger?.invoke(Log.DEBUG, &quot;ConnectWifiLauncher: onFailure for $ssid - $reason&quot;)
+&nbsp;                        onStatusChange?.invoke(ConnectWifiLauncherStatus.INACTIVE)
+&nbsp;                        pendingAssociationRequest = null
+&nbsp;                        onResult(
+&nbsp;                            ConnectWifiLauncherResult(
+&nbsp;                                hotspotConfig = null,
+&nbsp;                                exception = WifiConnectException(&quot;CompanionDeviceManager: onFailure: $reason&quot;),
+&nbsp;                                isWifiConnected = false,
+&nbsp;                            )
+&nbsp;                        )
+&nbsp;                    }
+&nbsp;                },
+&nbsp;                null
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    LaunchedEffect(pendingPermissionRequest) {
+&nbsp;        if(pendingPermissionRequest == null)
+&nbsp;            return@LaunchedEffect
+&nbsp;
+&nbsp;        onStatusChange?.invoke(ConnectWifiLauncherStatus.REQUESTING_PERMISSION)
+&nbsp;        requestPermissionLauncher.launch(NEARBY_WIFI_PERMISSION_NAME)
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    return ConnectWifiLauncher {
+&nbsp;        if(it.hotspotType == HotspotType.WIFIDIRECT_GROUP &amp;&amp; !wifiManager.isWifiEnabled){
+&nbsp;            //we cannot connect to this
+&nbsp;            onResult(
+&nbsp;                ConnectWifiLauncherResult(
+&nbsp;                    hotspotConfig = null,
+&nbsp;                    exception = WifiConnectException(&quot;We detected your device is trying to connect to a Wi-Fi Direct hotspot, but Wi-Fi is turned off. Please enable Wi-Fi before proceeding.&quot;),
+&nbsp;                    isWifiConnected = false,
+&nbsp;                )
+&nbsp;            )
+&nbsp;        }
+&nbsp;        else if(it.band == ConnectBand.BAND_5GHZ &amp;&amp; !wifiManager.is5GHzBandSupported) {
+&nbsp;            //we cannot connect to this
+&nbsp;            onResult(
+&nbsp;                ConnectWifiLauncherResult(
+&nbsp;                    hotspotConfig = null,
+&nbsp;                    exception = WifiConnectException(&quot;5GHz not supported: ${it.ssid} is operating on a 5GHz band, which your device does not support. Please connect to a 2.4GHz network instead.&quot;),
+&nbsp;                    isWifiConnected = false,
+&nbsp;                )
+&nbsp;            )
+&nbsp;        }
+&nbsp;        else {
+&nbsp;            //Note: If the permission is already granted, requestPermission can call back immediately
+&nbsp;            // synchronously to the launcher&#39;s onResult. This would cause a problem because the mutable
+&nbsp;            // state wouldn&#39;t be updated until the next function invocation.
+&nbsp;            pendingAssociationRequest = null
+&nbsp;            pendingPermissionRequest = ConnectRequest(
+&nbsp;                receivedTime = System.currentTimeMillis(),
+&nbsp;                connectConfig = it,
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

@@ -1,0 +1,220 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > SettingsScreenViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">debug.com.greybox.projectmesh.viewModel</a>
+</div>
+
+<h1>Coverage Summary for Class: SettingsScreenViewModel (debug.com.greybox.projectmesh.viewModel)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+</tr>
+  <tr>
+    <td class="name">SettingsScreenViewModel$Companion</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">SettingsScreenViewModel$special$$inlined$instance$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    0%
+  </span>
+  <span class="absValue">
+    (0/13)
+  </span>
+</td>
+    <td class="coverageStat"/>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.viewModel
+&nbsp;
+&nbsp;import android.content.SharedPreferences
+&nbsp;import android.net.Uri
+&nbsp;import android.os.Build
+&nbsp;import android.os.Environment
+&nbsp;import androidx.compose.runtime.mutableStateOf
+&nbsp;import androidx.lifecycle.SavedStateHandle
+&nbsp;import androidx.lifecycle.ViewModel
+&nbsp;import com.greybox.projectmesh.ui.theme.AppTheme
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.StateFlow
+&nbsp;import org.kodein.di.DI
+&nbsp;import org.kodein.di.instance
+&nbsp;
+&nbsp;class SettingsScreenViewModel(di: DI, savedStateHandle: SavedStateHandle): ViewModel() {
+&nbsp;    // inject SharedPreferences
+&nbsp;    private val settingPrefs: SharedPreferences by di.instance(tag = &quot;settings&quot;)
+&nbsp;
+&nbsp;    // Theme State
+&nbsp;    private val _theme = MutableStateFlow(loadTheme())
+&nbsp;    val theme: StateFlow&lt;AppTheme&gt; = _theme
+&nbsp;
+&nbsp;    // Language State
+&nbsp;    private val _lang = MutableStateFlow(loadLang())
+&nbsp;    val lang: StateFlow&lt;String&gt; = _lang
+&nbsp;
+&nbsp;    // Device Name State
+&nbsp;    private val _deviceName = MutableStateFlow(loadDeviceName())
+&nbsp;    val deviceName: StateFlow&lt;String&gt; = _deviceName
+&nbsp;
+&nbsp;    // Auto Finish State
+&nbsp;    private val _autoFinish = MutableStateFlow(loadAutoFinish())
+&nbsp;    val autoFinish: StateFlow&lt;Boolean&gt; = _autoFinish
+&nbsp;
+&nbsp;    // Save To Folder (directory path)
+&nbsp;    private val _saveToFolder = MutableStateFlow(loadSaveToFolder())
+&nbsp;    val saveToFolder: StateFlow&lt;String&gt; = _saveToFolder
+&nbsp;
+&nbsp;    init {
+&nbsp;        // Load the theme from SharedPreferences
+&nbsp;        _theme.value = loadTheme()
+&nbsp;        _lang.value = loadLang()
+&nbsp;        _deviceName.value = loadDeviceName()
+&nbsp;        _autoFinish.value = loadAutoFinish()
+&nbsp;        _saveToFolder.value = loadSaveToFolder()
+&nbsp;    }
+&nbsp;
+&nbsp;    // Load theme from SharedPreferences
+&nbsp;    private fun loadTheme(): AppTheme {
+&nbsp;        val themeName = settingPrefs.getString(THEME_KEY, AppTheme.SYSTEM.name) ?: AppTheme.SYSTEM.name
+&nbsp;        return AppTheme.valueOf(themeName)
+&nbsp;    }
+&nbsp;
+&nbsp;    // Store Selected Theme to SharedPreferences
+&nbsp;    fun saveTheme(theme: AppTheme) {
+&nbsp;        _theme.value = theme
+&nbsp;        settingPrefs.edit().putString(THEME_KEY, theme.name).apply()
+&nbsp;    }
+&nbsp;
+&nbsp;    // Load Language from SharedPreferences
+&nbsp;    private fun loadLang(): String {
+&nbsp;        return settingPrefs.getString(LANGUAGE_KEY, &quot;System&quot;) ?: &quot;System&quot;
+&nbsp;    }
+&nbsp;
+&nbsp;    // Store Selected Language to SharedPreferences
+&nbsp;    fun saveLang(languageCode: String) {
+&nbsp;        _lang.value = languageCode
+&nbsp;        settingPrefs.edit().putString(LANGUAGE_KEY, languageCode).apply()
+&nbsp;    }
+&nbsp;
+&nbsp;    // Load Device Name from SharedPreferences
+&nbsp;    private fun loadDeviceName(): String {
+&nbsp;        return settingPrefs.getString(DEVICE_NAME_KEY, Build.MODEL) ?: Build.MODEL
+&nbsp;    }
+&nbsp;
+&nbsp;    // Store Device Name to SharedPreferences
+&nbsp;    fun saveDeviceName(deviceName: String) {
+&nbsp;        _deviceName.value = deviceName
+&nbsp;        settingPrefs.edit().putString(DEVICE_NAME_KEY, deviceName).apply()
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadAutoFinish(): Boolean {
+&nbsp;        return settingPrefs.getBoolean(AUTO_FINISH_KEY, false)
+&nbsp;    }
+&nbsp;
+&nbsp;    fun saveAutoFinish(autoFinish: Boolean) {
+&nbsp;        _autoFinish.value = autoFinish
+&nbsp;        settingPrefs.edit().putBoolean(AUTO_FINISH_KEY, autoFinish).apply()
+&nbsp;    }
+&nbsp;
+&nbsp;    private fun loadSaveToFolder(): String {
+&nbsp;        return settingPrefs.getString(
+&nbsp;            SAVE_TO_FOLDER_KEY,
+&nbsp;            &quot;${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh&quot;) ?:
+&nbsp;            &quot;${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh&quot;
+&nbsp;    }
+&nbsp;
+&nbsp;    fun saveSaveToFolder(saveToFolder: String) {
+&nbsp;        _saveToFolder.value = saveToFolder
+&nbsp;        settingPrefs.edit().putString(SAVE_TO_FOLDER_KEY, saveToFolder).apply()
+&nbsp;    }
+&nbsp;
+&nbsp;    fun updateConcurrencySettings(concurrencyKnown: Boolean, concurrencySupported: Boolean) {
+&nbsp;        settingPrefs.edit()
+&nbsp;            .putBoolean(&quot;concurrency_known&quot;, concurrencyKnown)
+&nbsp;            .putBoolean(&quot;concurrency_supported&quot;, concurrencySupported)
+&nbsp;            .apply()
+&nbsp;    }
+&nbsp;
+&nbsp;
+&nbsp;    companion object{
+&nbsp;        private const val THEME_KEY = &quot;app_theme&quot;
+&nbsp;        private const val LANGUAGE_KEY = &quot;language&quot;
+&nbsp;        private const val DEVICE_NAME_KEY = &quot;device_name&quot;
+&nbsp;        private const val AUTO_FINISH_KEY = &quot;auto_finish&quot;
+&nbsp;        private const val SAVE_TO_FOLDER_KEY = &quot;save_to_folder&quot;
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>

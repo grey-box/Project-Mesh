@@ -1,0 +1,190 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Kover HTML Report Coverage Report > SendScreenViewModel</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">com.greybox.projectmesh.viewModel</a>
+</div>
+
+<h1>Coverage Summary for Class: SendScreenViewModel (com.greybox.projectmesh.viewModel)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">SendScreenViewModel</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (11/11)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">SendScreenViewModel$1</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (4/4)
+  </span>
+</td>
+    <td class="coverageStat"/>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (12/12)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode"><b class="fc">&nbsp;package com.greybox.projectmesh.viewModel</b>
+&nbsp;
+&nbsp;import android.net.Uri
+&nbsp;import androidx.lifecycle.SavedStateHandle
+&nbsp;import androidx.lifecycle.ViewModel
+&nbsp;import androidx.lifecycle.viewModelScope
+&nbsp;import com.greybox.projectmesh.server.AppServer
+&nbsp;import kotlinx.coroutines.flow.Flow
+&nbsp;import kotlinx.coroutines.flow.MutableStateFlow
+&nbsp;import kotlinx.coroutines.flow.asStateFlow
+&nbsp;import kotlinx.coroutines.flow.update
+&nbsp;import kotlinx.coroutines.launch
+&nbsp;import org.kodein.di.DI
+&nbsp;import org.kodein.di.instance
+&nbsp;
+&nbsp;data class SendScreenModel(
+&nbsp;    val outgoingTransfers: List&lt;AppServer.OutgoingTransferInfo&gt; = emptyList()
+&nbsp;)
+&nbsp;
+&nbsp;class SendScreenViewModel(
+&nbsp;    di: DI,
+&nbsp;    savedStateHandle: SavedStateHandle,
+<b class="fc">&nbsp;    private val onSwitchToSelectDestNode: (List&lt;Uri&gt;) -&gt; Unit</b>
+<b class="fc">&nbsp;): ViewModel() {</b>
+&nbsp;    // _uiState will be updated whenever there is a change in the UI state
+<b class="fc">&nbsp;    private val _uiState = MutableStateFlow(SendScreenModel())</b>
+&nbsp;    // uiState is a read-only property that shows the current UI state
+<b class="fc">&nbsp;    val uiState: Flow&lt;SendScreenModel&gt; = _uiState.asStateFlow()</b>
+<b class="fc">&nbsp;    private val appServer: AppServer by di.instance()</b>
+&nbsp;
+<b class="fc">&nbsp;    init {</b>
+<b class="fc">&nbsp;        viewModelScope.launch{</b>
+<b class="fc">&nbsp;            appServer.outgoingTransfers.collect{</b>
+&nbsp;                _uiState.update { prev -&gt;
+&nbsp;                    prev.copy(
+&nbsp;                        outgoingTransfers = it
+&nbsp;                    )
+&nbsp;                }
+&nbsp;
+&nbsp;            }
+&nbsp;        }
+<b class="fc">&nbsp;    }</b>
+&nbsp;
+&nbsp;    fun onFileChosen(uris: List&lt;Uri&gt;){//Can we copy this to the Chat screen model?
+<b class="fc">&nbsp;        onSwitchToSelectDestNode(uris)</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    fun onDelete(transfer: AppServer.OutgoingTransferInfo){
+<b class="fc">&nbsp;        viewModelScope.launch {</b>
+&nbsp;            appServer.removeOutgoingTransfer(transfer.id)
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-03-05 20:12</div>
+</div>
+</body>
+</html>
