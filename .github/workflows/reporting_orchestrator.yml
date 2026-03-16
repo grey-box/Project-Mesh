@@ -72,7 +72,7 @@ jobs:
           unset GLOBIGNORE
 
       - name: Download All Artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           path: ./build_reports/
           # TODO: edit to never pull APKs
@@ -125,7 +125,9 @@ jobs:
 
       - name: Commit Reports to Viewing Directory
         run: |
-          git switch --force gh-pages
+          git status
+          git switch gh-pages
+          git status
           git add --force ./build_reports/
           git commit -m "Relocate reports for viewing"
           git push
