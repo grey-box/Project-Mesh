@@ -2,7 +2,7 @@
 *
 
 # EXCEPT
-!/build_reports
+!/build_reports/*
 !/.gitignore
 !/.prettierignore
 !/LICENSE
