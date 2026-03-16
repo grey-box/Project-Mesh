@@ -33,13 +33,13 @@ jobs:
       pull-requests: write
     steps:
       - name: Check Out Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Define Coverage Minimums
         run: |
           echo "min-coverage-overall=80" >> $GITHUB_ENV
           echo "min-coverage-changed-files=80" >> $GITHUB_ENV
-      - uses: actions/checkout@v4
+      
       - name: Set up JDK
         uses: actions/setup-java@v4
         with:

@@ -61,7 +61,7 @@ jobs:
       url: ${{steps.deployment.outputs.page_url}}
     steps:
       - name: Check Out Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           fetch-depth: 0 # necessary to allow branch switching
 
