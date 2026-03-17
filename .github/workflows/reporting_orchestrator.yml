@@ -126,7 +126,9 @@ jobs:
       - name: Commit Reports to Viewing Directory
         run: |
           git status
+          git stash --include-untracked
           git switch gh-pages
+          git stash pop
           git status
           git add --force ./build_reports/
           git commit -m "Relocate reports for viewing"
