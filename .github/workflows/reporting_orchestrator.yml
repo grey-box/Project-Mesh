@@ -124,13 +124,21 @@ jobs:
           git config user.name "github-actions[bot]"
 
       - name: Commit Reports to Viewing Directory
+        # run: |
+        #   git status
+        #   git stash --include-untracked
+        #   git switch gh-pages
+        #   git checkout stash --
+        #   git add --force ./build_reports
+        #   git status
+        #   git commit -m "Relocate reports for viewing"
+        #   git push
         run: |
-          git status
-          git stash --include-untracked
+          git add ./build_reports
+          git stash
           git switch gh-pages
-          git checkout stash --
-          git add --force ./build_reports/
-          git status
+          git stash pop
+          git add .
           git commit -m "Relocate reports for viewing"
           git push
         env:
