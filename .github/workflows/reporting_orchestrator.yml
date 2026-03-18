@@ -129,8 +129,8 @@ jobs:
           git stash --include-untracked
           git switch gh-pages
           git checkout stash --
-          git status
           git add --force ./build_reports/
+          git status
           git commit -m "Relocate reports for viewing"
           git push
         env:
