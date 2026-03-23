@@ -143,6 +143,12 @@ jobs:
           echo ---
           git stash pop
           echo ---
+          git checkout --theirs .
+          echo ---
+          git reset
+          echo ---
+          git stash drop
+          echo ---
           git add .
           echo ---
           git commit -m "Relocate reports for viewing"
