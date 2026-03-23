@@ -72,7 +72,7 @@ jobs:
           unset GLOBIGNORE
 
       - name: Download All Artifacts
-        uses: actions/download-artifact@v6
+        uses: actions/download-artifact@v8
         with:
           path: ./build_reports/
           # TODO: edit to never pull APKs
