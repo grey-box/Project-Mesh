@@ -134,13 +134,21 @@ jobs:
         #   git commit -m "Relocate reports for viewing"
         #   git push
         run: |
+          echo ---
           git add ./build_reports
+          echo ---
           git stash
+          echo ---
           git switch gh-pages
+          echo ---
           git stash pop
+          echo ---
           git add .
+          echo ---
           git commit -m "Relocate reports for viewing"
+          echo ---
           git push
+          echo ---
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
