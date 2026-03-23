@@ -159,7 +159,7 @@ jobs:
           git add ./build_reports
           git commit -m "Local commit for cherrypick"
           git switch gh-pages
-          git cherrypick feature/ras-cicd
+          git cherry-pick feature/ras-cicd
           git push
         # this cherrypick will pull the committed build_reports files off the top of the CICD branch
         env:
