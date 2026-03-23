@@ -133,28 +133,35 @@ jobs:
         #   git status
         #   git commit -m "Relocate reports for viewing"
         #   git push
+        # run: |
+        #   echo ---
+        #   git add ./build_reports
+        #   echo ---
+        #   git stash
+        #   echo ---
+        #   git switch gh-pages
+        #   echo ---
+        #   git stash pop
+        #   echo ---
+        #   git checkout --theirs .
+        #   echo ---
+        #   git reset
+        #   echo ---
+        #   git stash drop
+        #   echo ---
+        #   git add .
+        #   echo ---
+        #   git commit -m "Relocate reports for viewing"
+        #   echo ---
+        #   git push
+        #   echo ---
         run: |
-          echo ---
           git add ./build_reports
-          echo ---
-          git stash
-          echo ---
+          git commit -m "Local commit for cherrypick"
           git switch gh-pages
-          echo ---
-          git stash pop
-          echo ---
-          git checkout --theirs .
-          echo ---
-          git reset
-          echo ---
-          git stash drop
-          echo ---
-          git add .
-          echo ---
-          git commit -m "Relocate reports for viewing"
-          echo ---
+          git cherrypick feature/ras-cicd
           git push
-          echo ---
+        # this cherrypick will pull the committed build_reports files off the top of the CICD branch
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
