@@ -41,13 +41,13 @@ jobs:
           echo "min-coverage-changed-files=80" >> $GITHUB_ENV
       
       - name: Set up JDK
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: "temurin"
           java-version: "17"
 
       - name: Set Up Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v5
 
       - name: Generate Kover Coverage Report
         id: koverXmlReport
@@ -107,7 +107,7 @@ jobs:
 
       - name: Upload Coverage Report Artifact (if called by orchestrator)
         if: ${{ inputs.skip_commit == true }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: coverage_report_artifact
           path: ./app/build/reports/kover/html
@@ -115,7 +115,7 @@ jobs:
 
       - name: Upload Test Debug Artifact (if called by orchestrator)
         if: ${{ inputs.skip_commit == true }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: test_report_debug_artifact
           path: ./app/build/reports/tests/testDebugUnitTest
@@ -123,7 +123,7 @@ jobs:
 
       - name: Upload Test Release Artifact (if called by orchestrator)
         if: ${{ inputs.skip_commit == true }}
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: test_report_release_artifact
           path: ./app/build/reports/tests/testReleaseUnitTest
