@@ -1,0 +1,39 @@
+@startuml
+
+class ChatScreenModel {
+  + deviceName: String?
+  + virtualAddress: InetAddress
+  + allChatMessages: List<Message>
+  + offlineWarning: String?
+}
+
+class ConversationsHomeScreenModel {
+  + isLoading: Boolean
+  + conversations: List<Conversation>
+  + error: String?
+}
+
+class Message
+class Conversation
+class InetAddress
+
+ChatScreenModel --> Message : contains
+ChatScreenModel --> InetAddress : uses
+
+ConversationsHomeScreenModel --> Conversation : contains
+
+note right of ChatScreenModel
+Represents state of chat screen
+- Device info (name + IP)
+- List of messages
+- Offline warning handling
+end note
+
+note right of ConversationsHomeScreenModel
+Represents state of conversations list screen
+- Loading state
+- List of conversations
+- Error handling
+end note
+
+@enduml

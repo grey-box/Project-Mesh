@@ -1,0 +1,100 @@
+@startuml
+
+class ChatScreenViewModel {
+  - virtualAddress: InetAddress
+  - ipStr: String
+  - passedConversationId: String?
+  - userEntity: UserEntity?
+  - deviceName: String
+  - sharedPrefs: SharedPreferences
+  - localUuid: String
+  - userUuid: String
+  - savedConversationId: String?
+  - conversationId: String
+  - chatName: String
+  - addressDotNotation: String
+  - conversationRepository: ConversationRepository
+  - _uiState: MutableStateFlow<ChatScreenModel>
+  + uiState: Flow<ChatScreenModel>
+  - db: MeshDatabase
+  - appServer: AppServer
+  - _deviceOnlineStatus: MutableStateFlow<Boolean>
+  + deviceOnlineStatus: StateFlow<Boolean>
+  - markConversationAsRead(): Unit
+  + sendChatMessage(virtualAddress: InetAddress, message: String, file: URI?): Unit
+  + addOutgoingTransfer(fileUri: Uri, toAddress: InetAddress): OutgoingTransferInfo
+}
+
+class ConversationsHomeScreenViewModel {
+  - _uiState: MutableStateFlow<ConversationsHomeScreenModel>
+  + uiState: Flow<ConversationsHomeScreenModel>
+  - conversationRepository: ConversationRepository
+  - sharedPrefs: SharedPreferences
+  - updateConversationStatuses(deviceStatusMap: Map<String, Boolean>): Unit
+  - loadConversations(): Unit
+  + refreshConversations(): Unit
+  + markConversationAsRead(conversationId: String): Unit
+}
+
+class ChatScreenModel
+class ConversationsHomeScreenModel
+class ConversationRepository
+class MeshDatabase
+class AppServer
+class OutgoingTransferInfo
+class DeviceStatusManager
+class ConversationUtils
+class TestDeviceService
+class GlobalApp
+class UserEntity
+class SharedPreferences
+class SavedStateHandle
+class Message
+class InetAddress
+class Uri
+class URI
+
+ChatScreenViewModel --> ChatScreenModel : manages state
+ChatScreenViewModel --> ConversationRepository : uses
+ChatScreenViewModel --> MeshDatabase : uses
+ChatScreenViewModel --> AppServer : sends messages/files
+ChatScreenViewModel --> OutgoingTransferInfo : returns
+ChatScreenViewModel --> DeviceStatusManager : monitors status
+ChatScreenViewModel --> ConversationUtils : creates conversation id
+ChatScreenViewModel --> TestDeviceService : test device logic
+ChatScreenViewModel --> GlobalApp : fetches user info
+ChatScreenViewModel --> UserEntity : uses
+ChatScreenViewModel --> SharedPreferences : reads local UUID
+ChatScreenViewModel --> SavedStateHandle : reads nav args
+ChatScreenViewModel --> Message : creates/stores
+ChatScreenViewModel --> InetAddress : uses
+ChatScreenViewModel --> Uri : uses
+ChatScreenViewModel --> URI : uses
+
+ConversationsHomeScreenViewModel --> ConversationsHomeScreenModel : manages state
+ConversationsHomeScreenViewModel --> ConversationRepository : uses
+ConversationsHomeScreenViewModel --> SharedPreferences : reads local UUID
+ConversationsHomeScreenViewModel --> DeviceStatusManager : monitors status
+
+note right of ChatScreenViewModel
+Handles chat screen business logic
+- resolves conversation identity
+- loads messages from database
+- observes live message flow
+- tracks online/offline status
+- stores outgoing messages locally
+- attempts network delivery
+- updates offline warning state
+- supports outgoing file transfer
+end note
+
+note right of ConversationsHomeScreenViewModel
+Handles conversation list state
+- loads all conversations
+- filters out local user
+- updates online/offline status
+- refreshes conversation list
+- marks conversations as read
+end note
+
+@enduml
