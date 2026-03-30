@@ -61,7 +61,6 @@ jobs:
 
       - name: Build with Gradle Wrapper
         run: ./gradlew assemble # use assemble because build runs tests, even though a different part of the system handles that
-        continue-on-error: true # allows APK build even if tests fail (TODO: remove if assemble works properly)
 
       - name: Upload App Debug APK
         uses: actions/upload-artifact@v6

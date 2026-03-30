@@ -101,12 +101,7 @@ jobs:
   call-super-linter:
     name: Call Super-Linter
     permissions:
-      contents: read # clone the repo to lint
-      statuses: write # read/write to repo custom statuses
+      contents: read 
+      statuses: write 
 
     uses: ./.github/workflows/super_lint.yml
-
-    # with:
-    ### A regex to exclude files from linting
-    ### defaults to empty
-    # filter-regex-exclude:

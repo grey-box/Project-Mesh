@@ -46,7 +46,7 @@ jobs:
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v5
 
-      - name: Call Dokka Task
+      - name: Generate Dokka Pages
         run: ./gradlew dokkaGenerate
         continue-on-error: true
 
