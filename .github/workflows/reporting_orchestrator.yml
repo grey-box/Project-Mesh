@@ -117,6 +117,11 @@ jobs:
           mkdir ./build_reports/documentation
           cp -a ./build_reports/dokka_documentation_artifact/. ./build_reports/documentation/
           rm -r ./build_reports/dokka_documentation_artifact
+
+          echo "----"
+          ls ./build_reports
+          echo "----"
+          ls ./build_reports/documentation
       
       - name: Write Timestamp
         run: |
