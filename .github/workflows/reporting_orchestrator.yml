@@ -73,9 +73,9 @@ jobs:
         with:
           fetch-depth: 0 # necessary to allow branch switching
 
-      - name: Ensure Report Dir is empty
+      - name: Ensure Report Dir is empty #add files NOT to delete each run to the list below
         run: |
-          export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore"
+          export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore:./build_reports/include_html.js"
           rm -rf ./build_reports/*
           unset GLOBIGNORE
 
@@ -145,10 +145,9 @@ jobs:
       - name: Commit Reports to Viewing Directory
         run: |
           git add ./build_reports
-          git status
           git commit -m "Local commit for cherrypick"
           git switch gh-pages
-          git cherry-pick -X theirs feature/ras-cicd
+          git cherry-pick -X theirs ${{ github.ref_name }}
           git push
         # TODO: figure out how to cherrypick the calling branch, instead of the cicd branch
         # this cherrypick will pull the committed build_reports files off the top of the CICD branch
