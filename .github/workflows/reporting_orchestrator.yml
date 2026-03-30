@@ -58,7 +58,7 @@ jobs:
       pages: write
     environment:
       name: github-pages
-      url: ${{steps.deployment.outputs.page_url}}
+      url: ${{ steps.set-pages-link.outputs.pages-link }}
     steps:
       - name: Check Out Code
         uses: actions/checkout@v6
@@ -155,9 +155,15 @@ jobs:
       #   id: deployment
       #   uses: actions/deploy-pages@v4
 
+      - name: Define Pages Link on Success
+        id: set-pages-link
+        run: |
+          echo "pages-link=https://grey-box.github.io/Project-Mesh/" >> "$GITHUB_OUTPUT"
+
       - name: Link Pages in Build Summary
         run: |
-          echo "All reports can be viewed at ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "All reports can be viewed at ${{ steps.set-pages-link.outputs.pages-link }}, about 30s after this workflow is completed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+  
