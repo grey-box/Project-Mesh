@@ -158,11 +158,11 @@ jobs:
       - name: Define Pages Link on Success
         id: set-pages-link
         run: |
-          echo "pages-link=https://grey-box.github.io/Project-Mesh/" >> "$GITHUB_OUTPUT"
+          echo "pages-link=https://grey-box.github.io/Project-Mesh/" >> $GITHUB_OUTPUT
 
       - name: Link Pages in Build Summary
         run: |
-          echo "All reports can be viewed at ${{ steps.set-pages-link.outputs.pages-link }}, about 30s after this workflow is completed" >> $GITHUB_STEP_SUMMARY
+          echo "All reports can be viewed at ${{ steps.set-pages-link.outputs.pages-link }} about 30s after this workflow is completed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
