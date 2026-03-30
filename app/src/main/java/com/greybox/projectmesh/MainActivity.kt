@@ -94,7 +94,7 @@ import com.greybox.projectmesh.views.LogScreen
 
 
 import com.greybox.projectmesh.views.RequestPermissionsScreen
-import org.kodein.di.android.BuildConfig
+import com.greybox.projectmesh.BuildConfig
 import org.kodein.di.compose.localDI
 
 import timber.log.Timber
