@@ -57,7 +57,7 @@ jobs:
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          generate-job-summary: false
+          add-job-summary: false
 
       - name: Build with Gradle Wrapper
         run: ./gradlew assemble # use assemble because build runs tests, even though a different part of the system handles that

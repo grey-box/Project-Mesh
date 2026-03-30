@@ -49,7 +49,7 @@ jobs:
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v5
         with:
-          generate-job-summary: false
+          add-job-summary: false
 
       - name: Generate Kover Coverage Report
         id: koverXmlReport
