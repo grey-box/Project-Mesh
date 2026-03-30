@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Kover HTML Report Coverage Report > HomeScreenKt</title>
+  <title>Kover HTML Report Coverage Report > RequestPermissionScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,10 +22,9 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
     <a href="../index.html">com.greybox.projectmesh.views</a>
 </div>
 
-<h1>Coverage Summary for Class: HomeScreenKt (com.greybox.projectmesh.views)</h1>
+<h1>Coverage Summary for Class: RequestPermissionScreenKt (com.greybox.projectmesh.views)</h1>
 
 <table class="coverageStats">
-
 <tr>
   <th class="name">Class</th>
 <th class="coverageStat 
@@ -33,58 +32,11 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
   Branch, %
 </th>
 </tr>
-  <tr>
-    <td class="name">HomeScreenKt$ConcurrencyWarningDialog$2</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$HomeScreen$7$2</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$LongPressCopyableText$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$NoConcurrencyWarningDialog$2</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7$2</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7$3</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7$4</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7$4$2$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7$5</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7$6</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">HomeScreenKt$StartHomeScreen$7$6$7</td>
-    <td class="coverageStat"/>
-  </tr>
 <tr>
-  <td class="name"><strong>Total</strong></td>
+  <td class="name">RequestPermissionScreenKt</td>
     <td class="coverageStat"/>
 </tr>
+
 </table>
 
 <br/>
@@ -94,630 +46,192 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.views
 &nbsp;
+&nbsp;import android.Manifest
 &nbsp;import android.app.AlertDialog
 &nbsp;import android.content.Context
 &nbsp;import android.content.Intent
 &nbsp;import android.content.pm.PackageManager
-&nbsp;import android.net.wifi.WifiManager
+&nbsp;import android.graphics.Typeface
 &nbsp;import android.os.Build
-&nbsp;import android.util.Log
-&nbsp;import android.widget.Toast
+&nbsp;import android.os.PowerManager
+&nbsp;import android.provider.Settings
+&nbsp;import android.text.SpannableString
+&nbsp;import android.text.Spanned
+&nbsp;import android.text.style.StyleSpan
 &nbsp;import androidx.activity.compose.rememberLauncherForActivityResult
 &nbsp;import androidx.activity.result.contract.ActivityResultContracts
-&nbsp;import androidx.compose.foundation.Image
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.gestures.detectTapGestures
-&nbsp;import androidx.compose.foundation.layout.Arrangement
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.Row
-&nbsp;import androidx.compose.foundation.layout.Spacer
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
-&nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
-&nbsp;import androidx.compose.foundation.layout.width
-&nbsp;import androidx.compose.foundation.lazy.LazyColumn
-&nbsp;import androidx.compose.foundation.shape.CircleShape
-&nbsp;import androidx.compose.foundation.text.BasicText
-&nbsp;import androidx.compose.material.icons.Icons
-&nbsp;import androidx.compose.material.icons.filled.Close
-&nbsp;import androidx.compose.material.icons.filled.Wifi
-&nbsp;import androidx.compose.material3.AlertDialog
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.CircularProgressIndicator
-&nbsp;import androidx.compose.material3.FilterChip
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.IconButton
-&nbsp;import androidx.compose.material3.ListItem
-&nbsp;import androidx.compose.material3.MaterialTheme
-&nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.TextButton
-&nbsp;import androidx.compose.material3.TextField
-&nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.collectAsState
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.saveable.rememberSaveable
-&nbsp;import androidx.compose.runtime.setValue
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.graphics.asImageBitmap
-&nbsp;import androidx.compose.ui.input.pointer.pointerInput
-&nbsp;import androidx.compose.ui.platform.LocalClipboardManager
-&nbsp;import androidx.compose.ui.platform.LocalConfiguration
+&nbsp;import androidx.compose.runtime.*
 &nbsp;import androidx.compose.ui.platform.LocalContext
-&nbsp;import androidx.compose.ui.platform.LocalDensity
-&nbsp;import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-&nbsp;import androidx.compose.ui.res.stringResource
-&nbsp;import androidx.compose.ui.text.AnnotatedString
-&nbsp;import androidx.compose.ui.text.TextStyle
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.compose.ui.unit.sp
-&nbsp;import androidx.lifecycle.viewmodel.compose.viewModel
-&nbsp;import com.google.zxing.BarcodeFormat
-&nbsp;import com.greybox.projectmesh.extension.NEARBY_WIFI_PERMISSION_NAME
-&nbsp;import com.greybox.projectmesh.R
-&nbsp;import com.greybox.projectmesh.ViewModelFactory
-&nbsp;import com.greybox.projectmesh.extension.hasNearbyWifiDevicesOrLocationPermission
-&nbsp;import com.greybox.projectmesh.viewModel.HomeScreenViewModel
-&nbsp;import com.journeyapps.barcodescanner.BarcodeEncoder
-&nbsp;import com.journeyapps.barcodescanner.ScanContract
-&nbsp;import com.journeyapps.barcodescanner.ScanOptions
-&nbsp;import com.ustadmobile.meshrabiya.ext.addressToDotNotation
-&nbsp;import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
-&nbsp;import com.ustadmobile.meshrabiya.vnet.MeshrabiyaConnectLink
-&nbsp;import com.ustadmobile.meshrabiya.vnet.VirtualNode
-&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.state.WifiStationState
-&nbsp;import org.kodein.di.compose.localDI
-&nbsp;import org.kodein.di.direct
-&nbsp;import org.kodein.di.instance
-&nbsp;import androidx.compose.runtime.State
-&nbsp;import com.greybox.projectmesh.extension.hasStaApConcurrency
-&nbsp;import com.greybox.projectmesh.ui.theme.TransparentButton
-&nbsp;import com.greybox.projectmesh.viewModel.HomeScreenModel
-&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
-&nbsp;import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
-&nbsp;import com.greybox.projectmesh.components.ConnectWifiLauncherResult
-&nbsp;import com.greybox.projectmesh.components.ConnectWifiLauncherStatus
-&nbsp;import com.greybox.projectmesh.components.meshrabiyaConnectLauncher
-&nbsp;import com.ustadmobile.meshrabiya.log.MNetLogger
+&nbsp;import androidx.core.content.ContextCompat
 &nbsp;
 &nbsp;@Composable
-&nbsp;// We customize the viewModel since we need to inject dependencies
-&nbsp;fun HomeScreen(
-&nbsp;    viewModel: HomeScreenViewModel = viewModel(
-&nbsp;        factory = ViewModelFactory(
-&nbsp;            di = localDI(),
-&nbsp;            owner = LocalSavedStateRegistryOwner.current,
-&nbsp;            vmFactory = { di, savedStateHandle -&gt; HomeScreenViewModel(di, savedStateHandle) },
-&nbsp;            defaultArgs = null)),
-&nbsp;    deviceName: String?
-&nbsp;)
-&nbsp;{
+&nbsp;fun RequestPermissionsScreen(skipPermissions: Boolean) {
 &nbsp;    val context = LocalContext.current
-&nbsp;    val di = localDI()
-&nbsp;    val uiState: HomeScreenModel by viewModel.uiState.collectAsState(initial = HomeScreenModel())
-&nbsp;    val node: VirtualNode by di.instance()
-&nbsp;    val logger: MNetLogger by di.instance()
-&nbsp;    val currConcurrencyKnown = viewModel.concurrencyKnown.collectAsState()
-&nbsp;    val currConcurrencySupported = viewModel.concurrencySupported.collectAsState()
 &nbsp;
-&nbsp;    // Request nearby wifi permission since it is necessary to start a hotspot
-&nbsp;    val requestNearbyWifiPermissionLauncher = rememberLauncherForActivityResult(
-&nbsp;        ActivityResultContracts.RequestPermission()
-&nbsp;    ){ granted -&gt; if (granted){
-&nbsp;        if(context.hasNearbyWifiDevicesOrLocationPermission()){
-&nbsp;            viewModel.onSetIncomingConnectionsEnabled(true)
-&nbsp;        }
-&nbsp;    } }
+&nbsp;    // Track permission states
+&nbsp;    var currentStep by remember { mutableIntStateOf(if (skipPermissions) 6 else 0) }
 &nbsp;
-&nbsp;    // if not known and android version &gt;= 11, then use official api to check concurrency
-&nbsp;    if(!currConcurrencyKnown.value &amp;&amp; Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.R){
-&nbsp;        viewModel.saveConcurrencyKnown(true)
-&nbsp;        viewModel.saveConcurrencySupported(context.hasStaApConcurrency())
-&nbsp;    }
-&nbsp;
-&nbsp;    var errorMessage by remember { mutableStateOf&lt;String?&gt;(null) }
-&nbsp;
-&nbsp;    // Launch the home screen
-&nbsp;    StartHomeScreen(
-&nbsp;        uiState = uiState,
-&nbsp;        node = node as AndroidVirtualNode,
-&nbsp;        onSetIncomingConnectionsEnabled = { enabled -&gt;
-&nbsp;            if(enabled) {
-&nbsp;                if (!context.hasNearbyWifiDevicesOrLocationPermission()) {
-&nbsp;                    requestNearbyWifiPermissionLauncher.launch(NEARBY_WIFI_PERMISSION_NAME)
-&nbsp;                    return@StartHomeScreen
-&nbsp;                }
-&nbsp;                if (uiState.hotspotTypeToCreate == HotspotType.WIFIDIRECT_GROUP) {
-&nbsp;                    val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
-&nbsp;                    if (!wifiManager.isWifiEnabled) {
-&nbsp;                        Toast.makeText(context, &quot;Please Turn on Wifi&quot;, Toast.LENGTH_SHORT).show()
-&nbsp;                        return@StartHomeScreen
-&nbsp;                    }
-&nbsp;                }
-&nbsp;            }
-&nbsp;            viewModel.onSetIncomingConnectionsEnabled(enabled)
-&nbsp;        },
-&nbsp;        onClickDisconnectWifiStation = viewModel::onClickDisconnectStation,
-&nbsp;        deviceName = deviceName,
-&nbsp;        context = context,
-&nbsp;        currConcurrencyKnown = currConcurrencyKnown,
-&nbsp;        currConcurrencySupported = currConcurrencySupported,
-&nbsp;        onSetBand = viewModel::onConnectBandChanged,
-&nbsp;        onSetHotspotTypeToCreate = viewModel::onSetHotspotTypeToCreate,
-&nbsp;        onConnectWifiLauncherResult = { result -&gt;
-&nbsp;            if(result.hotspotConfig != null) {
-&nbsp;                viewModel.onConnectWifi(result.hotspotConfig)
-&nbsp;            }else {
-&nbsp;                errorMessage = result.exception?.message
-&nbsp;            }
-&nbsp;        },
-&nbsp;        logger = logger
-&nbsp;    )
-&nbsp;    // Show an error dialog when needed
-&nbsp;    errorMessage?.let { message -&gt;
-&nbsp;        AlertDialog(
-&nbsp;            onDismissRequest = { errorMessage = null },
-&nbsp;            title = { Text(&quot;Connection Error&quot;) },
-&nbsp;            text = { Text(message) },
-&nbsp;            confirmButton = {
-&nbsp;                TextButton(onClick = { errorMessage = null }) {
-&nbsp;                    Text(&quot;OK&quot;)
-&nbsp;                }
-&nbsp;            }
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;// Display the home screen
-&nbsp;@Composable
-&nbsp;fun StartHomeScreen(
-&nbsp;    uiState: HomeScreenModel,
-&nbsp;    node: AndroidVirtualNode,
-&nbsp;    onSetIncomingConnectionsEnabled: (Boolean) -&gt; Unit = { },
-&nbsp;    onClickDisconnectWifiStation: () -&gt; Unit = { },
-&nbsp;    viewModel: HomeScreenViewModel = viewModel(),
-&nbsp;    deviceName: String?,
-&nbsp;    context: Context,
-&nbsp;    currConcurrencyKnown: State&lt;Boolean&gt;,
-&nbsp;    currConcurrencySupported: State&lt;Boolean&gt;,
-&nbsp;    onSetBand: (ConnectBand) -&gt; Unit = { },
-&nbsp;    onSetHotspotTypeToCreate: (HotspotType) -&gt; Unit = { },
-&nbsp;    onConnectWifiLauncherResult: (ConnectWifiLauncherResult) -&gt; Unit,
-&nbsp;    logger: MNetLogger
-&nbsp;){
-&nbsp;    val di = localDI()
-&nbsp;    val barcodeEncoder = remember { BarcodeEncoder() }
-&nbsp;    var connectLauncherState by remember {
-&nbsp;        mutableStateOf(ConnectWifiLauncherStatus.INACTIVE)
-&nbsp;    }
-&nbsp;    val connectLauncher = meshrabiyaConnectLauncher(
-&nbsp;        node = node,
-&nbsp;        logger = logger,
-&nbsp;        onStatusChange = {
-&nbsp;            connectLauncherState = it
-&nbsp;        },
-&nbsp;        onResult = onConnectWifiLauncherResult,
-&nbsp;    )
-&nbsp;    var userEnteredConnectUri by rememberSaveable { mutableStateOf(&quot;&quot;) }
-&nbsp;    val showNoConcurrencyWarning by viewModel.showNoConcurrencyWarning.collectAsState()
-&nbsp;    val showConcurrencyWarning by viewModel.showConcurrencyWarning.collectAsState()
-&nbsp;    // connect to other device via connect uri
-&nbsp;    fun connect(uri: String, logger: MNetLogger): Unit {
-&nbsp;        try {
-&nbsp;            logger(Log.INFO, &quot;HomeScreen: Scanned link: $uri&quot;)
-&nbsp;            // Parse the link, get the wifi connect configuration.
-&nbsp;            val hotSpot = MeshrabiyaConnectLink.parseUri(
-&nbsp;                uri = uri,
-&nbsp;                json = di.direct.instance()
-&nbsp;            ).hotspotConfig
-&nbsp;            // if the configuration is valid, connect to the device.
-&nbsp;            if (hotSpot != null) {
-&nbsp;                if(hotSpot.nodeVirtualAddr !in uiState.nodesOnMesh) {
-&nbsp;                    // Connect device thru wifi connection
-&nbsp;                    connectLauncher.launch(hotSpot)
-&nbsp;                }else{
-&nbsp;                    Toast.makeText(context, &quot;Already connected to this device&quot;, Toast.LENGTH_SHORT).show()
-&nbsp;                    logger(Log.INFO,&quot;Already connected to this device&quot;)
-&nbsp;                }
-&nbsp;            } else {
-&nbsp;                Toast.makeText(context, &quot;Link doesn&#39;t have a connect config&quot;, Toast.LENGTH_SHORT).show()
-&nbsp;                logger(Log.WARN, &quot;HomeScreen: Link doesn&#39;t have a connect config&quot;)
-&nbsp;            }
-&nbsp;        } catch (e: Exception) {
-&nbsp;            Toast.makeText(context, &quot;Invalid Link&quot;, Toast.LENGTH_SHORT).show()
-&nbsp;            logger(Log.WARN, &quot;HomeScreen: Invalid Link&quot;, e)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    // initialize the QR code scanner
-&nbsp;    val qrScannerLauncher = rememberLauncherForActivityResult(contract = ScanContract()) { result -&gt;
-&nbsp;        // Get the contents of the QR code
-&nbsp;        val link = result.contents
-&nbsp;        if (link != null) {
-&nbsp;            connect(link, logger)
-&nbsp;        }else{
-&nbsp;            Toast.makeText(context, &quot;QR Code scan doesn&#39;t return a link&quot;, Toast.LENGTH_SHORT).show()
-&nbsp;            logger(Log.INFO,&quot;QR Code scan doesn&#39;t return a link&quot;)
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    // Show warning popup when device does not support STA/AP concurrency
-&nbsp;    if (showNoConcurrencyWarning) {
-&nbsp;        NoConcurrencyWarningDialog(onDismiss = { viewModel.dismissNoConcurrencyWarning() })
-&nbsp;    }
-&nbsp;
-&nbsp;    // Show warning popup when device does not support STA/AP concurrency
-&nbsp;    if (showConcurrencyWarning) {
-&nbsp;        ConcurrencyWarningDialog(onDismiss = { viewModel.dismissConcurrencyWarning() })
-&nbsp;    }
-&nbsp;
-&nbsp;    // Function to check if Wi-Fi Direct is supported
-&nbsp;    fun isWifiDirectSupported(context: Context): Boolean {
-&nbsp;        return context.packageManager.hasSystemFeature(PackageManager.FEATURE_WIFI_DIRECT)
-&nbsp;    }
-&nbsp;
-&nbsp;    LazyColumn(
-&nbsp;        modifier = Modifier.fillMaxSize(),
-&nbsp;        verticalArrangement = Arrangement.spacedBy(8.dp),
+&nbsp;    val nearbyWifiPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
 &nbsp;    ) {
-&nbsp;        item (key = &quot;device_info&quot;) {
-&nbsp;            LongPressCopyableText(
-&nbsp;                context,
-&nbsp;                text = stringResource(id = R.string.device_name) + &quot;: &quot;,
-&nbsp;                textCopyable = deviceName.toString(),
-&nbsp;                textSize = 14,
-&nbsp;                padding = 6
-&nbsp;            )
-&nbsp;            LongPressCopyableText(
-&nbsp;                context,
-&nbsp;                text = stringResource(id = R.string.ip_address) + &quot;: &quot;,
-&nbsp;                textCopyable = uiState.localAddress.addressToDotNotation(),
-&nbsp;                textSize = 14,
-&nbsp;                padding = 6
-&nbsp;            )
-&nbsp;        }
+&nbsp;        // Move to next permission
+&nbsp;        currentStep = 1
+&nbsp;    }
 &nbsp;
-&nbsp;        item (key = &quot;band_option&quot;){
-&nbsp;            if (uiState.connectBandVisible) {
-&nbsp;                Text(
-&nbsp;                    modifier = Modifier.padding(horizontal = 6.dp),
-&nbsp;                    text = stringResource(id = R.string.band),
-&nbsp;                    style = MaterialTheme.typography.bodySmall,
-&nbsp;                )
-&nbsp;                Row (modifier = Modifier.padding(horizontal = 6.dp)){
-&nbsp;                    uiState.bandMenu.forEach { band -&gt;
-&nbsp;                        FilterChip(
-&nbsp;                            selected = uiState.band == band,
-&nbsp;                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
-&nbsp;                            onClick = {
-&nbsp;                                onSetBand(band)
-&nbsp;                            },
-&nbsp;                            label = {
-&nbsp;                                Text(band.toString())
-&nbsp;                            },
-&nbsp;                        )
-&nbsp;                    }
+&nbsp;    val locationPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) {
+&nbsp;        // Move to next permission
+&nbsp;        currentStep = 2
+&nbsp;    }
+&nbsp;
+&nbsp;    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) {
+&nbsp;        // Move to next permission
+&nbsp;        currentStep = 3
+&nbsp;    }
+&nbsp;
+&nbsp;    val storagePermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestMultiplePermissions()
+&nbsp;    ) {
+&nbsp;        // Move to next step permission
+&nbsp;        currentStep = 4
+&nbsp;    }
+&nbsp;    
+&nbsp;    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+&nbsp;        contract = ActivityResultContracts.RequestPermission()
+&nbsp;    ) {
+&nbsp;        // Move to next step (Battery Optimization)
+&nbsp;        currentStep = 5
+&nbsp;    }
+&nbsp;
+&nbsp;    LaunchedEffect(currentStep) {
+&nbsp;        if (currentStep == 6) return@LaunchedEffect
+&nbsp;        when (currentStep) {
+&nbsp;            0 -&gt; { // Request Nearby Wi-Fi Permission
+&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M &amp;&amp;
+&nbsp;                    !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
+&nbsp;                    nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
+&nbsp;                } else {
+&nbsp;                    currentStep = 1
 &nbsp;                }
 &nbsp;            }
-&nbsp;        }
-&nbsp;
-&nbsp;        item (key = &quot;hotspot_type_option&quot;) {
-&nbsp;            if(!uiState.wifiConnectionEnabled) {
-&nbsp;                val wifiDirectSupported = isWifiDirectSupported(context)
-&nbsp;                Text(
-&nbsp;                    modifier = Modifier.padding(horizontal = 6.dp),
-&nbsp;                    text = stringResource(id = R.string.hotspot_type),
-&nbsp;                    style = MaterialTheme.typography.bodySmall,
-&nbsp;                )
-&nbsp;                Row(modifier = Modifier.padding(horizontal = 6.dp)){
-&nbsp;                    uiState.hotspotTypeMenu.forEach { hotspotType -&gt;
-&nbsp;                        val isDisabled = (hotspotType == HotspotType.WIFIDIRECT_GROUP &amp;&amp; !wifiDirectSupported)
-&nbsp;                        FilterChip(
-&nbsp;                            enabled = !isDisabled,
-&nbsp;                            selected = hotspotType == uiState.hotspotTypeToCreate,
-&nbsp;                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
-&nbsp;                            onClick = { onSetHotspotTypeToCreate(hotspotType) },
-&nbsp;                            label = { Text(hotspotType.toString()) }
-&nbsp;                        )
-&nbsp;                    }
+&nbsp;            1 -&gt; { // Request Location Permission
+&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M &amp;&amp;
+&nbsp;                    !hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+&nbsp;                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+&nbsp;                } else {
+&nbsp;                    currentStep = 2
 &nbsp;                }
 &nbsp;            }
-&nbsp;        }
-&nbsp;
-&nbsp;        item (key = &quot;start_stop_hotspot_button&quot;){
-&nbsp;            // Display the &quot;Start Hotspot&quot; button
-&nbsp;            val stationState = uiState.wifiState?.wifiStationState
-&nbsp;            if (!uiState.wifiConnectionEnabled) {
-&nbsp;                Row{
-&nbsp;                    TransparentButton(
-&nbsp;                        onClick = { onSetIncomingConnectionsEnabled(true) },
-&nbsp;                        modifier = Modifier.padding(4.dp),
-&nbsp;                        text = stringResource(id = R.string.start_hotspot),
-&nbsp;                        // If not connected to a WiFi, enable the button
-&nbsp;                        // Else, check if the device supports WiFi STA/AP Concurrency
-&nbsp;                        // If it does, enable the button. Otherwise, disable it
-&nbsp;                        enabled = if(stationState == null || stationState.status == WifiStationState.Status.INACTIVE)
-&nbsp;                            true
-&nbsp;                        else
-&nbsp;                            currConcurrencySupported.value
-&nbsp;                    )
+&nbsp;            2 -&gt; { // Request Notification Permission (Android 13+)
+&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU &amp;&amp;
+&nbsp;                    !hasPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {
+&nbsp;                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+&nbsp;                } else {
+&nbsp;                    currentStep = 3
 &nbsp;                }
 &nbsp;            }
-&nbsp;            // Display the &quot;Stop Hotspot&quot; button
-&nbsp;            else{
-&nbsp;                Row{
-&nbsp;                    TransparentButton(
-&nbsp;                        onClick = {
-&nbsp;                            stopHotspotConfirmationDialog(context) { onConfirm -&gt;
-&nbsp;                                if (onConfirm) {
-&nbsp;                                    onSetIncomingConnectionsEnabled(false)
-&nbsp;                                }
-&nbsp;                            }
-&nbsp;                        },
-&nbsp;                        modifier = Modifier.padding(4.dp),
-&nbsp;                        text = stringResource(id = R.string.stop_hotspot),
-&nbsp;                        enabled = true
+&nbsp;            3 -&gt; { // Request Storage Permission (Android 13+ has different permissions)
+&nbsp;                val storagePermissions = if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU) {
+&nbsp;                    arrayOf(
+&nbsp;                        Manifest.permission.READ_MEDIA_IMAGES,
+&nbsp;                        Manifest.permission.READ_MEDIA_VIDEO
 &nbsp;                    )
+&nbsp;                } else {
+&nbsp;                    arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE)
+&nbsp;                }
+&nbsp;
+&nbsp;                if (!hasAnyPermission(context, storagePermissions)) {
+&nbsp;                    storagePermissionLauncher.launch(storagePermissions)
+&nbsp;                } else {
+&nbsp;                    currentStep = 4
 &nbsp;                }
 &nbsp;            }
-&nbsp;        }
-&nbsp;
-&nbsp;        item(key = &quot;qr_code_view&quot;){
-&nbsp;            // Generating QR CODE
-&nbsp;            val connectUri = uiState.connectUri
-&nbsp;            if (connectUri != null &amp;&amp; uiState.wifiConnectionEnabled) {
-&nbsp;                QRCodeView(
-&nbsp;                    connectUri,
-&nbsp;                    barcodeEncoder,
-&nbsp;                    uiState.wifiState?.connectConfig?.ssid,
-&nbsp;                    uiState.wifiState?.connectConfig?.passphrase,
-&nbsp;                    uiState.wifiState?.connectConfig?.bssid,
-&nbsp;                    uiState.wifiState?.connectConfig?.port.toString()
-&nbsp;                )
-&nbsp;                // Display connectUri
-&nbsp;                Spacer(modifier = Modifier.height(16.dp))
-&nbsp;                Text(text = stringResource(id = R.string.instruction_start_hotspot))
-&nbsp;                Button(onClick = {
-&nbsp;                    val sendIntent: Intent = Intent().apply {
-&nbsp;                        action = Intent.ACTION_SEND
-&nbsp;                        putExtra(Intent.EXTRA_TEXT, connectUri)
-&nbsp;                        type = &quot;text/plain&quot;
-&nbsp;                    }
-&nbsp;                    val shareIntent = Intent.createChooser(sendIntent, null)
-&nbsp;                    context.startActivity(shareIntent)
-&nbsp;                }, modifier = Modifier.padding(4.dp), enabled = true) {
-&nbsp;                    Text(stringResource(id = R.string.share_connect_uri))
+&nbsp;            4 -&gt; { // Request Camera Permission
+&nbsp;                if (!hasPermission(context, Manifest.permission.CAMERA)) {
+&nbsp;                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+&nbsp;                } else {
+&nbsp;                    currentStep = 5
 &nbsp;                }
 &nbsp;            }
-&nbsp;        }
-&nbsp;
-&nbsp;        item(key = &quot;connect_via_qr_code&quot;) {
-&nbsp;            val stationState = uiState.wifiState?.wifiStationState
-&nbsp;            // Scan the QR CODE
-&nbsp;            // If the stationState is not null and its status is INACTIVE,
-&nbsp;            // It will display the option to connect via a QR code scan.
-&nbsp;            if (stationState != null){
-&nbsp;                if (stationState.status == WifiStationState.Status.INACTIVE){
-&nbsp;                    Text(modifier = Modifier.padding(6.dp), text = stringResource(id = R.string.wifi_station_connection), style = TextStyle(fontSize = 16.sp))
-&nbsp;                    Spacer(modifier = Modifier.height(12.dp))
-&nbsp;                    Row{
-&nbsp;                        TransparentButton(onClick = {
-&nbsp;                            qrScannerLauncher.launch(ScanOptions().setOrientationLocked(false)
-&nbsp;                                .setPrompt(&quot;Scan another device to join the Mesh&quot;)
-&nbsp;                                .setBeepEnabled(true)
-&nbsp;                            )},
-&nbsp;                            modifier = Modifier.padding(4.dp),
-&nbsp;                            text = stringResource(id = R.string.connect_via_qr_code_scan),
-&nbsp;                            // If the hotspot isn&#39;t started, enable the button
-&nbsp;                            // Else, check if the device supports WiFi STA/AP Concurrency
-&nbsp;                            // If it does, enable the button. Otherwise, disable it
-&nbsp;                            enabled = if(!uiState.hotspotStatus)
-&nbsp;                                true
-&nbsp;                            else
-&nbsp;                                currConcurrencySupported.value
-&nbsp;                        )
-&nbsp;                    }
-&nbsp;                    Text(modifier = Modifier.padding(6.dp), text = stringResource(id = R.string.instruction))
-&nbsp;                    TextField(
-&nbsp;                        value = userEnteredConnectUri,
-&nbsp;                        onValueChange = {
-&nbsp;                            userEnteredConnectUri = it
-&nbsp;                        },
-&nbsp;                        label = { Text(stringResource(id = R.string.prompt_enter_uri)) }
-&nbsp;                    )
-&nbsp;                    TransparentButton(
-&nbsp;                        onClick = {
-&nbsp;                            connect(userEnteredConnectUri, logger)
-&nbsp;                        },
-&nbsp;                        modifier = Modifier.padding(4.dp),
-&nbsp;                        text = stringResource(id = R.string.connect_via_entering_connect_uri),
-&nbsp;                        // If the hotspot isn&#39;t started, enable the button
-&nbsp;                        // Else, check if the device supports WiFi STA/AP Concurrency
-&nbsp;                        // If it does, enable the button. Otherwise, disable it
-&nbsp;                        enabled = if (!uiState.hotspotStatus)
-&nbsp;                            true
-&nbsp;                        else
-&nbsp;                            currConcurrencySupported.value
-&nbsp;                    )
+&nbsp;            5 -&gt; { // Handle Battery Optimization
+&nbsp;                if (!isBatteryOptimizationDisabled(context)) {
+&nbsp;                    promptDisableBatteryOptimization(context)
 &nbsp;                }
-&nbsp;                // If the stationState is not INACTIVE, it displays a ListItem that represents
-&nbsp;                // the current connection status.
-&nbsp;                else{
-&nbsp;                    ListItem(
-&nbsp;                        headlineContent = {
-&nbsp;                            Text(stationState.config?.ssid ?: &quot;(Unknown SSID)&quot;)
-&nbsp;                        },
-&nbsp;                        supportingContent = {
-&nbsp;                            Text(
-&nbsp;                                (stationState.config?.nodeVirtualAddr?.addressToDotNotation() ?: &quot;&quot;) +
-&nbsp;                                        &quot; - ${stationState.status}&quot;
-&nbsp;                            )
-&nbsp;                        },
-&nbsp;                        leadingContent = {
-&nbsp;                            if(stationState.status == WifiStationState.Status.CONNECTING) {
-&nbsp;                                CircularProgressIndicator(
-&nbsp;                                    modifier = Modifier.padding(8.dp)
-&nbsp;                                )
-&nbsp;                            }else {
-&nbsp;                                Icon(
-&nbsp;                                    imageVector = Icons.Default.Wifi,
-&nbsp;                                    contentDescription = &quot;&quot;,
-&nbsp;                                )
-&nbsp;                            }
-&nbsp;                        },
-&nbsp;                        trailingContent = {
-&nbsp;                            IconButton(
-&nbsp;                                onClick = {
-&nbsp;                                    onClickDisconnectWifiStation()
-&nbsp;                                }
-&nbsp;                            ) {
-&nbsp;                                Icon(
-&nbsp;                                    imageVector = Icons.Default.Close,
-&nbsp;                                    contentDescription = &quot;Disconnect&quot;,
-&nbsp;                                )
-&nbsp;                            }
-&nbsp;                        }
-&nbsp;                    )
-&nbsp;                }
-&nbsp;            }
-&nbsp;        }
-&nbsp;
-&nbsp;        // add a Hotspot status indicator
-&nbsp;        item(key = &quot;hotspot_status_indicator&quot;){
-&nbsp;            Row(verticalAlignment = Alignment.CenterVertically) {
-&nbsp;                Text(modifier = Modifier.padding(6.dp),
-&nbsp;                    text = stringResource(id = R.string.hotspot_status) + &quot;: &quot; +
-&nbsp;                            if (uiState.hotspotStatus) stringResource(
-&nbsp;                                id = R.string.hotspot_status_online)
-&nbsp;                            else stringResource(id = R.string.hotspot_status_offline))
-&nbsp;                Box(
-&nbsp;                    modifier = Modifier.size(8.dp).background(
-&nbsp;                        color = if (uiState.hotspotStatus) Color.Green else Color.Red,
-&nbsp;                        shape = CircleShape
-&nbsp;                    )
-&nbsp;                )
 &nbsp;            }
 &nbsp;        }
 &nbsp;    }
 &nbsp;}
 &nbsp;
-&nbsp;fun stopHotspotConfirmationDialog(context: Context, onConfirm: (Boolean) -&gt; Unit){
-&nbsp;    AlertDialog.Builder(context)
-&nbsp;        .setTitle(&quot;Do you want to turn off the hotspot?&quot;)
-&nbsp;        .setPositiveButton(&quot;Yes&quot;){ _, _ -&gt;
-&nbsp;            onConfirm(true)
-&nbsp;        }
-&nbsp;        .setNegativeButton(&quot;No&quot;){ _, _ -&gt;
-&nbsp;            onConfirm(false)
-&nbsp;        }
-&nbsp;        .show()
+&nbsp;/** Function to Check If Permission is Granted */
+&nbsp;fun hasPermission(context: Context, permission: String): Boolean {
+&nbsp;    return ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 &nbsp;}
 &nbsp;
-&nbsp;// Enable users to copy text by holding down the text for a long press
-&nbsp;@Composable
-&nbsp;fun LongPressCopyableText(context: Context,
-&nbsp;                          text: String,
-&nbsp;                          textCopyable: String,
-&nbsp;                          textSize: Int,
-&nbsp;                          padding: Int = 0){
-&nbsp;    val clipboardManager = LocalClipboardManager.current
-&nbsp;    BasicText(
-&nbsp;        text = text + textCopyable,
-&nbsp;        style = TextStyle(
-&nbsp;            fontSize = textSize.sp,
-&nbsp;            color = MaterialTheme.colorScheme.onBackground),
-&nbsp;        modifier = Modifier
-&nbsp;            .pointerInput(textCopyable) {
-&nbsp;                detectTapGestures(
-&nbsp;                    onLongPress = {
-&nbsp;                        clipboardManager.setText(AnnotatedString(textCopyable))
-&nbsp;                        Toast
-&nbsp;                            .makeText(context, &quot;Text copied to clipboard!&quot;, Toast.LENGTH_SHORT)
-&nbsp;                            .show()
-&nbsp;                    })
-&nbsp;            }
-&nbsp;            .padding(padding.dp)
-&nbsp;    )
+&nbsp;/** Function to Check If Any Permission from a List is Granted */
+&nbsp;fun hasAnyPermission(context: Context, permissions: Array&lt;String&gt;): Boolean {
+&nbsp;    return permissions.any { ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED }
 &nbsp;}
 &nbsp;
-&nbsp;// display the QR code
-&nbsp;@Composable
-&nbsp;fun QRCodeView(qrcodeUri: String, barcodeEncoder: BarcodeEncoder, ssid: String?, password: String?,
-&nbsp;               mac: String?, port: String?) {
-&nbsp;    val configuration = LocalConfiguration.current
-&nbsp;    val screenWidthDp = configuration.screenWidthDp.dp
-&nbsp;    val density = LocalDensity.current
-&nbsp;    // Convert dp to int once and remember the value
-&nbsp;    val qrCodeSize = remember(density, screenWidthDp) {
-&nbsp;        with(density) { screenWidthDp.times(0.35f).roundToPx() } // Converts to Int
+&nbsp;/** Function to Check If Battery Optimization is Disabled */
+&nbsp;fun isBatteryOptimizationDisabled(context: Context): Boolean {
+&nbsp;    val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+&nbsp;    return if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
+&nbsp;        powerManager.isIgnoringBatteryOptimizations(context.packageName)
+&nbsp;    } else {
+&nbsp;        true // Battery optimization doesn&#39;t apply below Android 6.0
 &nbsp;    }
-&nbsp;    val qrCodeBitMap = remember(qrcodeUri) {
-&nbsp;        barcodeEncoder.encodeBitmap(
-&nbsp;            qrcodeUri, BarcodeFormat.QR_CODE, qrCodeSize, qrCodeSize
-&nbsp;        ).asImageBitmap()
-&nbsp;    }
-&nbsp;    Row (modifier = Modifier.fillMaxWidth()) {
-&nbsp;        // QR Code left side, Device info on the right side
-&nbsp;        Image(
-&nbsp;            bitmap = qrCodeBitMap,
-&nbsp;            contentDescription = &quot;QR Code&quot;
+&nbsp;}
+&nbsp;
+&nbsp;/** Function to Prompt User to Disable Battery Optimization */
+&nbsp;fun promptDisableBatteryOptimization(context: Context) {
+&nbsp;    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
+&nbsp;        val message = SpannableString(
+&nbsp;            &quot;To ensure uninterrupted background functionality and maintain a stable connection, &quot; +
+&nbsp;                    &quot;please disable battery optimization for this app.\n\n&quot; +
+&nbsp;                    &quot;1. Tap Open Settings below\n\n&quot; +
+&nbsp;                    &quot;2. Tap the dropdown menu at top of page and select All Apps\n\n&quot; +
+&nbsp;                    &quot;3. Scroll to Project Mesh and tap to turn off battery optimization.\n&quot;
 &nbsp;        )
-&nbsp;        Spacer(modifier = Modifier.width(8.dp))
-&nbsp;        Column(
-&nbsp;            modifier = Modifier.weight(1f)
-&nbsp;        ) {
-&nbsp;            Spacer(modifier = Modifier.height(10.dp))
-&nbsp;            Text(text = &quot;SSID: $ssid&quot;)
-&nbsp;            Spacer(modifier = Modifier.height(10.dp))
-&nbsp;            Text(text = &quot;Password: $password&quot;)
-&nbsp;            Spacer(modifier = Modifier.height(10.dp))
-&nbsp;            Text(text = &quot;MAC: $mac&quot;)
-&nbsp;            Spacer(modifier = Modifier.height(10.dp))
-&nbsp;            Text(text = &quot;Port: $port&quot;)
+&nbsp;
+&nbsp;        fun boldify(text: String) {
+&nbsp;            val start = message.indexOf(text)
+&nbsp;            if (start &gt;= 0) {
+&nbsp;                message.setSpan(
+&nbsp;                    StyleSpan(Typeface.BOLD),  // Apply bold
+&nbsp;                    start,
+&nbsp;                    start + text.length,
+&nbsp;                    Spanned.SPAN_EXCLUSIVE_EXCLUSIVE
+&nbsp;                )
+&nbsp;            }
 &nbsp;        }
+&nbsp;
+&nbsp;        // Bold specific words
+&nbsp;        boldify(&quot;Open Settings&quot;)
+&nbsp;        boldify(&quot;dropdown&quot;)
+&nbsp;        boldify(&quot;All Apps&quot;)
+&nbsp;        boldify(&quot;turn off battery optimization&quot;)
+&nbsp;
+&nbsp;        AlertDialog.Builder(context)
+&nbsp;            .setTitle(&quot;Disable Battery Optimization&quot;)
+&nbsp;            .setMessage(message)
+&nbsp;            .setPositiveButton(&quot;OPEN SETTINGS&quot;) { _, _ -&gt;
+&nbsp;                try {
+&nbsp;                    // Navigate to Battery Optimization Settings
+&nbsp;                    val intent = Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS)
+&nbsp;                    context.startActivity(intent)
+&nbsp;                } catch (e: Exception) {
+&nbsp;                    // Fallback to App Info screen
+&nbsp;                    val appSettingsIntent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+&nbsp;                        .setData(android.net.Uri.fromParts(&quot;package&quot;, context.packageName, null))
+&nbsp;                    context.startActivity(appSettingsIntent)
+&nbsp;                }
+&nbsp;            }
+&nbsp;            .setNegativeButton(&quot;CANCEL&quot;, null)
+&nbsp;            .show()
 &nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun NoConcurrencyWarningDialog(onDismiss: () -&gt; Unit) {
-&nbsp;    AlertDialog(
-&nbsp;        onDismissRequest = { onDismiss() },
-&nbsp;        title = { Text(&quot;STA/AP Concurrency Not Supported&quot;) },
-&nbsp;        text = {
-&nbsp;            Text(
-&nbsp;                &quot;Based on our test, we detected that your device does not support simultaneous Wi-Fi and hotspot usage (STA/AP concurrency).&quot;
-&nbsp;            )
-&nbsp;        },
-&nbsp;        confirmButton = {
-&nbsp;            TextButton(onClick = { onDismiss() }) {
-&nbsp;                Text(&quot;OK&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    )
-&nbsp;}
-&nbsp;
-&nbsp;@Composable
-&nbsp;fun ConcurrencyWarningDialog(onDismiss: () -&gt; Unit) {
-&nbsp;    AlertDialog(
-&nbsp;        onDismissRequest = { onDismiss() },
-&nbsp;        title = { Text(&quot;STA/AP Concurrency Supported&quot;) },
-&nbsp;        text = {
-&nbsp;            Text(
-&nbsp;                &quot;Based on our test, we detected that your device support simultaneous Wi-Fi and hotspot usage (STA/AP concurrency).&quot;
-&nbsp;            )
-&nbsp;        },
-&nbsp;        confirmButton = {
-&nbsp;            TextButton(onClick = { onDismiss() }) {
-&nbsp;                Text(&quot;OK&quot;)
-&nbsp;            }
-&nbsp;        }
-&nbsp;    )
 &nbsp;}
 </code>
 </pre>
@@ -742,7 +256,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-03-30 18:03</div>
+    <div style="float:right;">generated on 2026-03-30 18:31</div>
 </div>
 </body>
 </html>
