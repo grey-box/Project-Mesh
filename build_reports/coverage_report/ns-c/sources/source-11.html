@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Kover HTML Report Coverage Report > NetworkScreenKt</title>
+  <title>Kover HTML Report Coverage Report > OnboardingScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
     <a href="../index.html">com.greybox.projectmesh.views</a>
 </div>
 
-<h1>Coverage Summary for Class: NetworkScreenKt (com.greybox.projectmesh.views)</h1>
+<h1>Coverage Summary for Class: OnboardingScreenKt (com.greybox.projectmesh.views)</h1>
 
 <table class="coverageStats">
 
@@ -34,7 +34,11 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 </th>
 </tr>
   <tr>
-    <td class="name">NetworkScreenKt$NetworkScreen$2</td>
+    <td class="name">OnboardingScreenKt$OnboardingScreen$1$2</td>
+    <td class="coverageStat"/>
+  </tr>
+  <tr>
+    <td class="name">OnboardingScreenKt$OnboardingScreen$1$2$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -46,7 +50,91 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.views
+&nbsp;
+&nbsp;import androidx.compose.foundation.layout.Column
+&nbsp;import androidx.compose.foundation.layout.Spacer
+&nbsp;import androidx.compose.foundation.layout.height
+&nbsp;import androidx.compose.foundation.layout.padding
+&nbsp;import androidx.compose.material3.Button
+&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.material3.TextField
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.collectAsState
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.compose.runtime.remember
+&nbsp;import androidx.compose.ui.Modifier
+&nbsp;import androidx.compose.ui.unit.dp
+&nbsp;import androidx.lifecycle.ViewModel
+&nbsp;import androidx.lifecycle.ViewModelProvider
+&nbsp;import androidx.lifecycle.viewmodel.compose.viewModel
+&nbsp;import com.greybox.projectmesh.GlobalApp
+&nbsp;import com.greybox.projectmesh.extension.getLocalIpFromDI
+&nbsp;import com.greybox.projectmesh.viewModel.OnboardingViewModel
+&nbsp;import org.kodein.di.compose.localDI
+&nbsp;
+&nbsp;@Composable
+&nbsp;fun OnboardingScreen(
+&nbsp;    onComplete: () -&gt; Unit
+&nbsp;) {
+&nbsp;    // Retrieve DI instance
+&nbsp;    val di = localDI()
+&nbsp;    // Get the local IP from DI using our helper function
+&nbsp;    val localIp = getLocalIpFromDI(di)
+&nbsp;
+&nbsp;    // Create a custom ViewModelProvider.Factory that passes the local IP to OnboardingViewModel
+&nbsp;    val factory = remember {
+&nbsp;        object : ViewModelProvider.Factory {
+&nbsp;            override fun &lt;T : ViewModel&gt; create(modelClass: Class&lt;T&gt;): T {
+&nbsp;                if (modelClass.isAssignableFrom(OnboardingViewModel::class.java)) {
+&nbsp;                    @Suppress(&quot;UNCHECKED_CAST&quot;)
+&nbsp;                    return OnboardingViewModel(
+&nbsp;                        userRepository = GlobalApp.GlobalUserRepo.userRepository,
+&nbsp;                        prefs = GlobalApp.GlobalUserRepo.prefs,
+&nbsp;                        localIp = localIp  // pass the local IP here
+&nbsp;                    ) as T
+&nbsp;                }
+&nbsp;                throw IllegalArgumentException(&quot;Unknown ViewModel class&quot;)
+&nbsp;            }
+&nbsp;        }
+&nbsp;    }
+&nbsp;
+&nbsp;    // Obtain the OnboardingViewModel using the custom factory
+&nbsp;    val onboardingViewModel: OnboardingViewModel = viewModel(factory = factory)
+&nbsp;    val uiState by onboardingViewModel.uiState.collectAsState()
+&nbsp;
+&nbsp;    // Build your UI
+&nbsp;    Column(modifier = Modifier.padding(16.dp)) {
+&nbsp;        Text(&quot;Welcome to Project Mesh!&quot;)
+&nbsp;        Spacer(modifier = Modifier.height(16.dp))
+&nbsp;        Text(&quot;Please set your username:&quot;)
+&nbsp;        TextField(
+&nbsp;            value = uiState.username,
+&nbsp;            onValueChange = { newValue -&gt; onboardingViewModel.onUsernameChange(newValue) }
+&nbsp;        )
+&nbsp;        Spacer(modifier = Modifier.height(16.dp))
+&nbsp;        Button(onClick = {
+&nbsp;            // Check if the username is null or blank
+&nbsp;            if (uiState.username.isNullOrBlank()) {
+&nbsp;                onboardingViewModel.blankUsernameGenerator{ generatedName -&gt;
+&nbsp;                    onboardingViewModel.onUsernameChange(generatedName)
+&nbsp;
+&nbsp;                    onboardingViewModel.handleFirstTimeSetup { onComplete() }
+&nbsp;                }
+&nbsp;            } else {
+&nbsp;                onboardingViewModel.handleFirstTimeSetup { onComplete() }
+&nbsp;            }
+&nbsp;
+&nbsp;            onboardingViewModel.handleFirstTimeSetup { onComplete() }
+&nbsp;        }) {
+&nbsp;            Text(&quot;Next&quot;)
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -68,7 +156,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-03-30 18:03</div>
+    <div style="float:right;">generated on 2026-03-30 18:31</div>
 </div>
 </body>
 </html>

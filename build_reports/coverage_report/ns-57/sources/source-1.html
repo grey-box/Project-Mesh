@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Kover HTML Report Coverage Report > CustomButtonKt</title>
+  <title>Kover HTML Report Coverage Report > ThemeKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
     <a href="../index.html">com.greybox.projectmesh.ui.theme</a>
 </div>
 
-<h1>Coverage Summary for Class: CustomButtonKt (com.greybox.projectmesh.ui.theme)</h1>
+<h1>Coverage Summary for Class: ThemeKt (com.greybox.projectmesh.ui.theme)</h1>
 
 <table class="coverageStats">
 <tr>
@@ -33,7 +33,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 </th>
 </tr>
 <tr>
-  <td class="name">CustomButtonKt</td>
+  <td class="name">ThemeKt</td>
     <td class="coverageStat"/>
 </tr>
 
@@ -46,163 +46,68 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.ui.theme
 &nbsp;
-&nbsp;import androidx.compose.animation.core.animateFloatAsState
-&nbsp;import androidx.compose.foundation.BorderStroke
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.clickable
-&nbsp;import androidx.compose.foundation.layout.*
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material3.Button
-&nbsp;import androidx.compose.material3.ButtonDefaults
-&nbsp;import androidx.compose.material3.Text
+&nbsp;import androidx.compose.foundation.isSystemInDarkTheme
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.LaunchedEffect
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
-&nbsp;import androidx.compose.runtime.setValue
-&nbsp;import androidx.compose.ui.Alignment
-&nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.draw.scale
-&nbsp;import androidx.compose.ui.draw.shadow
-&nbsp;import androidx.compose.ui.graphics.Brush
+&nbsp;import androidx.compose.material3.*
 &nbsp;import androidx.compose.ui.graphics.Color
-&nbsp;import androidx.compose.ui.text.font.FontWeight
-&nbsp;import androidx.compose.ui.unit.Dp
-&nbsp;import androidx.compose.ui.unit.dp
-&nbsp;import androidx.compose.ui.unit.sp
-&nbsp;import kotlinx.coroutines.delay
 &nbsp;
 &nbsp;/**
-&nbsp; * A transparent button with white background and black text.
-&nbsp; * Optional rounded corners and full-width by default.
+&nbsp; * Dark color scheme for the app.
 &nbsp; */
-&nbsp;@Composable
-&nbsp;fun TransparentButton(
-&nbsp;    onClick: () -&gt; Unit,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    text: String,
-&nbsp;    enabled: Boolean = false
-&nbsp;) {
-&nbsp;    Button(
-&nbsp;        onClick = onClick,
-&nbsp;        colors = ButtonDefaults.buttonColors(
-&nbsp;            containerColor = Color.White, // White background
-&nbsp;            contentColor = Color.Black    // Black text
-&nbsp;        ),
-&nbsp;        border = BorderStroke(1.dp, Color.Black), // Black border
-&nbsp;        shape = RoundedCornerShape(8.dp), // Rounded corners
-&nbsp;        modifier = modifier.fillMaxWidth(), // Fill max width by default
-&nbsp;        enabled = enabled
-&nbsp;    ) {
-&nbsp;        Text(text = text)
-&nbsp;    }
+&nbsp;private val DarkColorScheme = darkColorScheme(
+&nbsp;    primary = Color(0xFFBB86FC),
+&nbsp;    secondary = Color(0xFF03DAC5),
+&nbsp;    background = Color(0xFF121212),
+&nbsp;    surface = Color(0xFF121212),
+&nbsp;    onPrimary = Color.Black,
+&nbsp;    onSecondary = Color.Black,
+&nbsp;    onBackground = Color.White,
+&nbsp;    onSurface = Color.White
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Light color scheme for the app.
+&nbsp; */
+&nbsp;private val LightColorScheme = lightColorScheme(
+&nbsp;    primary = Color(0xFF6200EE),
+&nbsp;    secondary = Color(0xFF03DAC5),
+&nbsp;    background = Color(0xFFFFFFFF),
+&nbsp;    surface = Color(0xFFFFFFFF),
+&nbsp;    onPrimary = Color.White,
+&nbsp;    onSecondary = Color.Black,
+&nbsp;    onBackground = Color.Black,
+&nbsp;    onSurface = Color.Black
+&nbsp;)
+&nbsp;
+&nbsp;/**
+&nbsp; * Enum to represent the app&#39;s theme choice.
+&nbsp; */
+&nbsp;enum class AppTheme {
+&nbsp;    SYSTEM, LIGHT, DARK
 &nbsp;}
 &nbsp;
 &nbsp;/**
-&nbsp; * A gradient button with press animation.
+&nbsp; * Apply ProjectMesh theme with the chosen AppTheme.
 &nbsp; *
-&nbsp; * @param text The label for the button.
-&nbsp; * @param gradientColors Colors to use for horizontal gradient background.
-&nbsp; * @param textColor Color of the text.
-&nbsp; * @param maxWidth Maximum width of the button.
-&nbsp; * @param onClick Action to perform when the button is clicked.
+&nbsp; * @param appTheme The selected theme (System, Light, Dark)
+&nbsp; * @param content The composable content to wrap with this theme
 &nbsp; */
 &nbsp;@Composable
-&nbsp;fun GradientButton(
-&nbsp;    text: String,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    gradientColors: List&lt;Color&gt; = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient
-&nbsp;    textColor: Color = Color.White,
-&nbsp;    maxWidth: Dp = 120.dp,
-&nbsp;    onClick: () -&gt; Unit
+&nbsp;fun ProjectMeshTheme(
+&nbsp;    appTheme: AppTheme,
+&nbsp;    content: @Composable () -&gt; Unit
 &nbsp;) {
-&nbsp;    var isPressed by remember { mutableStateOf(false) }
-&nbsp;    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down on press
-&nbsp;
-&nbsp;    LaunchedEffect(isPressed) {
-&nbsp;        if (isPressed) {
-&nbsp;            delay(100) // Short delay to show pressed effect
-&nbsp;            isPressed = false
-&nbsp;        }
+&nbsp;    val darkTheme = when (appTheme) {
+&nbsp;        AppTheme.SYSTEM -&gt; isSystemInDarkTheme() // Follow system setting
+&nbsp;        AppTheme.LIGHT -&gt; false
+&nbsp;        AppTheme.DARK -&gt; true
 &nbsp;    }
 &nbsp;
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .scale(scale)
-&nbsp;            .shadow(8.dp, RoundedCornerShape(12.dp)) // Shadow effect
-&nbsp;            .background(
-&nbsp;                brush = Brush.horizontalGradient(gradientColors),
-&nbsp;                shape = RoundedCornerShape(12.dp)
-&nbsp;            )
-&nbsp;            .height(50.dp)
-&nbsp;            .widthIn(min = 120.dp, max = maxWidth)
-&nbsp;            .padding(horizontal = 16.dp)
-&nbsp;            .clickable {
-&nbsp;                isPressed = true
-&nbsp;                onClick()
-&nbsp;            },
-&nbsp;        contentAlignment = Alignment.Center // Center the text
-&nbsp;    ) {
-&nbsp;        Text(
-&nbsp;            text = text,
-&nbsp;            color = textColor,
-&nbsp;            fontSize = 14.sp,
-&nbsp;            fontWeight = FontWeight.Bold,
-&nbsp;            maxLines = 1,
-&nbsp;            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;/**
-&nbsp; * A full-width gradient button with press animation.
-&nbsp; *
-&nbsp; * Similar to GradientButton but fills the available width.
-&nbsp; */
-&nbsp;@Composable
-&nbsp;fun GradientLongButton(
-&nbsp;    text: String,
-&nbsp;    modifier: Modifier = Modifier,
-&nbsp;    gradientColors: List&lt;Color&gt; = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient
-&nbsp;    textColor: Color = Color.White,
-&nbsp;    onClick: () -&gt; Unit
-&nbsp;) {
-&nbsp;    var isPressed by remember { mutableStateOf(false) }
-&nbsp;    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down on press
-&nbsp;
-&nbsp;    LaunchedEffect(isPressed) {
-&nbsp;        if (isPressed) {
-&nbsp;            delay(100)
-&nbsp;            isPressed = false
-&nbsp;        }
-&nbsp;    }
-&nbsp;
-&nbsp;    Box(
-&nbsp;        modifier = modifier
-&nbsp;            .fillMaxWidth() // Fill the full width
-&nbsp;            .scale(scale)
-&nbsp;            .shadow(8.dp, RoundedCornerShape(12.dp))
-&nbsp;            .background(
-&nbsp;                brush = Brush.horizontalGradient(gradientColors),
-&nbsp;                shape = RoundedCornerShape(12.dp)
-&nbsp;            )
-&nbsp;            .height(50.dp)
-&nbsp;            .clickable {
-&nbsp;                isPressed = true
-&nbsp;                onClick()
-&nbsp;            },
-&nbsp;        contentAlignment = Alignment.Center
-&nbsp;    ) {
-&nbsp;        Text(
-&nbsp;            text = text,
-&nbsp;            color = textColor,
-&nbsp;            fontSize = 14.sp,
-&nbsp;            fontWeight = FontWeight.Bold,
-&nbsp;            maxLines = 1,
-&nbsp;            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
-&nbsp;        )
-&nbsp;    }
+&nbsp;    MaterialTheme(
+&nbsp;        colorScheme = if (darkTheme) DarkColorScheme else LightColorScheme,
+&nbsp;        typography = Typography, // Apply predefined typography
+&nbsp;        content = content
+&nbsp;    )
 &nbsp;}
 </code>
 </pre>
@@ -227,7 +132,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-03-30 18:03</div>
+    <div style="float:right;">generated on 2026-03-30 18:31</div>
 </div>
 </body>
 </html>
