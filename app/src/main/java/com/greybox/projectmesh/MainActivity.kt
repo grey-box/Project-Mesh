@@ -3,7 +3,6 @@ package com.greybox.projectmesh
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
@@ -105,7 +104,6 @@ class MainActivity : ComponentActivity(), DIAware {
         super.onCreate(savedInstanceState)
         // crash screen
         CrashHandler.init(applicationContext, CrashScreenActivity::class.java)
-        val settingPref: SharedPreferences by di.instance(tag = "settings")
         val appServer: AppServer by di.instance()
         // Run this task asynchronously (default directory creation)
         lifecycleScope.launch(Dispatchers.IO) {
@@ -125,10 +123,10 @@ class MainActivity : ComponentActivity(), DIAware {
                 )
             )
 
-// Observe state from ViewModel
+            // Observe state from ViewModel
             val uiState by mainViewModel.uiState.collectAsState()
 
-// Use state from ViewModel instead of local state
+            // Use state from ViewModel instead of local state
             val hasRunBefore = uiState.hasRunBefore
             val currentScreen = uiState.currentScreen
             val deviceName = uiState.deviceName
@@ -136,8 +134,11 @@ class MainActivity : ComponentActivity(), DIAware {
             val languageCode = uiState.languageCode
             val autoFinish = uiState.autoFinish
             val saveToFolder = uiState.saveToFolder
+            val launchedFromNotification =
+                intent?.getStringExtra("navigateTo") == BottomNavItem.Receive.route ||
+                        intent?.action == "OPEN_CHAT_SCREEN" ||
+                        intent?.action == "OPEN_CHAT_CONVERSATION"
 
-            val meshPrefs = getSharedPreferences("project_mesh_prefs", MODE_PRIVATE)
             var restartServerKey by remember { mutableStateOf(0) }
             var localeState by rememberSaveable { mutableStateOf(Locale.getDefault()) }
 
@@ -185,6 +186,8 @@ class MainActivity : ComponentActivity(), DIAware {
             }
             key(localeState) {
                 ProjectMeshTheme(appTheme = AppTheme.valueOf(appTheme)) {
+                    RequestPermissionsScreen(skipPermissions = launchedFromNotification)
+
                     if (!hasRunBefore) {
                         OnboardingScreen(
                             onComplete = {mainViewModel.onEvent(MeshUiEvent.CompleteOnboarding)
@@ -202,8 +205,8 @@ class MainActivity : ComponentActivity(), DIAware {
                             onRestartServer = {restartServerKey++},
                             onDeviceNameChange = {newName -> mainViewModel.onEvent(MeshUiEvent.UpdateDeviceName(newName)) },
                             deviceName = deviceName,
-                            onAutoFinishChange = { autoFinishValue -> settingPref.edit().putBoolean("auto_finish", autoFinishValue).apply() },
-                                onSaveToFolderChange = {saveToFolder -> settingPref.edit().putString("save_to_folder", saveToFolder).apply() }
+                            onAutoFinishChange = { autoFinishValue -> mainViewModel.onEvent(MeshUiEvent.UpdateAutoFinish(autoFinishValue)) },
+                            onSaveToFolderChange = { saveToFolder -> mainViewModel.onEvent(MeshUiEvent.UpdateSaveToFolder(saveToFolder)) }
                         )
                     }
                 }
@@ -477,8 +480,8 @@ fun BottomNavApp(di: DI,
 
 @Composable
 fun ConversationChatScreen (
-        conversationId: String,
-        onBackClick: () -> Unit
+    conversationId: String,
+    onBackClick: () -> Unit
 ){
     Log.d("ConversationChatScreen", "Starting to load conversation: $conversationId")
 
@@ -636,4 +639,3 @@ fun ConversationChatScreen (
         )
     )
 }
-

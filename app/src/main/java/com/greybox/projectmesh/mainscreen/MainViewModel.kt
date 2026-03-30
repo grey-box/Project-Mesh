@@ -25,34 +25,24 @@ class MainViewModel(
     private val node: AndroidVirtualNode by di.instance()
 
     // Private mutable state
-    private val _uiState = MutableStateFlow(MeshUiState())
+    private val _uiState = MutableStateFlow(
+        MeshUiState(
+            deviceName = settingPrefs.getString("device_name", Build.MODEL) ?: Build.MODEL,
+            appTheme = settingPrefs.getString("app_theme", "SYSTEM") ?: "SYSTEM",
+            languageCode = settingPrefs.getString("language", "en") ?: "en",
+            autoFinish = settingPrefs.getBoolean("auto_finish", false),
+            saveToFolder = settingPrefs.getString("save_to_folder", null)
+                ?: "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh",
+            hasRunBefore = meshPrefs.getBoolean("hasRunBefore", false)
+        )
+    )
 
     // Public immutable state
     val uiState: StateFlow<MeshUiState> = _uiState.asStateFlow()
 
     init {
         Log.d(TAG, "MainViewModel initialized")
-        loadInitialState()
         observeMeshNetwork()
-    }
-
-    /**
-     * Load initial state from SharedPreferences
-     */
-    private fun loadInitialState() {
-        viewModelScope.launch {
-            _uiState.update { state ->
-                state.copy(
-                    deviceName = settingPrefs.getString("device_name", Build.MODEL) ?: Build.MODEL,
-                    appTheme = settingPrefs.getString("app_theme", "SYSTEM") ?: "SYSTEM",
-                    languageCode = settingPrefs.getString("language", "en") ?: "en",
-                    autoFinish = settingPrefs.getBoolean("auto_finish", false),
-                    saveToFolder = settingPrefs.getString("save_to_folder", null)
-                        ?: "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh",
-                    hasRunBefore = meshPrefs.getBoolean("hasRunBefore", false)
-                )
-            }
-        }
     }
 
     /**
