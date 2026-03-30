@@ -1,4 +1,4 @@
-name: Lint Code Base
+name: Lint Kotlin Code (Gradle Linter)
 run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
 
 on:
@@ -21,7 +21,7 @@ on:
 
 # cancel any previously-started, yet still active runs of this workflow on the same branch
 concurrency:
-  group: ${{ github.ref }}-Lint Code Base
+  group: ${{ github.ref }}-Lint Kotlin Code (Gradle Linter)
   cancel-in-progress: true
 
 permissions: read-all
@@ -97,11 +97,3 @@ jobs:
           name: lint_report_release_artifact
           path: ./app/build/reports/lint-results-release.html
           retention-days: 1
-
-  call-super-linter:
-    name: Call Super-Linter
-    permissions:
-      contents: read 
-      statuses: write 
-
-    uses: ./.github/workflows/super_lint.yml

@@ -23,9 +23,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format-and-lint:
-    name: Format and Lint
-    uses: ./.github/workflows/format_and_lint.yml
+  lint-kotlin:
+    name: Lint Kotlin (Gradle Linter)
+    uses: ./.github/workflows/call_gradle_lint.yml
     with:
       skip_commit: true
 
@@ -49,10 +49,14 @@ jobs:
     name: Submit Dependency Graph
     uses: ./.github/workflows/submit_dependency_graph.yml
 
+  lint-codebase:
+    name: Lint Code Base (Super-Linter)
+    uses: ./.github/workflows/call_super_lint.yml
+
 
   finalize-report-viewer:
     name: Finalize Report Viewer
-    needs: [format-and-lint, test-and-report-coverage, build-documentation]
+    needs: [lint-kotlin, test-and-report-coverage, build-documentation]
     if: always()
     runs-on: ubuntu-latest
     permissions:

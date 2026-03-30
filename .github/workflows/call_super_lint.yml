@@ -1,0 +1,36 @@
+name: Lint Code Base (Super-Linter)
+run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
+
+on:
+  # run when called by another workflow
+  workflow_call:
+    inputs:
+      skip_commit:
+        description: "Skip committing reports"
+        required: false
+        type: boolean
+        default: false
+
+  # run on demand
+  workflow_dispatch:
+    inputs:
+      custom-run-name:
+        description: "Custom name for this Actions run"
+        required: false
+        type: string
+
+# cancel any previously-started, yet still active runs of this workflow on the same branch
+concurrency:
+  group: ${{ github.ref }}-Lint Code Base (Super-Linter)
+  cancel-in-progress: true
+
+permissions: read-all
+
+jobs:
+  call-super-linter:
+    name: Call Super-Linter
+    permissions:
+      contents: read 
+      statuses: write 
+
+    uses: ./.github/workflows/super_lint.yml
