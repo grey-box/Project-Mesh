@@ -1,10 +1,10 @@
 {
   "version" : 0,
   "job" : {
-    "id" : "23763704466",
+    "id" : "23764398133",
     "correlator" : "compile_build_reports-dependency-submission"
   },
-  "sha" : "74ca3022fe8f2c8debb72ff04dce65a8f4025096",
+  "sha" : "02497f880f892e5f9f160dfc123e6c3183d7ae76",
   "ref" : "refs/heads/feature/ras-cicd",
   "detector" : {
     "name" : "GitHub Dependency Graph Gradle Plugin",
@@ -2696,5 +2696,5 @@
       }
     }
   },
-  "scanned" : "2026-03-30T19:34:41Z"
+  "scanned" : "2026-03-30T19:51:01Z"
 }
