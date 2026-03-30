@@ -145,6 +145,7 @@ jobs:
       - name: Commit Reports to Viewing Directory
         run: |
           git add ./build_reports
+          git status
           git commit -m "Local commit for cherrypick"
           git switch gh-pages
           git cherry-pick -X theirs feature/ras-cicd
