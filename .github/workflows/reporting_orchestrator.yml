@@ -43,8 +43,12 @@ jobs:
 
   upload-apks:
     name: Upload APKs
-    # needs: build-and-test # uses cached build from prior job
     uses: ./.github/workflows/build_artifacts.yml
+
+  submit-dependency-graph:
+    name: Submit Dependency Graph
+    uses: ./.github/workflows/submit_dependency_graph.yml
+
 
   finalize-report-viewer:
     name: Finalize Report Viewer
