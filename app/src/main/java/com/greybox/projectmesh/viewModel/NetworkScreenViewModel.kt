@@ -8,6 +8,8 @@ import com.greybox.projectmesh.DeviceStatusManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
 import org.kodein.di.DI
 import com.greybox.projectmesh.server.AppServer
@@ -197,7 +199,9 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
     fun onNodeSelected(ipAddress: String) {
         viewModelScope.launch {
             try {
-                val addr = InetAddress.getByName(ipAddress)
+                val addr = withContext(Dispatchers.IO) {
+                    InetAddress.getByName(ipAddress)
+                }
                 appServer.requestRemoteUserInfo(addr)
                 appServer.pushUserInfoTo(addr)
             } catch (e: Exception) {
