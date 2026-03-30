@@ -9,14 +9,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.ViewModelFactory
-import com.greybox.projectmesh.viewModel.HomeScreenViewModel
 import com.greybox.projectmesh.viewModel.NetworkScreenModel
 import com.greybox.projectmesh.viewModel.NetworkScreenViewModel
 import org.kodein.di.compose.localDI
 import com.greybox.projectmesh.extension.WifiListItem
-import com.greybox.projectmesh.server.AppServer
-import java.net.InetAddress
-import org.kodein.di.instance
+
 
 @Composable
 fun NetworkScreen(
@@ -30,8 +27,7 @@ fun NetworkScreen(
 ) {
     // declare the UI state, we can use the uiState to access the current state of the viewModel
     val uiState: NetworkScreenModel by viewModel.uiState.collectAsState(initial = NetworkScreenModel())
-    val di = localDI()
-    val appServer: AppServer by di.instance()
+
 
     // display all the connected station
     LazyColumn{
@@ -43,12 +39,7 @@ fun NetworkScreen(
                 wifiAddress = eachItem.key,
                 wifiEntry = eachItem.value,
                 onClick = { ipAddress ->
-                    //request user info when clicking
-                    val addr = InetAddress.getByName(ipAddress)
-                    appServer.requestRemoteUserInfo(addr)
-                    appServer.pushUserInfoTo(addr)
-
-                    //Navigate to Ping Screen
+                    viewModel.onNodeSelected(ipAddress)
                     onNodeClick(ipAddress)
                 }
             )
