@@ -45,6 +45,8 @@ jobs:
 
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v5
+        with:
+          generate-job-summary: false
 
       - name: Call Debug and Release Linters
         # ostensibly, ./gradlew lint should run both, but in practice on my (Thalia Wood's), it only runs the Debug linter

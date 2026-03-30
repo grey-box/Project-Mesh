@@ -34,11 +34,10 @@ The CI pipeline behaves as follows:
 
 ### Backlog
 
-- Integrate with Dokka
 - Break workflows out into multiple intelligently-grouped jobs for improved execution visibility
 - Add graceful error handling if specific preview reports cannot be generated
 - Add graceful error handling to note that coverage reporting can only be generated on PRs and pushes, not workflow dispatches
 - Research if it's possible to ask to run workflows on any push
 
 ### Integration
-- add dokka
+

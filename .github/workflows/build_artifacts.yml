@@ -54,10 +54,10 @@ jobs:
           distribution: "temurin"
           java-version: "17"
 
-      # Configure Gradle for optimal use in GitHub Actions, including caching of downloaded dependencies.
-      # See: https://github.com/gradle/actions/blob/main/setup-gradle/README.md
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@af1da67850ed9a4cedd57bfd976089dd991e2582 # v4.0.0
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          generate-job-summary: false
 
       - name: Build with Gradle Wrapper
         run: ./gradlew assemble # use assemble because build runs tests, even though a different part of the system handles that
