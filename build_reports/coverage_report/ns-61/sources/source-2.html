@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Kover HTML Report Coverage Report > ComposableSingletons</title>
+  <title>Kover HTML Report Coverage Report > ChatNodeListScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
     <a href="../index.html">com.greybox.projectmesh.messaging.ui.screens</a>
 </div>
 
-<h1>Coverage Summary for Class: ComposableSingletons (com.greybox.projectmesh.messaging.ui.screens)</h1>
+<h1>Coverage Summary for Class: ChatNodeListScreenKt (com.greybox.projectmesh.messaging.ui.screens)</h1>
 
 <table class="coverageStats">
 
@@ -34,11 +34,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 </th>
 </tr>
   <tr>
-    <td class="name">ComposableSingletons$ChatScreenKt</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">ComposableSingletons$ConversationsHomeScreenKt</td>
+    <td class="name">ChatNodeListScreenKt$ChatNodeListScreen$2$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -50,7 +46,66 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 <br/>
 <br/>
 
-  <code class="sourceCode">Source code is not available<br /></code>
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.messaging.ui.screens
+&nbsp;
+&nbsp;import androidx.compose.foundation.lazy.LazyColumn
+&nbsp;import androidx.compose.foundation.lazy.items
+&nbsp;import androidx.compose.runtime.Composable
+&nbsp;import androidx.compose.runtime.collectAsState
+&nbsp;import androidx.compose.runtime.getValue
+&nbsp;import androidx.lifecycle.viewmodel.compose.viewModel
+&nbsp;import com.greybox.projectmesh.ViewModelFactory
+&nbsp;import com.greybox.projectmesh.viewModel.NetworkScreenViewModel
+&nbsp;import com.greybox.projectmesh.extension.WifiListItem
+&nbsp;import org.kodein.di.compose.localDI
+&nbsp;import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+&nbsp;import com.greybox.projectmesh.viewModel.NetworkScreenModel
+&nbsp;
+&nbsp;/**
+&nbsp; * Composable that displays a list of network nodes as clickable items.
+&nbsp; *
+&nbsp; * @param onNodeSelected Lambda invoked when a node is selected; passes the node&#39;s IP address as a [String].
+&nbsp; * @param viewModel Optional [NetworkScreenViewModel] instance to provide network node data.
+&nbsp; *                  Defaults to a ViewModel created with [ViewModelFactory] using the local DI context.
+&nbsp; */
+&nbsp;@Composable
+&nbsp;fun ChatNodeListScreen(
+&nbsp;    onNodeSelected: (String) -&gt; Unit,
+&nbsp;    // Reuse NetworkScreenViewModel in the same way as NetworkScreen
+&nbsp;    viewModel: NetworkScreenViewModel = viewModel(
+&nbsp;        factory = ViewModelFactory(
+&nbsp;            di = localDI(),
+&nbsp;            owner = LocalSavedStateRegistryOwner.current,
+&nbsp;            vmFactory = { di, savedStateHandle -&gt;
+&nbsp;                NetworkScreenViewModel(di, savedStateHandle)
+&nbsp;            },
+&nbsp;            defaultArgs = null
+&nbsp;        )
+&nbsp;    )
+&nbsp;) {
+&nbsp;    // Provide the same initial state you used in NetworkScreen
+&nbsp;    val uiState: NetworkScreenModel by viewModel.uiState.collectAsState(initial = NetworkScreenModel())
+&nbsp;
+&nbsp;    LazyColumn {
+&nbsp;        items(
+&nbsp;            items = uiState.allNodes.entries.toList(),
+&nbsp;            key = { it.key }
+&nbsp;        ) { nodeEntry -&gt;
+&nbsp;            // Tapping a WifiListItem calls &#39;onNodeSelected&#39; instead of onClickNetworkNode
+&nbsp;            WifiListItem(
+&nbsp;                wifiAddress = nodeEntry.key,
+&nbsp;                wifiEntry = nodeEntry.value,
+&nbsp;                onClick = { selectedIp -&gt;
+&nbsp;                    onNodeSelected(selectedIp)
+&nbsp;                }
+&nbsp;            )
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
 </div>
 
 <script type="text/javascript">
@@ -72,7 +127,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-03-30 22:37</div>
+    <div style="float:right;">generated on 2026-04-06 20:03</div>
 </div>
 </body>
 </html>

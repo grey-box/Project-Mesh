@@ -5,7 +5,7 @@
 <html id="htmlId">
 <head>
   <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
-  <title>Kover HTML Report Coverage Report > SendScreenKt</title>
+  <title>Kover HTML Report Coverage Report > PingScreenKt</title>
   <style type="text/css">
     @import "../../css/coverage.css";
     @import "../../css/idea.min.css";
@@ -22,7 +22,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
     <a href="../index.html">com.greybox.projectmesh.views</a>
 </div>
 
-<h1>Coverage Summary for Class: SendScreenKt (com.greybox.projectmesh.views)</h1>
+<h1>Coverage Summary for Class: PingScreenKt (com.greybox.projectmesh.views)</h1>
 
 <table class="coverageStats">
 
@@ -34,23 +34,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 </th>
 </tr>
   <tr>
-    <td class="name">SendScreenKt$DisplayAllPendingTransfers$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SendScreenKt$DisplayAllPendingTransfers$1$2$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SendScreenKt$DisplayAllPendingTransfers$1$2$1$1</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SendScreenKt$DisplayAllPendingTransfers$1$2$1$1$2</td>
-    <td class="coverageStat"/>
-  </tr>
-  <tr>
-    <td class="name">SendScreenKt$DisplayAllPendingTransfers$1$2$swipeState$1</td>
+    <td class="name">PingScreenKt$PingScreen$2$1</td>
     <td class="coverageStat"/>
   </tr>
 <tr>
@@ -66,214 +50,61 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 <pre>
 <code class="sourceCode" id="sourceCode">&nbsp;package com.greybox.projectmesh.views
 &nbsp;
-&nbsp;import android.net.Uri
-&nbsp;import androidx.activity.compose.rememberLauncherForActivityResult
-&nbsp;import androidx.activity.result.contract.ActivityResultContracts
-&nbsp;import androidx.compose.animation.AnimatedVisibility
-&nbsp;import androidx.compose.animation.core.LinearOutSlowInEasing
-&nbsp;import androidx.compose.animation.core.tween
-&nbsp;import androidx.compose.animation.fadeOut
-&nbsp;import androidx.compose.foundation.ExperimentalFoundationApi
-&nbsp;import androidx.compose.foundation.background
-&nbsp;import androidx.compose.foundation.border
-&nbsp;import androidx.compose.foundation.layout.Box
-&nbsp;import androidx.compose.foundation.layout.Column
-&nbsp;import androidx.compose.foundation.layout.fillMaxSize
+&nbsp;import androidx.compose.foundation.layout.Row
+&nbsp;import androidx.compose.foundation.layout.Spacer
 &nbsp;import androidx.compose.foundation.layout.fillMaxWidth
-&nbsp;import androidx.compose.foundation.layout.height
-&nbsp;import androidx.compose.foundation.layout.padding
-&nbsp;import androidx.compose.foundation.layout.size
+&nbsp;import androidx.compose.foundation.layout.width
 &nbsp;import androidx.compose.foundation.lazy.LazyColumn
 &nbsp;import androidx.compose.foundation.lazy.items
-&nbsp;import androidx.compose.foundation.shape.RoundedCornerShape
-&nbsp;import androidx.compose.material.icons.Icons
-&nbsp;import androidx.compose.material.icons.filled.Delete
-&nbsp;import androidx.compose.material3.DismissValue
-&nbsp;import androidx.compose.material3.ExperimentalMaterial3Api
-&nbsp;import androidx.compose.material3.HorizontalDivider
-&nbsp;import androidx.compose.material3.Icon
-&nbsp;import androidx.compose.material3.ListItem
-&nbsp;import androidx.compose.material3.SwipeToDismiss
-&nbsp;import androidx.compose.material3.SwipeToDismissBox
-&nbsp;import androidx.compose.material3.SwipeToDismissBoxValue
+&nbsp;import androidx.compose.material3.Button
 &nbsp;import androidx.compose.material3.Text
-&nbsp;import androidx.compose.material3.rememberSwipeToDismissBoxState
 &nbsp;import androidx.compose.runtime.Composable
-&nbsp;import androidx.compose.runtime.LaunchedEffect
 &nbsp;import androidx.compose.runtime.collectAsState
 &nbsp;import androidx.compose.runtime.getValue
-&nbsp;import androidx.compose.runtime.mutableStateOf
-&nbsp;import androidx.compose.runtime.remember
-&nbsp;import androidx.compose.runtime.rememberCoroutineScope
-&nbsp;import androidx.compose.runtime.setValue
-&nbsp;import androidx.compose.ui.Alignment
 &nbsp;import androidx.compose.ui.Modifier
-&nbsp;import androidx.compose.ui.graphics.Brush
-&nbsp;import androidx.compose.ui.graphics.Color
+&nbsp;import androidx.compose.ui.platform.LocalContext
 &nbsp;import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-&nbsp;import androidx.compose.ui.res.stringResource
 &nbsp;import androidx.compose.ui.unit.dp
 &nbsp;import androidx.lifecycle.viewmodel.compose.viewModel
-&nbsp;import com.greybox.projectmesh.GlobalApp
-&nbsp;import com.greybox.projectmesh.R
 &nbsp;import com.greybox.projectmesh.ViewModelFactory
-&nbsp;import com.greybox.projectmesh.ui.theme.TransparentButton
-&nbsp;import com.greybox.projectmesh.viewModel.SendScreenModel
-&nbsp;import com.greybox.projectmesh.viewModel.SendScreenViewModel
-&nbsp;import kotlinx.coroutines.delay
-&nbsp;import kotlinx.coroutines.launch
-&nbsp;import kotlinx.coroutines.runBlocking
+&nbsp;import com.greybox.projectmesh.viewModel.PingScreenModel
+&nbsp;import com.greybox.projectmesh.viewModel.PingScreenViewModel
+&nbsp;import com.ustadmobile.meshrabiya.ext.addressToDotNotation
+&nbsp;import com.ustadmobile.meshrabiya.mmcp.MmcpOriginatorMessage
 &nbsp;import org.kodein.di.compose.localDI
+&nbsp;import java.net.InetAddress
 &nbsp;
 &nbsp;@Composable
-&nbsp;fun SendScreen(
-&nbsp;    onSwitchToSelectDestNode: (List&lt;Uri&gt;) -&gt; Unit,
-&nbsp;    viewModel: SendScreenViewModel = viewModel(
+&nbsp;fun PingScreen(
+&nbsp;    virtualAddress: InetAddress,
+&nbsp;    viewModel: PingScreenViewModel = viewModel(
 &nbsp;        factory = ViewModelFactory(
 &nbsp;            di = localDI(),
 &nbsp;            owner = LocalSavedStateRegistryOwner.current,
-&nbsp;            vmFactory = { di, savedStateHandle -&gt; SendScreenViewModel(di, savedStateHandle, onSwitchToSelectDestNode)},
-&nbsp;            defaultArgs = null,
+&nbsp;            vmFactory = { di, savedStateHandle -&gt; PingScreenViewModel(di, savedStateHandle, virtualAddress) },
+&nbsp;            defaultArgs = null
 &nbsp;        )
-&nbsp;    ),
+&nbsp;    )
 &nbsp;) {
-&nbsp;    // declare the UI state
-&nbsp;    val uiState: SendScreenModel by viewModel.uiState.collectAsState(SendScreenModel())
-&nbsp;    // File picker launcher
-&nbsp;    val openDocumentLauncher = rememberLauncherForActivityResult(
-&nbsp;        ActivityResultContracts.OpenMultipleDocuments()
-&nbsp;    ){ uris -&gt;
-&nbsp;        if (uris.isNotEmpty()){
-&nbsp;            viewModel.onFileChosen(uris)
-&nbsp;        }
-&nbsp;    }
-&nbsp;    Box(modifier = Modifier.fillMaxSize()){
-&nbsp;        Column(modifier = Modifier
-&nbsp;            .fillMaxSize()
-&nbsp;            .padding(bottom = 72.dp)) {
-&nbsp;            DisplayAllPendingTransfers(viewModel, uiState)
-&nbsp;        }
-&nbsp;        TransparentButton(onClick = { openDocumentLauncher.launch(arrayOf(&quot;*/*&quot;)) },
-&nbsp;            modifier = Modifier
-&nbsp;                .align(Alignment.BottomCenter)
-&nbsp;                .padding(16.dp),
-&nbsp;            text = stringResource(id = R.string.send_file),
-&nbsp;            enabled = true
-&nbsp;        )
-&nbsp;    }
-&nbsp;}
+&nbsp;    // declare the UI state, we can use the uiState to access the current state of the viewModel
+&nbsp;    val uiState: PingScreenModel by viewModel.uiState.collectAsState(initial = PingScreenModel())
 &nbsp;
-&nbsp;@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
-&nbsp;@Composable
-&nbsp;// Display all the pending transfers
-&nbsp;fun DisplayAllPendingTransfers(
-&nbsp;    viewModel: SendScreenViewModel,
-&nbsp;    uiState: SendScreenModel,
-&nbsp;){
-&nbsp;    val coroutineScope = rememberCoroutineScope()
-&nbsp;    LazyColumn {
-&nbsp;        items(
-&nbsp;            items = uiState.outgoingTransfers,
-&nbsp;            key = { it.id }
-&nbsp;        ) {transfer -&gt;
-&nbsp;            var isVisible by remember { mutableStateOf(true) }
-&nbsp;            val swipeState = rememberSwipeToDismissBoxState(
-&nbsp;                confirmValueChange = { dismissValue -&gt;
-&nbsp;                    if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-&nbsp;                        coroutineScope.launch {
-&nbsp;                            isVisible = false // Start fade-out animation
-&nbsp;                            delay(300)
-&nbsp;                            viewModel.onDelete(transfer) // Remove item on swipe
-&nbsp;                        }
-&nbsp;                        true
-&nbsp;                    } else {
-&nbsp;                        false
-&nbsp;                    }
-&nbsp;                }
-&nbsp;            )
-&nbsp;            AnimatedVisibility(
-&nbsp;                visible = isVisible,
-&nbsp;                exit = fadeOut(animationSpec = tween(300)),
-&nbsp;                modifier = Modifier.animateItemPlacement()
-&nbsp;            ){
-&nbsp;                SwipeToDismissBox(
-&nbsp;                    state = swipeState,
-&nbsp;                    enableDismissFromStartToEnd = false, // Allow swipe only from right to left
-&nbsp;                    enableDismissFromEndToStart = true,
-&nbsp;                    backgroundContent = {
-&nbsp;                        Box(
-&nbsp;                            modifier = Modifier
-&nbsp;                                .fillMaxSize()
-&nbsp;                                .height(64.dp) // Controls the red background size
-&nbsp;                                .padding(vertical = 8.dp) // Prevents red from touching top &amp; bottom
-&nbsp;                                .background(Color.Red, shape = RoundedCornerShape(12.dp))
-&nbsp;                                .border(width = 0.dp, color = Color.Transparent, shape = RoundedCornerShape(12.dp)),
-&nbsp;                            contentAlignment = Alignment.CenterEnd
-&nbsp;                        ) {
-&nbsp;                            Icon(
-&nbsp;                                imageVector = Icons.Default.Delete,
-&nbsp;                                contentDescription = &quot;Delete&quot;,
-&nbsp;                                tint = Color.White,
-&nbsp;                                modifier = Modifier.size(32.dp).padding(end = 6.dp)
-&nbsp;                            )
-&nbsp;                        }
-&nbsp;                    },
-&nbsp;                    content = {
-&nbsp;                        ListItem(
-&nbsp;                            headlineContent = { Text(transfer.name) },
-&nbsp;                            supportingContent = {
-&nbsp;                                Column {
-&nbsp;                                    val byteTransferred: Int = transfer.transferred
-&nbsp;                                    val byteSize: Int = transfer.size
-&nbsp;                                    val toHostAddress = transfer.toHost.hostAddress
-&nbsp;                                    val deviceName = toHostAddress?.let { ipStr -&gt;
-&nbsp;                                        runBlocking {
-&nbsp;                                            GlobalApp.GlobalUserRepo.userRepository.getUserByIp(ipStr)?.name
-&nbsp;                                        }
-&nbsp;                                    }
-&nbsp;//                                    val deviceName = toHostAddress?.let {
-&nbsp;//                                        GlobalApp.DeviceInfoManager.getDeviceName(it)
-&nbsp;//                                    }
-&nbsp;                                    if (deviceName != null) {
-&nbsp;                                        Text(&quot;To: ${deviceName} (${toHostAddress})&quot;)
-&nbsp;                                    } else {
-&nbsp;                                        Text(&quot;To: Loading... (${toHostAddress})&quot;)
-&nbsp;                                    }
-&nbsp;                                    Text(stringResource(id = R.string.status) + &quot;: ${transfer.status}&quot;)
-&nbsp;                                    Text(stringResource(id = R.string.send) + &quot;: ${autoConvertByte(byteTransferred)} / ${autoConvertByte(byteSize)}&quot;)
-&nbsp;                                }
-&nbsp;                            },
-&nbsp;                            modifier = Modifier.padding(vertical = 4.dp)
-&nbsp;                        )
-&nbsp;                    },
-&nbsp;                )
-&nbsp;                HorizontalDivider()
+&nbsp;    // display all ping information
+&nbsp;    LazyColumn{
+&nbsp;        item{
+&nbsp;            Row(modifier = Modifier.fillMaxWidth()){
+&nbsp;                Text(text = &quot;Device name: ${uiState.deviceName}, IP address: ${uiState.virtualAddress.hostAddress}&quot;)
 &nbsp;            }
 &nbsp;        }
-&nbsp;    }
-&nbsp;}
-&nbsp;
-&nbsp;fun autoConvertByte(byteSize: Int): String{
-&nbsp;    val kb = Math.round(byteSize / 1024.0 * 100) / 100.0
-&nbsp;    val mb = Math.round((byteSize / (1024.0 * 1024.0) * 100) / 100.0)
-&nbsp;    if (byteSize == 0){
-&nbsp;        return &quot;0B&quot;
-&nbsp;    }
-&nbsp;    else if (mb &lt; 1){
-&nbsp;        return &quot;${kb}KB&quot;
-&nbsp;    }
-&nbsp;    return &quot;${mb}MB&quot;
-&nbsp;}
-&nbsp;
-&nbsp;fun autoConvertMS(ms: Int): String {
-&nbsp;    val second = Math.round(ms / 1000.0 * 100) / 100.0
-&nbsp;    val minute = Math.round((second / 60.0) * 100) / 100.0
-&nbsp;    return if (second &gt;= 1 &amp;&amp; minute &lt; 1) {
-&nbsp;        &quot;${second}s&quot;
-&nbsp;    } else if (minute &gt;= 1) {
-&nbsp;        &quot;${minute}m&quot;
-&nbsp;    } else {
-&nbsp;        &quot;${ms}ms&quot;
+&nbsp;        items(
+&nbsp;            items = uiState.allOriginatorMessages
+&nbsp;        ){ originatorMessage -&gt;
+&nbsp;            val mmcpMessage: MmcpOriginatorMessage = originatorMessage.originatorMessage
+&nbsp;            Spacer(modifier = Modifier.width(4.dp))
+&nbsp;            Row(modifier = Modifier.fillMaxWidth()){
+&nbsp;                Text(text = &quot;Ping: ${mmcpMessage.pingTimeSum}ms, hops: ${originatorMessage.hopCount}, last hop: ${originatorMessage.lastHopAddr.addressToDotNotation()}, id: ${mmcpMessage.messageId}&quot;)
+&nbsp;            }
+&nbsp;        }
 &nbsp;    }
 &nbsp;}
 </code>
@@ -299,7 +130,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-03-30 22:37</div>
+    <div style="float:right;">generated on 2026-04-06 20:03</div>
 </div>
 </body>
 </html>
