@@ -75,4 +75,6 @@
     <string name="manual_test">Test manuel</string>
     <string name="reset">Réinitialiser</string>
     <string name="log">Registre</string>
+
+    <string name="text_view">TextView</string>
 </resources>

@@ -56,4 +56,6 @@
 
     <string name="chat">聊天</string>
 
+    <string name="text_view">TextView</string>
+
 </resources>

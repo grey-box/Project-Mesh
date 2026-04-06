@@ -63,4 +63,6 @@
     <string name="log">Registro</string>
 
     <string name="chat">Chat</string>
+
+    <string name="text_view">TextView</string>
 </resources>
