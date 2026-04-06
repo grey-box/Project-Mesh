@@ -29,22 +29,15 @@ The CI pipeline behaves as follows:
 - Add script to preview to change iFrame title and onscreen title + pass/fail indicator
 - For orchestrator
   - determine how to allow multiple reusable workflows to share build cache
-  - add link to super-linter actions output
-  - onsider whether to delete reports files after use
   - add setting on manual run whether to commit anything/deploy to pages
-- replace build-artifacts setup gradle with coverage setup gradle
-- Prevent any non-main commits from showing in the Pages preview, but build in a system to view the webpage from any commit iteration and branch.
+
 
 ### Backlog
 
-- Integrate with Dokka
-- Test auto UML diagramming
 - Break workflows out into multiple intelligently-grouped jobs for improved execution visibility
 - Add graceful error handling if specific preview reports cannot be generated
 - Add graceful error handling to note that coverage reporting can only be generated on PRs and pushes, not workflow dispatches
 - Research if it's possible to ask to run workflows on any push
-- Alter pages commit process to commit build_reports to gh-pages and not main, so it stays off main and avoids double-commits and extra fetches
 
 ### Integration
-- add dokka
-- add uml to previewer
+

@@ -1,4 +1,4 @@
-name: Lint Code Base
+name: Lint Kotlin Code (Gradle Linter)
 run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
 
 on:
@@ -21,7 +21,7 @@ on:
 
 # cancel any previously-started, yet still active runs of this workflow on the same branch
 concurrency:
-  group: ${{ github.ref }}-Lint Code Base
+  group: ${{ github.ref }}-Lint Kotlin Code (Gradle Linter)
   cancel-in-progress: true
 
 permissions: read-all
@@ -45,6 +45,8 @@ jobs:
 
       - name: Set Up Gradle
         uses: gradle/actions/setup-gradle@v5
+        with:
+          add-job-summary: never
 
       - name: Call Debug and Release Linters
         # ostensibly, ./gradlew lint should run both, but in practice on my (Thalia Wood's), it only runs the Debug linter
@@ -97,16 +99,3 @@ jobs:
           name: lint_report_release_artifact
           path: ./app/build/reports/lint-results-release.html
           retention-days: 1
-
-  call-super-linter:
-    name: Call Super-Linter
-    permissions:
-      contents: read # clone the repo to lint
-      statuses: write # read/write to repo custom statuses
-
-    uses: ./.github/workflows/super_lint.yml
-
-    # with:
-    ### A regex to exclude files from linting
-    ### defaults to empty
-    # filter-regex-exclude:

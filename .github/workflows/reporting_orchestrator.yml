@@ -23,9 +23,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  format-and-lint:
-    name: Format and Lint
-    uses: ./.github/workflows/format_and_lint.yml
+  lint-kotlin:
+    name: Lint Kotlin (Gradle Linter)
+    uses: ./.github/workflows/call_gradle_lint.yml
     with:
       skip_commit: true
 
@@ -43,12 +43,20 @@ jobs:
 
   upload-apks:
     name: Upload APKs
-    # needs: build-and-test # uses cached build from prior job
     uses: ./.github/workflows/build_artifacts.yml
+
+  submit-dependency-graph:
+    name: Submit Dependency Graph
+    uses: ./.github/workflows/submit_dependency_graph.yml
+
+  lint-codebase:
+    name: Lint Code Base (Super-Linter)
+    uses: ./.github/workflows/call_super_lint.yml
+
 
   finalize-report-viewer:
     name: Finalize Report Viewer
-    needs: [format-and-lint, test-and-report-coverage, build-documentation]
+    needs: [lint-kotlin, test-and-report-coverage, build-documentation]
     if: always()
     runs-on: ubuntu-latest
     permissions:
@@ -58,16 +66,16 @@ jobs:
       pages: write
     environment:
       name: github-pages
-      url: ${{steps.deployment.outputs.page_url}}
+      url: ${{ steps.set-pages-link.outputs.pages-link }}
     steps:
       - name: Check Out Code
         uses: actions/checkout@v6
         with:
           fetch-depth: 0 # necessary to allow branch switching
 
-      - name: Ensure Report Dir is Empty
+      - name: Ensure Report Dir is Empty # add files NOT to delete each run to the list below
         run: |
-          export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore"
+          export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore:./build_reports/include_html.js"
           rm -rf ./build_reports/*
           unset GLOBIGNORE
 
@@ -117,6 +125,11 @@ jobs:
           mkdir ./build_reports/documentation
           cp -a ./build_reports/dokka_documentation_artifact/. ./build_reports/documentation/
           rm -r ./build_reports/dokka_documentation_artifact
+
+          echo "----"
+          ls ./build_reports
+          echo "----"
+          ls ./build_reports/documentation
       
       - name: Write Timestamp
         run: |
@@ -131,10 +144,12 @@ jobs:
 
       - name: Commit Reports to Viewing Directory
         run: |
+          git rm -r --cached ./build_reports
           git add ./build_reports
+          git status
           git commit -m "Local commit for cherrypick"
           git switch gh-pages
-          git cherry-pick -X theirs feature/ras-cicd
+          git cherry-pick -X theirs ${{ github.ref_name }}
           git push
         # TODO: figure out how to cherrypick the calling branch, instead of the cicd branch
         # this cherrypick will pull the committed build_reports files off the top of the CICD branch
@@ -150,9 +165,15 @@ jobs:
       #   id: deployment
       #   uses: actions/deploy-pages@v4
 
+      - name: Define Pages Link on Success
+        id: set-pages-link
+        run: |
+          echo "pages-link=https://grey-box.github.io/Project-Mesh/" >> $GITHUB_OUTPUT
+
       - name: Link Pages in Build Summary
         run: |
-          echo "All reports can be viewed at ${{ steps.deployment.outputs.page_url }}" >> $GITHUB_STEP_SUMMARY
+          echo "All reports can be viewed at ${{ steps.set-pages-link.outputs.pages-link }} about 30s after this workflow is completed" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
           echo "---" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
+  
