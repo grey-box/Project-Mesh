@@ -65,7 +65,7 @@ jobs:
         with:
           fetch-depth: 0 # necessary to allow branch switching
 
-      - name: Ensure Report Dir is empty
+      - name: Ensure Report Dir is Empty
         run: |
           export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore"
           rm -rf ./build_reports/*
