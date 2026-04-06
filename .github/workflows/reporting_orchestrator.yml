@@ -148,11 +148,22 @@ jobs:
           git add ./build_reports
           git status
           git commit -m "Local commit for cherrypick"
-          git switch gh-pages
-          git cherry-pick -X theirs ${{ github.ref_name }}
-          git push
-        # TODO: figure out how to cherrypick the calling branch, instead of the cicd branch
-        # this cherrypick will pull the committed build_reports files off the top of the CICD branch
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "Triggered by Push, standard case"
+            git switch gh-pages
+            git cherry-pick -X theirs ${{ github.ref_name }}
+            git push
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Triggered by PR, creating temp branch (will not outlive workflow)"
+            git branch temp_for_cherrypick "$(git rev-parse --short HEAD)"
+            git switch gh-pages
+            git cherry-pick -X theirs temp_for_cherrypick
+            git push
+          else
+            echo "Triggered by: ${{ github.event_name }}. This is unhandled."
+            exit 2
+          fi
+
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
