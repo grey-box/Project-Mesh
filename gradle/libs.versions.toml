@@ -1,56 +1,108 @@
 [versions]
+accompanistPermissions = "0.31.1-alpha"
+acraDialog = "5.11.0"
+acraHTTP = "5.11.0"
+activity = "1.9.0"
+activityCompose = "1.7.0"
 agp = "8.5.1"
+appcompat = "1.6.1"
+coilCompose = "1.4.0"
+composeBom = "2023.08.00"
+composePreviewRenderer = "0.0.1-alpha01"
+composeQRPainter = "0.0.1"
+constraintlayout = "2.1.4"
+coreKtx = "1.10.1"
+datastoreCore = "1.0.0"
 datastoreCoreVersion = "1.1.1"
 datastorePreferences = "1.1.1"
-kotlin = "1.9.0"
-coreKtx = "1.10.1"
+datastorePreferencesCore = "1.0.0"
+espressoCore = "3.5.1"
+gson = "2.10.1"
+ipAddress = "5.3.3"
 junit = "4.13.2"
 junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-libMeshrabiya = "0.1-snapshot"
-lifecycleRuntimeKtx = "2.6.1"
-activityCompose = "1.7.0"
-composeBom = "2023.08.00"
-constraintlayout = "2.1.4"
-material = "1.11.0"
-datastoreCore = "1.0.0"
+kodeinDIFrameworkAndroidX = "7.20.2"
+kodeinDIFrameworkCompose = "7.20.2"
+kotlin = "1.9.0"
+kotlinxCoroutinesTest = "1.8.1" 
+kotlinxSerializationJSON = "1.6.3"
+libMeshrabiya = "0.1d10-snapshot"
 lifecycleRuntimeCompose = "2.7.0"
-datastorePreferencesCore = "1.0.0"
-appcompat = "1.6.1"
-activity = "1.9.0"
-composePreviewRenderer = "0.0.1-alpha01"
-navigationCompose = "2.7.7"
+lifecycleRuntimeKtx = "2.6.1"
 lifecycleViewmodelAndroid = "2.8.6"
+lifecycleViewmodelCompose = "2.8.6"
+material = "1.11.0"
+material3 = "1.2.1"
+materialIconsCore = "1.6.8" 
+materialIconsExtendedAndroid = "1.6.8"
+mockk = "1.13.12"
+nanoHTTPD = "2.3.1"
+navigationCompose = "2.7.7"
+okHTTP = "4.10.0"
+robolectric = "4.12.2" 
+roomVersion = "2.6.1"
+testCore = "1.6.1"
+turbine = "1.1.0" 
+zxingAndroidEmbedded = "4.3.0"
 
 [libraries]
+accompanist-permissions = { group = "com.google.accompanist", name = "accompanist-permissions", version.ref = "accompanistPermissions" }
+acra-dialog = { group = "ch.acra", name = "acra-dialog", version.ref = "acraDialog" }
+acra-http = { group = "ch.acra", name = "acra-http", version.ref = "acraHTTP" }
+androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
+androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
+androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
 androidx-datastore-core-v111 = { module = "androidx.datastore:datastore-core", version.ref = "datastoreCoreVersion" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
-androidx-foundation = { module = "androidx.compose.foundation:foundation" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastorePreferencesCore" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+androidx-foundation = { module = "androidx.compose.foundation:foundation" }
+androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
+androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "lifecycleRuntimeKtx" }
-androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
-androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
+androidx-lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-android", version.ref = "lifecycleViewmodelAndroid" }
+androidx-lifecycle-viewmodel-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "lifecycleViewmodelCompose" }
+androidx-material-icons-core = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "materialIconsCore" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended-android", version.ref = "materialIconsExtendedAndroid" }
+androidx-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "material3" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "roomVersion" }
+androidx-room-guava = { group = "androidx.room", name = "room-guava", version.ref = "roomVersion" }
+androidx-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "roomVersion" }
+androidx-room-paging = { group = "androidx.room", name = "room-paging", version.ref = "roomVersion" }
+androidx-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "roomVersion" }
+androidx-room-rxjava2 = { group = "androidx.room", name = "room-rxjava2", version.ref = "roomVersion" }
+androidx-room-rxjava3 = { group = "androidx.room", name = "room-rxjava3", version.ref = "roomVersion" }
+androidx-room-testing = { group = "androidx.room", name = "room-testing", version.ref = "roomVersion" }
+androidx-test-core = { group = "androidx.test", name = "core", version.ref = "testCore" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui" }
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
+androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
+androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
-androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-lib-meshrabiya = { module = "com.github.UstadMobile.Meshrabiya:lib-meshrabiya", version.ref = "libMeshrabiya" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
-androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "lifecycleRuntimeCompose" }
-androidx-datastore-preferences-core = { group = "androidx.datastore", name = "datastore-preferences-core", version.ref = "datastorePreferencesCore" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-androidx-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coilCompose" }
 compose-preview-renderer = { group = "com.android.tools.compose", name = "compose-preview-renderer", version.ref = "composePreviewRenderer" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
-androidx-lifecycle-viewmodel-android = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-android", version.ref = "lifecycleViewmodelAndroid" }
+compose-qrpainter = { group = "com.github.yveskalume", name = "compose-qrpainter", version.ref = "composeQRPainter" }
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+ipaddress = { group = "com.github.seancfoley", name = "ipaddress", version.ref = "ipAddress" }
+jetbrains-kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinxCoroutinesTest" }
+jetbrains-kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerializationJSON" }
+junit = { group = "junit", name = "junit", version.ref = "junit" }
+kodein-di-framework-android-x = { group = "org.kodein.di", name = "kodein-di-framework-android-x", version.ref = "kodeinDIFrameworkAndroidX" }
+kodein-di-framework-compose = { group = "org.kodein.di", name = "kodein-di-framework-compose", version.ref = "kodeinDIFrameworkCompose" }
+material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+meshrabiya = { group = "com.github.UstadMobile.Meshrabiya", name = "lib-meshrabiya", version.ref = "libMeshrabiya" }
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+nanohttp = { group = "org.nanohttpd", name = "nanohttpd", version.ref = "nanoHTTPD" }
+okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okHTTP" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+zxing-android-embedded = { group = "com.journeyapps", name = "zxing-android-embedded", version.ref = "zxingAndroidEmbedded" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
