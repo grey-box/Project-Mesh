@@ -73,11 +73,17 @@ jobs:
         with:
           fetch-depth: 0 # necessary to allow branch switching
 
-      - name: Ensure Report Dir is Empty # add files NOT to delete each run to the list below
+      # - name: Ensure Report Dir is Empty # add files NOT to delete each run to the list below
+      #   run: |
+      #     export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore:./build_reports/include_html.js"
+      #     rm -rf ./build_reports/*
+      #     unset GLOBIGNORE
+
+      - name: Create Clean Build-Reports Directory
         run: |
-          export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore:./build_reports/include_html.js"
-          rm -rf ./build_reports/*
-          unset GLOBIGNORE
+          rm -rf ./build_reports 2> /dev/null
+          mkdir ./build_reports
+
 
       - name: Download All Artifacts
         uses: actions/download-artifact@v8
@@ -143,6 +149,7 @@ jobs:
           git config user.name "github-actions[bot]"
 
       - name: Commit Reports to Viewing Directory
+        # PRs run workflows out of a temp branch instead of the calling branch, so they need to create a temp branch to host the commit for build reports
         run: |
           git rm -r --cached ./build_reports
           git add ./build_reports
