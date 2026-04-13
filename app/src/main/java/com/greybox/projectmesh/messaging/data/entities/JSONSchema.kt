@@ -1,8 +1,8 @@
 package com.greybox.projectmesh.messaging.data.entities
 
-import android.util.Log
 import org.json.JSONObject
 import org.json.JSONException
+import timber.log.Timber
 
 class JSONSchema {
 
@@ -22,8 +22,8 @@ class JSONSchema {
 """
     //Takes JSON string and validates it against JSON Schema
     fun schemaValidation(json: String): Boolean {
-        //Log.d("JSONSchema", "Validating JSON: $json")
-        //Log.d("JSONSchema", "Against schema: $schemaString")
+        //Timber.tag("JSONSchema").d("Validating JSON: $json")
+        //Timber.tag("JSONSchema").d("Against schema: $schemaString")
         try {
             val schemaJson = JSONObject(schemaString)
             val jsonObject = JSONObject(json)
@@ -31,7 +31,7 @@ class JSONSchema {
             validate(jsonObject, schemaJson)
             return true
         }catch (e: JSONException) {
-            Log.e("JSONSchema", "JSON schema validation failed: ${e.message}")
+            Timber.tag("JSONSchema",).e("JSON schema validation failed: ${e.message}")
             return false
         }
     }

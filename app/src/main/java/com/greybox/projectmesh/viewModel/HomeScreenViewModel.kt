@@ -2,7 +2,6 @@ package com.greybox.projectmesh.viewModel
 
 import android.content.SharedPreferences
 import android.os.Build
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -22,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.kodein.di.DI
 import org.kodein.di.instance
+import timber.log.Timber
 
 
 data class HomeScreenModel(
@@ -144,7 +144,7 @@ class HomeScreenViewModel(di: DI,
         viewModelScope.launch {
             val wasWifiConnected = _uiState.value.wifiState?.wifiStationState?.status
             try {
-                Log.d("HotspotDebug", "Attempt 1: Setting Hotspot to $enable")
+                Timber.tag("HotspotDebug").d("Attempt 1: Setting Hotspot to $enable")
                 val response = withTimeoutOrNull(1500) {
                     node.setWifiHotspotEnabled(
                         enabled = enable,
@@ -153,17 +153,17 @@ class HomeScreenViewModel(di: DI,
                     )
                 }
                 if (response == null) {
-                    Log.w("HotspotDebug", "No response within 1500ms, Retrying...")
+                    Timber.tag("HotspotDebug").w("No response within 1500ms, Retrying...")
                     // Retry once
                     val retryResponse = node.setWifiHotspotEnabled(
                         enabled = enable,
                         preferredBand = _uiState.value.band,
                         hotspotType = _uiState.value.hotspotTypeToCreate
                     )
-                    Log.d("HotspotDebug", "Retry successful: $retryResponse")
+                    Timber.tag("HotspotDebug").d("Retry successful: $retryResponse")
                 }
                 else {
-                    Log.d("HotspotDebug", "Hotspot set successfully: $response")
+                    Timber.tag("HotspotDebug").d("Hotspot set successfully: $response")
                 }
                 if (!_concurrencyKnown.value && Build.VERSION.SDK_INT < Build.VERSION_CODES.R){
                     delay(500)
@@ -172,16 +172,17 @@ class HomeScreenViewModel(di: DI,
                     {
                         if(isWifiStillConnected == WifiStationState.Status.INACTIVE || isWifiStillConnected == null){
                             markStaApConcurrencyUnsupported()
-                            Log.d("HotspotDebug", "Wi-Fi disconnected after enabling hotspot. STA/AP concurrency NOT supported.")
+                            Timber.tag("HotspotDebug").d("Wi-Fi disconnected after enabling hotspot. STA/AP concurrency NOT supported.")
                         }
                         else{
                             markStaApConcurrencySupported()
-                            Log.d("HotspotDebug", "Wi-Fi still connected after enabling hotspot. STA/AP concurrency supported.")
+                            Timber.tag("HotspotDebug").d("Wi-Fi still connected after enabling " +
+                                    "hotspot. STA/AP concurrency supported.")
                         }
                     }
                 }
             } catch (e: Exception) {
-                Log.e("HotspotDebug", "Failed to set hotspot: ${e.message}")
+                Timber.tag("HotspotDebug").e("Failed to set hotspot: ${e.message}")
             }
         }
     }
@@ -208,7 +209,7 @@ class HomeScreenViewModel(di: DI,
                 }
             }
             catch (e: Exception){
-                Log.e("HomeScreenViewModel", "onConnectWifi: ${e.message}")
+                Timber.tag("HomeScreenViewModel").e("onConnectWifi: ${e.message}")
             }
         }
     }

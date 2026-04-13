@@ -83,7 +83,7 @@
         </activity>
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.greybox.projectmesh.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:grantUriPermissions="true"
             android:exported="false">
 

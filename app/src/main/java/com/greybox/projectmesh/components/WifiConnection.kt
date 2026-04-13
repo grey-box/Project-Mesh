@@ -28,7 +28,6 @@ import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectException
 import java.util.regex.Pattern
 import android.util.Log
 
-
 // This File is to pre-check the wifi connection, reusing from Meshrabiya test app
 /*
 WorkFlow:

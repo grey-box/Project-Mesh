@@ -1,6 +1,6 @@
 package com.greybox.projectmesh.utils
 
-import android.util.Log
+import timber.log.Timber
 
 /**
  * Centralized logging utility for the app.
@@ -13,28 +13,28 @@ object Logger {
 
     fun d(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.d("$TAG_PREFIX$tag", message)
+            Timber.tag("$TAG_PREFIX$tag").d(message)
         }
     }
 
     fun i(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.i("$TAG_PREFIX$tag", message)
+            Timber.tag("$TAG_PREFIX$tag").i(message)
         }
     }
 
     fun w(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.w("$TAG_PREFIX$tag", message)
+            Timber.tag("$TAG_PREFIX$tag").w(message)
         }
     }
 
     fun e(tag: String, message: String, throwable: Throwable? = null) {
         if (LOGGING_ENABLED) {
             if (throwable != null) {
-                Log.e("$TAG_PREFIX$tag", message, throwable)
+                Timber.tag("$TAG_PREFIX$tag").e(throwable, message)
             } else {
-                Log.e("$TAG_PREFIX$tag", message)
+                Timber.tag("$TAG_PREFIX$tag").e(message)
             }
         }
     }
@@ -42,9 +42,9 @@ object Logger {
     // Log important events that should be visible even in production
     fun critical(tag: String, message: String, throwable: Throwable? = null) {
         if (throwable != null) {
-            Log.e("$TAG_PREFIX${tag}_CRITICAL", message, throwable)
+            Timber.tag("$TAG_PREFIX${tag}_CRITICAL").e(throwable, message)
         } else {
-            Log.e("$TAG_PREFIX${tag}_CRITICAL", message)
+            Timber.tag("$TAG_PREFIX${tag}_CRITICAL").e(message)
         }
     }
 }

@@ -1,13 +1,9 @@
 package com.greybox.projectmesh.debug
 
-import android.R.layout
 import android.content.Context
 import android.content.Intent
-import android.util.Log
-import android.widget.FrameLayout
-import android.widget.PopupWindow
 import com.google.gson.Gson
-import org.xml.sax.helpers.DefaultHandler
+import timber.log.Timber
 import java.lang.Exception
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.system.exitProcess
@@ -29,7 +25,7 @@ class CrashHandler(private val context: Context, private val defaultHandler: Unc
     {
         val crashIntent = Intent(applicationContext, activity).also {
             it.putExtra("CrashData", Gson().toJson(exception))
-            Log.e("Project Mesh Error","Error: ",exception);
+            Timber.tag("Project Mesh Error").e(exception, "Error: ");
         }
 
         crashIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_NEW_TASK)
@@ -50,7 +46,7 @@ class CrashHandler(private val context: Context, private val defaultHandler: Unc
                 Gson().fromJson(intent.getStringExtra("CrashData"), Throwable::class.java)
             }
             catch (e: Exception) {
-                Log.e("CrashHandler","getThrowableFromIntent: ",e);
+                Timber.tag("CrashHandler",).e(e,"getThrowableFromIntent: ");
                 null
             }
 

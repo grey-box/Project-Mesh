@@ -86,6 +86,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.lifecycleScope
+import com.greybox.projectmesh.logging.ReleaseTree
 import kotlinx.coroutines.launch
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
@@ -93,13 +94,26 @@ import com.greybox.projectmesh.views.LogScreen
 
 
 import com.greybox.projectmesh.views.RequestPermissionsScreen
+import com.greybox.projectmesh.BuildConfig
 import org.kodein.di.compose.localDI
+
+import timber.log.Timber
 
 class MainActivity : ComponentActivity(), DIAware {
     override val di by closestDI()
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.Theme_ProjectMesh)
         super.onCreate(savedInstanceState)
+
+        // Init Timber for Debug Build
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(ReleaseTree())
+        }
+
+        Timber.d("Timber init in ${BuildConfig.BUILD_TYPE}")
+
         // crash screen
         CrashHandler.init(applicationContext, CrashScreenActivity::class.java)
         val settingPref: SharedPreferences by di.instance(tag = "settings")
@@ -110,7 +124,8 @@ class MainActivity : ComponentActivity(), DIAware {
         }
         //Initialize test device:
         TestDeviceService.initialize()
-        Log.d("MainActivity", "Test device initialized")
+        Timber.tag("MainActivity").d("Test device initialized")
+
         setContent {
             val meshPrefs = getSharedPreferences("project_mesh_prefs", MODE_PRIVATE)
             var hasRunBefore by rememberSaveable {
@@ -168,7 +183,7 @@ class MainActivity : ComponentActivity(), DIAware {
                         val route = "chatScreen/$ip"
                         currentScreen = route
                     } catch (e: Exception) {
-                        Log.e("MainActivity", "Invalid IP address in intent: $ip", e)
+                        Timber.tag("MainActivity").e(e, "Invalid IP address in intent: %s", ip)
                         // Fall back to home screen
                         currentScreen = BottomNavItem.Home.route
                     }
@@ -218,6 +233,7 @@ class MainActivity : ComponentActivity(), DIAware {
                 }
             }
         }
+        Timber.tag("BuildCheck").d("Build Type is: ${BuildConfig.BUILD_TYPE}")
     }
 
     private fun ensureDefaultDirectory() {
@@ -228,14 +244,16 @@ class MainActivity : ComponentActivity(), DIAware {
         if (!defaultDirectory.exists()) {
             // Create the directory if it doesn't exist
             if (defaultDirectory.mkdirs()) {
-                Log.d("DirectoryCheck", "Default directory created: ${defaultDirectory.absolutePath}")
+                Timber.tag("DirectoryCheck").d("Default directory created: ${defaultDirectory
+                    .absolutePath}")
             }
             else {
-                Log.e("DirectoryCheck", "Failed to create default directory: ${defaultDirectory.absolutePath}")
+                Timber.tag("DirectoryCheck").e("Failed to create default directory: %s", defaultDirectory.absolutePath)
             }
         }
         else {
-            Log.d("DirectoryCheck", "Default directory already exists: ${defaultDirectory.absolutePath}")
+            Timber.tag("DirectoryCheck").d("Default directory already exists: ${defaultDirectory
+                .absolutePath}")
         }
     }
 
@@ -291,15 +309,15 @@ fun BottomNavApp(di: DI,
                 val ip = entry.arguments?.getString("ip")
                     ?: throw IllegalArgumentException("Invalid address")
 
-                Log.d("Navigation", "Navigating to chatScreen with parameter: $ip")
+                Timber.tag("Navigation").d("Navigating to chatScreen with parameter: $ip")
 
                 //determine if this is an ip address
                 val isValidIpAddress = ip.matches(Regex("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\$"))
-                Log.d("Navigation", "Is valid IP address: $isValidIpAddress")
+                Timber.tag("Navigation").d("Is valid IP address: $isValidIpAddress")
 
 
                 if(isValidIpAddress) {
-                    Log.d("Navigation", "Showing chat for IP address: $ip")
+                    Timber.tag("Navigation").d("Showing chat for IP address: $ip")
                     // This is a valid IP address, use normal chat screen
                     ChatScreen(
                         virtualAddress = InetAddress.getByName(ip),
@@ -308,12 +326,12 @@ fun BottomNavApp(di: DI,
                         }
                     )
                 } else {
-                    Log.d("Navigation", "Showing chat for conversation ID: $ip")
+                    Timber.tag("Navigation").d("Showing chat for conversation ID: $ip")
                     //conversation id: handle offline chat
                     ConversationChatScreen(
                         conversationId = ip,
                         onBackClick = {
-                            Log.d("Navigation", "Navigating back from conversation")
+                            Timber.tag("Navigation").d("Navigating back from conversation")
                             navController.popBackStack()
                         }
                     )
@@ -333,8 +351,8 @@ fun BottomNavApp(di: DI,
                 val sharedUrisViewModel: SharedUriViewModel = viewModel(activity)
                 SendScreen(
                     onSwitchToSelectDestNode = { uris ->
-                        Log.d("uri_track_nav_send", "size: " + uris.size.toString())
-                        Log.d("uri_track_nav_send", "List: $uris")
+                        Timber.tag("uri_track_nav_send").d("size: %s", uris.size.toString())
+                        Timber.tag("uri_track_nav_send").d("List: $uris")
                         sharedUrisViewModel.setUris(uris)
                         navController.navigate("selectDestNode")
                     }
@@ -344,8 +362,8 @@ fun BottomNavApp(di: DI,
                 val activity = LocalContext.current as ComponentActivity
                 val sharedUrisViewModel: SharedUriViewModel = viewModel(activity)
                 val sendUris by sharedUrisViewModel.uris.collectAsState()
-                Log.d("uri_track_nav_selectDestNode", "size: " + sendUris.size.toString())
-                Log.d("uri_track_nav_selectDestNode", "List: $sendUris")
+                Timber.tag("uri_track_nav_selectDestNode").d("size: %s", sendUris.size.toString())
+                Timber.tag("uri_track_nav_selectDestNode").d("List: $sendUris")
                 SelectDestNodeScreen(
                     uris = sendUris,
                     popBackWhenDone = {navController.popBackStack()},
@@ -366,7 +384,7 @@ fun BottomNavApp(di: DI,
                     onLanguageChange = onLanguageChange,
                     onRestartServer = onRestartServer,
                     onDeviceNameChange = { newDeviceName ->
-                        Log.d("BottomNavApp", "Device name changed to: $newDeviceName")
+                        Timber.tag("BottomNavApp").d("Device name changed to: $newDeviceName")
                         // Retrieve the local UUID from SharedPreferences
                         val localUuid = settingsPrefs.getString("UUID", null)
                         if (localUuid != null) {
@@ -378,7 +396,7 @@ fun BottomNavApp(di: DI,
                                     name = newDeviceName,
                                     address = appServer.localVirtualAddr.hostAddress  // <-- local IP here
                                 )
-                                Log.d("BottomNavApp", "Updated local user with new name: $newDeviceName")
+                                Timber.tag("BottomNavApp").d("Updated local user with new name:$newDeviceName")
 
                                 // 2. Retrieve all connected users (those with a non-null address)
                                 val connectedUsers = userRepository.getAllConnectedUsers()
@@ -386,16 +404,17 @@ fun BottomNavApp(di: DI,
                                     user.address?.let { ip ->
                                         try {
                                             val remoteAddr = InetAddress.getByName(ip)
-                                            Log.d("BottomNavApp", "Broadcasting updated info to: $ip")
+                                            Timber.tag("BottomNavApp").d("Broadcasting updated info to: $ip")
                                             appServer.pushUserInfoTo(remoteAddr)
                                         } catch (e: Exception) {
-                                            Log.e("BottomNavApp", "Error processing IP address: $ip", e)
+                                            Timber.tag("BottomNavApp").e(e, "Error processing IP " +
+                                                    "address:$ip")
                                         }
                                     }
                                 }
                             }
                         } else {
-                            Log.e("BottomNavApp", "Local UUID not found; cannot update user")
+                            Timber.tag("BottomNavApp").e("Local UUID not found; cannot update user")
                         }
                     },
                     onAutoFinishChange = onAutoFinishChange,
@@ -411,7 +430,7 @@ fun BottomNavApp(di: DI,
                     onConversationSelected = { userIdentifier ->
                         // userIdentifier will be either an IP address (for online users)
                         // or a conversation ID (for offline users)
-                        Log.d("Navigation", "Selected conversation/user: $userIdentifier")
+                        Timber.tag("Navigation").d("Selected conversation/user: $userIdentifier")
                         //navigate to the chat screen with this identifier
                         navController.navigate("chatScreen/${userIdentifier}")
                     }
@@ -420,14 +439,18 @@ fun BottomNavApp(di: DI,
                 ChatNodeListScreen(
                     onNodeSelected = { ip ->
                         val remoteAddr = InetAddress.getByName(ip)
-                        Log.d("ChatHandshake", "Node selected with IP: $ip, remoteAddr: $remoteAddr")
+                        Timber.tag("ChatHandshake").d("Node selected with IP: $ip, remoteAddr:
+                        $remoteAddr")
 
                         // Request remote user info
-                        Log.d("ChatHandshake", "Requesting remote user info from: ${remoteAddr.hostAddress}")
+                        Timber.tag("ChatHandshake").d("Requesting remote user info from:
+                        ${remoteAddr
+                        .hostAddress}")
                         appServer.requestRemoteUserInfo(remoteAddr)
 
                         // Push local user info to remote node
-                        Log.d("ChatHandshake", "Pushing local user info to: ${remoteAddr.hostAddress}")
+                        Timber.tag("ChatHandshake").d("Pushing local user info to: ${remoteAddr
+                        .hostAddress}")
                         appServer.pushUserInfoTo(remoteAddr)
 
                         // Navigate to the chat screen
@@ -453,7 +476,7 @@ fun BottomNavApp(di: DI,
                             try {
                                 InetAddress.getByName(ipParam)
                             } catch (e: Exception) {
-                                Log.e("Navigation", "Error creating address from parameter: $ipParam", e)
+                                Timber.tag("Navigation").e(e, "Error creating address from parameter:$ipParam")
                                 null
                             }
                         } else {
@@ -489,7 +512,7 @@ fun ConversationChatScreen (
         conversationId: String,
         onBackClick: () -> Unit
 ){
-    Log.d("ConversationChatScreen", "Starting to load conversation: $conversationId")
+    Timber.tag("ConversationChatScreen").d("Starting to load conversation: $conversationId")
 
     var conversationState = remember { mutableStateOf<Conversation?>(null) }
     var isLoading = remember { mutableStateOf(true) }
@@ -501,19 +524,20 @@ fun ConversationChatScreen (
 
     // Load the conversation data
     LaunchedEffect(conversationId) {
-        Log.d("ConversationChatScreen", "LaunchedEffect triggered for ID: $conversationId")
+        Timber.tag("ConversationChatScreen").d("LaunchedEffect triggered for ID: $conversationId")
         coroutineScope.launch {
             try {
-                Log.d("ConversationChatScreen", "Attempting to fetch conversation")
+                Timber.tag("ConversationChatScreen").d("Attempting to fetch conversation")
                 val result = GlobalApp.GlobalUserRepo.conversationRepository.getConversationById(conversationId)
-                Log.d("ConversationChatScreen", "Fetch result: ${result != null}")
+                Timber.tag("ConversationChatScreen").d("Fetch result: ${result != null}")
                 //conversationState.value = result
 
                 if (result == null) {
                     errorMessage.value = "Conversation not found"
                     isLoading.value = false
                     /*
-                    Log.e("ConversationChatScreen", "Conversation not found: $conversationId")
+                    Timber.tag("ConversationChatScreen").e("Conversation not found:
+                    $conversationId")
                     Toast.makeText(
                         context,
                         "Conversation not found",
@@ -524,10 +548,10 @@ fun ConversationChatScreen (
                 }else {
                     conversationState.value = result
                     isLoading.value = false
-                    Log.d("ConversationChatScreen", "Loaded conversation: ${result.userName}, online=${result.isOnline}")
+                    Timber.tag("ConversationChatScreen").d("Loaded conversation: ${result.userName}, online=${result.isOnline}")
                 }
             } catch (e: Exception) {
-                Log.e("ConversationChatScreen", "Error loading conversation", e)
+                Timber.tag("ConversationChatScreen").e(e, "Error loading conversation")
                 errorMessage.value = e.message
                 isLoading.value = false
                 /*
@@ -589,7 +613,8 @@ fun ConversationChatScreen (
             conversation.userAddress?.let { ipAddress ->
                 val statusFromManager = deviceStatusMap[ipAddress] ?: false
                 if (isUserOnline != statusFromManager) {
-                    Log.d("ConversationChatScreen", "Device status changed for ${conversation.userName}: ${if (statusFromManager) "online" else "offline"}")
+                    Timber.tag("ConversationChatScreen").d("Device status changed for ${conversation
+                        .userName}: ${if (statusFromManager) "online" else "offline"}")
                     isUserOnline = statusFromManager
                 }
             }
@@ -600,20 +625,20 @@ fun ConversationChatScreen (
     val virtualAddress = if (conversation?.userAddress.isNullOrEmpty()) {
         //use offline test device address if this is the offline test conversation
         if (conversation.userName == TestDeviceService.TEST_DEVICE_NAME_OFFLINE) {
-            Log.d("ConversationChatScreen", "Using offline test device address")
+            Timber.tag("ConversationChatScreen").d("Using offline test device address")
             InetAddress.getByName(TestDeviceService.TEST_DEVICE_IP_OFFLINE)
         } else {
             //use a placeholder address for regular offline users
-            Log.d("ConversationChatScreen", "Using placeholder address for offline user")
+            Timber.tag("ConversationChatScreen").d("Using placeholder address for offline user")
             InetAddress.getByName("0.0.0.0")
         }
     } else {
         //use the actual address if available
-        Log.d("ConversationChatScreen", "Using actual address: ${conversation.userAddress}")
+        Timber.tag("ConversationChatScreen").d("Using actual address: ${conversation.userAddress}")
         InetAddress.getByName(conversation.userAddress)
     }
 
-    Log.d("ConversationChatScreen", "Showing chat screen for: ${conversation.userName}")
+    Timber.tag("ConversationChatScreen").d("Showing chat screen for: ${conversation.userName}")
 
     // Show the chat screen
     ChatScreen(

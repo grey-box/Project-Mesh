@@ -9,7 +9,6 @@ import android.os.Build
 import android.os.Environment
 import android.provider.DocumentsContract
 import android.provider.MediaStore
-import android.util.Log
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -56,6 +55,8 @@ import org.kodein.di.instance
 import java.io.File
 import androidx.compose.material3.HorizontalDivider
 import com.greybox.projectmesh.viewModel.ReceiveScreenModel
+import timber.log.Timber
+import com.greybox.projectmesh.BuildConfig
 
 @Composable
 fun ReceiveScreen(
@@ -96,7 +97,7 @@ fun HandleIncomingTransfers(
 
     LaunchedEffect(onAutoFinishChange) {
         autoFinishEnabled = settingPref.getBoolean("auto_finish", false)
-        Log.d("ReceiveScreen", "autoFinishEnabled: $autoFinishEnabled")
+        Timber.tag("ReceiveScreen").d("autoFinishEnabled: $autoFinishEnabled")
     }
     LaunchedEffect(autoFinishEnabled, uiState.incomingTransfers) {
         if (autoFinishEnabled) {
@@ -116,9 +117,10 @@ fun HandleIncomingTransfers(
         if (file != null && transfer.status == AppServer.Status.COMPLETED){
             // Generate a content URI for the file, it provide secure access to files
             val uri = FileProvider.getUriForFile(
-                context, "com.greybox.projectmesh.fileprovider", file
-            )
-            // allow the system to find an app capable of handling and viewing the file
+                context,
+                "${BuildConfig.APPLICATION_ID}.fileprovider",
+                file
+            )            // allow the system to find an app capable of handling and viewing the file
             val intent = Intent(Intent.ACTION_VIEW).apply {
                 // The flag is set to ensure the receiving app can temporarily access the file uri with read permission
                 flags = Intent.FLAG_GRANT_READ_URI_PERMISSION

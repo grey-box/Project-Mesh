@@ -2,18 +2,15 @@
 package com.greybox.projectmesh.messaging.network
 
 import android.content.SharedPreferences
-import android.util.Log
-import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.messaging.repository.MessageRepository
 import com.greybox.projectmesh.messaging.data.entities.Message
 import com.greybox.projectmesh.messaging.repository.ConversationRepository
-import com.greybox.projectmesh.messaging.data.entities.Conversation
-import com.greybox.projectmesh.messaging.utils.MessageUtils
 import com.greybox.projectmesh.user.UserRepository
 import java.net.InetAddress
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import timber.log.Timber
 
 class MessageService(
     override val di: DI
@@ -61,7 +58,7 @@ class MessageService(
 
             }
         }catch (e: Exception){
-            Log.e("MessageService", "Error updating conversation with message", e)
+            Timber.tag("MessageService").e(e,"Error updating conversation with message")
         }
     }
 }
