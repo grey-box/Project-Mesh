@@ -73,7 +73,7 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
                 }
             }
             1 -> { // Request Location Permission
-                //noinspection
+                //noinspection ObsoleteSdkInt
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     !hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -82,7 +82,7 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
                 }
             }
             2 -> { // Request Notification Permission (Android 13+)
-                //noinspection
+                //noinspection ObsoleteSdkInt
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                     !hasPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {
                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -91,7 +91,7 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
                 }
             }
             3 -> { // Request Storage Permission (Android 13+ has different permissions)
-                //noinspection
+                //noinspection ObsoleteSdkInt
                 val storagePermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     arrayOf(
                         Manifest.permission.READ_MEDIA_IMAGES,
@@ -136,7 +136,7 @@ fun hasAnyPermission(context: Context, permissions: Array<String>): Boolean {
 /** Function to Check If Battery Optimization is Disabled */
 fun isBatteryOptimizationDisabled(context: Context): Boolean {
     val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-    //noinspection
+    //noinspection ObsoleteSdkInt
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         powerManager.isIgnoringBatteryOptimizations(context.packageName)
     } else {
@@ -146,7 +146,7 @@ fun isBatteryOptimizationDisabled(context: Context): Boolean {
 
 /** Function to Prompt User to Disable Battery Optimization */
 fun promptDisableBatteryOptimization(context: Context) {
-    //noinspection
+    //noinspection ObsoleteSdkInt
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val message = SpannableString(
             "To ensure uninterrupted background functionality and maintain a stable connection, " +
