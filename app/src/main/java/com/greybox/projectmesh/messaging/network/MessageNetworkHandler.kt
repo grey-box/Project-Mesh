@@ -36,6 +36,13 @@ import android.os.Parcel
 import android.os.Parcelable
 import java.net.URI
 
+/**
+ * Handles sending and receiving chat messages over the network.
+ *
+ * @property httpClient The OkHttpClient used to make HTTP requests.
+ * @property localVirtualAddr The local device's virtual network IP address.
+ * @property di The Kodein DI container instance for retrieving dependencies.
+ */
 class MessageNetworkHandler(
     private val httpClient: OkHttpClient,
     private val localVirtualAddr: InetAddress,
@@ -45,7 +52,14 @@ class MessageNetworkHandler(
     private val conversationRepository: ConversationRepository by di.instance()
     private val settingsPrefs: SharedPreferences by di.instance(tag = "settings")
 
-    //function sendChatMessage(address: InetAddress, time: Long, message: String) {
+    /**
+     * Sends a chat message to a remote device over HTTP.
+     *
+     * @param address The target device's IP address.
+     * @param time The timestamp of the message in milliseconds.
+     * @param message The message text to send.
+     * @param file Optional URI of a file to send along with the message.
+     */
     fun sendChatMessage(address: InetAddress, time: Long, message: String, file: URI?/* test this*/) {
         scope.launch {
             try {
@@ -103,8 +117,17 @@ class MessageNetworkHandler(
             }
         }
     }
+
     companion object {
-        //process incoming messages and route them to the correct conversation
+        /**
+         * Processes an incoming message and routes it to the correct conversation.
+         *
+         * @param chatMessage The message content received.
+         * @param time The timestamp when the message was received.
+         * @param senderIp The IP address of the sender.
+         * @param incomingfile Optional file URI attached to the message.
+         * @return The created [Message] object representing the incoming message.
+         */
         fun handleIncomingMessage(
             chatMessage: String?,
             time: Long,
@@ -176,8 +199,13 @@ class MessageNetworkHandler(
             return message
         }
 
-
-        // New helper function to show notifications that route to chat screen
+        /**
+         * Shows a notification for an incoming message and routes to the chat screen.
+         *
+         * @param conversation The conversation to which the message belongs.
+         * @param message The message to display in the notification.
+         * @param senderIp The IP address of the sender.
+         */
         private fun showMessageNotification(
             conversation: Conversation,
             message: Message,

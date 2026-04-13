@@ -1,0 +1,22 @@
+@startuml MessageService
+skinparam classAttributeIconSize 0
+
+class MessageService {
+  -di: DI
+  -messageNetworkHandler: MessageNetworkHandler
+  -messageRepository: MessageRepository
+  -conversationRepository: ConversationRepository
+  -userRepository: UserRepository
+  -settingsPrefs: SharedPreferences
+  +sendMessage(address: InetAddress, message: Message): Unit
+  -updateConversationWithMessage(address: InetAddress, message: Message): Unit
+}
+
+MessageService --> MessageNetworkHandler
+MessageService --> MessageRepository
+MessageService --> ConversationRepository
+MessageService --> UserRepository
+MessageService --> SharedPreferences
+MessageService --> Message
+
+@enduml

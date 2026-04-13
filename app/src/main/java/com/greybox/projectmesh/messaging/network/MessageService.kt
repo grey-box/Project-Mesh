@@ -15,6 +15,12 @@ import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
 
+/**
+ * Service layer for handling message operations including sending messages
+ * and updating conversations.
+ *
+ * @property di Kodein DI container for retrieving required dependencies.
+ */
 class MessageService(
     override val di: DI
 ) : DIAware {
@@ -24,6 +30,13 @@ class MessageService(
     private val userRepository: UserRepository by di.instance()
     private val settingsPrefs: SharedPreferences by di.instance(tag = "settings")
 
+    /**
+     * Sends a message to a given IP address.
+     * First saves the message locally, then sends it over the network.
+     *
+     * @param address The target device's IP address.
+     * @param message The [Message] object to be sent.
+     */
     suspend fun sendMessage(address: InetAddress, message: Message) {
         //First save locally
         messageRepository.addMessage(message)
@@ -37,6 +50,12 @@ class MessageService(
         )
     }
 
+    /**
+     * Updates the conversation associated with a given user IP with a new message.
+     *
+     * @param address The IP address of the remote user.
+     * @param message The [Message] object to update in the conversation.
+     */
     private suspend fun updateConversationWithMessage(address: InetAddress, message: Message){
         try {
             //find user by ip address

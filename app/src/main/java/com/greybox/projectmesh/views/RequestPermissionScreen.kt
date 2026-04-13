@@ -64,7 +64,11 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
         if (currentStep == 6) return@LaunchedEffect
         when (currentStep) {
             0 -> { // Request Nearby Wi-Fi Permission
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                //noinspection ObsoleteSdkInt
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                    // changed from .M (android 6, sdk level 26) to .TIRAMISU (android 13, sdk level 33) during linting, as NEARBY_WIFI_DEVICES permission was added in Android 13.
+                    // this may be a breaking change, next time someone with better understanding of this codebase/aspect is here, please verify this change
+                    // made by Thalia Wood, 04/13/2026
                     !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
                     nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
                 } else {
@@ -72,6 +76,7 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
                 }
             }
             1 -> { // Request Location Permission
+                //noinspection ObsoleteSdkInt
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     !hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
                     locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
@@ -80,6 +85,7 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
                 }
             }
             2 -> { // Request Notification Permission (Android 13+)
+                //noinspection ObsoleteSdkInt
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
                     !hasPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {
                     notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -88,6 +94,7 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
                 }
             }
             3 -> { // Request Storage Permission (Android 13+ has different permissions)
+                //noinspection ObsoleteSdkInt
                 val storagePermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     arrayOf(
                         Manifest.permission.READ_MEDIA_IMAGES,
@@ -132,6 +139,7 @@ fun hasAnyPermission(context: Context, permissions: Array<String>): Boolean {
 /** Function to Check If Battery Optimization is Disabled */
 fun isBatteryOptimizationDisabled(context: Context): Boolean {
     val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
+    //noinspection ObsoleteSdkInt
     return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         powerManager.isIgnoringBatteryOptimizations(context.packageName)
     } else {
@@ -141,6 +149,7 @@ fun isBatteryOptimizationDisabled(context: Context): Boolean {
 
 /** Function to Prompt User to Disable Battery Optimization */
 fun promptDisableBatteryOptimization(context: Context) {
+    //noinspection ObsoleteSdkInt
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         val message = SpannableString(
             "To ensure uninterrupted background functionality and maintain a stable connection, " +

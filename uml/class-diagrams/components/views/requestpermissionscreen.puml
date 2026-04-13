@@ -1,0 +1,130 @@
+@startuml
+title RequestPermissionsScreen.kt (Compose) - Permission Step State Machine + Battery Optimization Prompt
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class RequestPermissionsScreen <<Composable>> {
+    +RequestPermissionsScreen(skipPermissions: Boolean)
+  }
+
+  class hasPermission <<Function>> {
+    +hasPermission(context: Context, permission: String): Boolean
+  }
+
+  class hasAnyPermission <<Function>> {
+    +hasAnyPermission(context: Context, permissions: Array<String>): Boolean
+  }
+
+  class isBatteryOptimizationDisabled <<Function>> {
+    +isBatteryOptimizationDisabled(context: Context): Boolean
+  }
+
+  class promptDisableBatteryOptimization <<Function>> {
+    +promptDisableBatteryOptimization(context: Context)
+  }
+}
+
+package "Compose Runtime" as Compose {
+  class rememberLauncherForActivityResult
+  class ActivityResultContracts
+  class LaunchedEffect
+  class LocalContext
+  class mutableIntStateOf
+}
+
+package "Android Framework" as Android {
+  class Context
+  class Manifest
+  class Build
+  class PackageManager
+  class ContextCompat
+  class PowerManager
+  class AlertDialogBuilder as "AlertDialog.Builder"
+  class Intent
+  class Settings
+  class SpannableString
+  class StyleSpan
+  class Typeface
+  class Spanned
+}
+
+' ---- State / initialization ----
+Views.RequestPermissionsScreen ..> Compose.LocalContext : context
+Views.RequestPermissionsScreen ..> Compose.mutableIntStateOf : currentStep\n(skipPermissions ? 6 : 0)
+
+note right of Views.RequestPermissionsScreen
+currentStep meanings:
+0 - Nearby Wi-Fi permission
+1 - Location permission
+2 - Notification permission (Android 13+)
+3 - Storage permission(s) (Android 13+ uses READ_MEDIA_*)
+4 - Camera permission
+5 - Battery optimization prompt
+6 - Done / skip
+end note
+
+' ---- Launchers ----
+Views.RequestPermissionsScreen ..> Compose.rememberLauncherForActivityResult : nearbyWifiPermissionLauncher (RequestPermission)
+Views.RequestPermissionsScreen ..> Compose.rememberLauncherForActivityResult : locationPermissionLauncher (RequestPermission)
+Views.RequestPermissionsScreen ..> Compose.rememberLauncherForActivityResult : notificationPermissionLauncher (RequestPermission)
+Views.RequestPermissionsScreen ..> Compose.rememberLauncherForActivityResult : storagePermissionLauncher (RequestMultiplePermissions)
+Views.RequestPermissionsScreen ..> Compose.rememberLauncherForActivityResult : cameraPermissionLauncher (RequestPermission)
+
+note bottom of Compose.rememberLauncherForActivityResult
+Launcher callbacks advance currentStep:
+- nearbyWifi -> step=1
+- location  -> step=2
+- notification -> step=3
+- storage -> step=4
+- camera -> step=5
+end note
+
+' ---- Step machine ----
+Views.RequestPermissionsScreen ..> Compose.LaunchedEffect : reacts to currentStep
+
+Views.RequestPermissionsScreen ..> Views.hasPermission : check single permission
+Views.RequestPermissionsScreen ..> Views.hasAnyPermission : check storage group
+Views.RequestPermissionsScreen ..> Views.isBatteryOptimizationDisabled : check battery opt
+Views.RequestPermissionsScreen ..> Views.promptDisableBatteryOptimization : show dialog
+
+note right of Compose.LaunchedEffect
+On currentStep change:
+
+If currentStep == 6 -> return
+
+Step 0:
+  if SDK>=M and !has NEARBY_WIFI_DEVICES -> launch request
+  else currentStep=1
+
+Step 1:
+  if SDK>=M and !has ACCESS_FINE_LOCATION -> launch request
+  else currentStep=2
+
+Step 2:
+  if SDK>=TIRAMISU and !has POST_NOTIFICATIONS -> launch request
+  else currentStep=3
+
+Step 3:
+  storagePermissions =
+     if SDK>=TIRAMISU -> [READ_MEDIA_IMAGES, READ_MEDIA_VIDEO]
+     else -> [READ_EXTERNAL_STORAGE]
+  if !hasAnyPermission(storagePermissions) -> launch multiple request
+  else currentStep=4
+
+Step 4:
+  if !has CAMERA -> launch request
+  else currentStep=5
+
+Step 5:
+  if !isBatteryOptimizationDisabled -> promptDisableBatteryOptimization
+end note
+
+' ---- Battery optimization dialog ----
+Views.promptDisableBatteryOptimization ..> Android.SpannableString : build message + bold spans
+Views.promptDisableBatteryOptimization ..> Android.AlertDialogBuilder : show dialog
+Views.promptDisableBatteryOptimization ..> Android.Intent : OPEN SETTINGS / fallback App Details
+Views.promptDisableBatteryOptimization ..> Android.Settings : ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS\nACTION_APPLICATION_DETAILS_SETTINGS
+
+@enduml

@@ -4,6 +4,8 @@ plugins {
     id("kotlin-kapt")
     id("com.google.devtools.ksp") version "1.9.0-1.0.13"
     kotlin("plugin.serialization") version "1.9.0"
+    id("org.jetbrains.kotlinx.kover") version "0.9.3"
+    id("org.jetbrains.dokka") version "2.2.0-Beta"
 }
 
 android {
@@ -39,6 +41,10 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    lint {
+        // affects gradle linter
+        disable.add("UnusedResources")
+    }
     buildFeatures {
         compose = true
     }
@@ -60,89 +66,89 @@ android {
 }
 
 dependencies {
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
-    implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.lifecycle.runtime.ktx)
+    // ===============================
+    // General
+    // ===============================
+    implementation(libs.accompanist.permissions)
+    implementation(libs.acra.dialog)
+    implementation(libs.acra.http)
     implementation(libs.androidx.activity.compose)
-    implementation("ch.acra:acra-http:5.11.0")
-    implementation("ch.acra:acra-dialog:5.11.0")
-    implementation(platform(libs.androidx.compose.bom))
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.compose.material:material-icons-core:1.6.8")
-    implementation("androidx.compose.material:material-icons-extended-android:1.6.8")
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.datastore.core.v111)
+    implementation(libs.androidx.datastore.preferences.core)
+    implementation(libs.androidx.datastore.preferences)
     implementation(libs.androidx.foundation)
-    implementation(libs.androidx.ui)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.viewmodel.android)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.material.icons.core)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.androidx.material3)
+    implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.androidx.material3)
-    implementation(libs.androidx.constraintlayout)
+    implementation(libs.androidx.ui)
+    implementation(libs.coil.compose)
+    implementation(libs.compose.qrpainter)
+    implementation(libs.gson) // for crash screen
+    implementation(libs.ipaddress)
+    implementation(libs.jetbrains.kotlinx.serialization.json) // For JSON serialization
     implementation(libs.material)
-    implementation(libs.androidx.datastore.core.v111)
-    implementation(libs.androidx.datastore.preferences)
-    implementation(libs.androidx.lifecycle.runtime.compose)
-    implementation(libs.androidx.datastore.preferences.core)
-    implementation(libs.androidx.activity)
-    implementation(libs.androidx.navigation.compose)
-    implementation(libs.androidx.lifecycle.viewmodel.android)
-    testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    debugImplementation(libs.androidx.ui.tooling)
-    debugImplementation(libs.androidx.ui.test.manifest)
-    implementation("com.github.UstadMobile.Meshrabiya:lib-meshrabiya:0.1d10-snapshot")
-    implementation("com.github.seancfoley:ipaddress:5.3.3")
-    implementation("com.squareup.okhttp3:okhttp:4.10.0")
-    implementation("org.nanohttpd:nanohttpd:2.3.1")
-    implementation (libs.material)
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
-    implementation("com.github.yveskalume:compose-qrpainter:0.0.1")
-    implementation("com.journeyapps:zxing-android-embedded:4.3.0")
-    implementation(libs.androidx.appcompat)
-    implementation ("io.coil-kt:coil-compose:1.4.0")
-    implementation("androidx.compose.material3:material3:1.2.1")
-    implementation("androidx.navigation:navigation-compose:2.7.7")
-    implementation("com.google.accompanist:accompanist-permissions:0.31.1-alpha")
-    // Core Kodein DI dependency
+    implementation(libs.meshrabiya)
+    implementation(libs.nanohttp)
+    implementation(libs.okhttp)
+    implementation(libs.zxing.android.embedded)
+    implementation(platform(libs.androidx.compose.bom))
 
+
+    // ===============================
+    // Unit testing (JVM) deps added
+    // ===============================
+    testImplementation(libs.androidx.test.core)
+    testImplementation(libs.jetbrains.kotlinx.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.turbine)
+
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    debugImplementation(libs.androidx.ui.test.manifest)
+    debugImplementation(libs.androidx.ui.tooling)
+    
+
+    // ===============================
+    // Kodein
+    // ===============================
     // For Android-specific features
-    implementation ("org.kodein.di:kodein-di-framework-android-x:7.20.2")
+    implementation (libs.kodein.di.framework.android.x)
 
     // For Jetpack Compose support
-    implementation ("org.kodein.di:kodein-di-framework-compose:7.20.2")
+    implementation (libs.kodein.di.framework.compose)
 
-    val room_version = "2.6.1"
 
-    implementation("androidx.room:room-runtime:$room_version")
-    annotationProcessor("androidx.room:room-compiler:$room_version")
+    // ===============================
+    // Room
+    // ===============================
+    annotationProcessor(libs.androidx.room.compiler)
+    implementation(libs.androidx.room.runtime)
 
     // To use Kotlin annotation processing tool (kapt)
     // kapt("androidx.room:room-compiler:$room_version")
     // To use Kotlin Symbol Processing (KSP)
-    ksp("androidx.room:room-compiler:$room_version")
-
-    // optional - Kotlin Extensions and Coroutines support for Room
-    implementation("androidx.room:room-ktx:$room_version")
-
-    // optional - RxJava2 support for Room
-    implementation("androidx.room:room-rxjava2:$room_version")
-
-    // optional - RxJava3 support for Room
-    implementation("androidx.room:room-rxjava3:$room_version")
-
-    // optional - Guava support for Room, including Optional and ListenableFuture
-    implementation("androidx.room:room-guava:$room_version")
-
-    // optional - Test helpers
-    testImplementation("androidx.room:room-testing:$room_version")
-
-    // optional - Paging 3 Integration
-    implementation("androidx.room:room-paging:$room_version")
-
-    // for crash scren
-    implementation("com.google.code.gson:gson:2.10.1")
-
-    // For JSON serialisation
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+    ksp(libs.androidx.room.compiler)
+    
+    implementation(libs.androidx.room.guava) // optional - Guava support for Room, including Optional and ListenableFuture
+    implementation(libs.androidx.room.ktx) // optional - Kotlin Extensions and Coroutines support for Room
+    implementation(libs.androidx.room.paging)  // optional - Paging 3 Integration
+    implementation(libs.androidx.room.rxjava2) // optional - RxJava2 support for Room
+    implementation(libs.androidx.room.rxjava3) // optional - RxJava3 support for Room
+    testImplementation(libs.androidx.room.testing) // optional - Test helpers
 }

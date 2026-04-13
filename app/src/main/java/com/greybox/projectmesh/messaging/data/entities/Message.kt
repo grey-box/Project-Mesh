@@ -13,34 +13,80 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.net.URI
-class URIConverter{
+
+/**
+ * Room type converter to convert between [URI] and [String] for database storage.
+ */
+class URIConverter {
+    /**
+     * Converts a [URI] to a [String] for database storage.
+     *
+     * @param theuri The URI to convert.
+     * @return The string representation of the URI, or null if input is null.
+     */
     @TypeConverter
-    fun convfromURI(theuri: URI?): String?{
+    fun convfromURI(theuri: URI?): String? {
         return theuri?.toString()
     }
+
+    /**
+     * Converts a [String] back to a [URI].
+     *
+     * @param uristring The string to convert.
+     * @return The corresponding URI, or null if input is null.
+     */
     @TypeConverter
-    fun convtoURI(uristring: String?): URI?{
-        return uristring?.let{URI.create(it)}
+    fun convtoURI(uristring: String?): URI? {
+        return uristring?.let { URI.create(it) }
     }
 }
-object URISerializable : KSerializer<URI> {//This makes the URI serializable, can be used in JSON
+
+/**
+ * Serializer to make [URI] serializable for Kotlinx serialization (e.g., JSON).
+ */
+object URISerializable : KSerializer<URI> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("URI", PrimitiveKind.STRING)
+
+    /**
+     * Serializes a [URI] into a string.
+     *
+     * @param enc The encoder.
+     * @param vals The URI to serialize.
+     */
     override fun serialize(enc: Encoder, vals: URI) {
         enc.encodeString(vals.toString())
     }
+
+    /**
+     * Deserializes a string into a [URI].
+     *
+     * @param dec The decoder.
+     * @return The deserialized URI.
+     */
     override fun deserialize(dec: Decoder): URI {
         return URI.create(dec.decodeString())
     }
 }
+
+/**
+ * Room entity representing a message in a chat.
+ *
+ * @property id Unique message ID (auto-generated).
+ * @property dateReceived Timestamp when the message was received.
+ * @property content The text content of the message.
+ * @property sender The identifier of the sender.
+ * @property chat The chat/conversation ID this message belongs to.
+ * @property file Optional file attached to the message, stored as a [URI].
+ */
 @Serializable
 @Entity(tableName = "message")
 @TypeConverters(URIConverter::class)
-data class Message(//
+data class Message(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "dateReceived") val dateReceived: Long,
     @ColumnInfo(name = "content") val content: String,
     @ColumnInfo(name = "sender") val sender: String,
     @ColumnInfo(name = "chat") val chat: String,
-   @ColumnInfo(name= "file")  @Serializable(with=URISerializable::class) val file: URI? = null
-    //@ColumnInfo(name = "file") @Serializable(with=URISerializable::class) val file: List<URI?>
+    @ColumnInfo(name = "file") @Serializable(with = URISerializable::class) val file: URI? = null
+    // @ColumnInfo(name = "file") @Serializable(with=URISerializable::class) val file: List<URI?>
 )

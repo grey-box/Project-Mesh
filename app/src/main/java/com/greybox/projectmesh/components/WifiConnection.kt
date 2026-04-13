@@ -28,7 +28,6 @@ import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectException
 import java.util.regex.Pattern
 import android.util.Log
 
-
 // This File is to pre-check the wifi connection, reusing from Meshrabiya test app
 /*
 WorkFlow:
@@ -41,24 +40,62 @@ WorkFlow:
 4. It handles the result (successful connection or error) and updates the UI as needed.
  */
 
-fun interface ConnectWifiLauncher{
+/**
+ * Functional interface representing a launcher for Wi-Fi connections.
+ */
+fun interface ConnectWifiLauncher {
+    /**
+     * Launch a connection attempt with the specified Wi-Fi configuration.
+     *
+     * @param config The Wi-Fi configuration to connect to.
+     */
     fun launch(config: WifiConnectConfig)
 }
 
+/**
+ * Represents a request to connect to a Wi-Fi network.
+ *
+ * @property receivedTime The timestamp when the request was created.
+ * @property connectConfig The configuration of the Wi-Fi network to connect to.
+ */
 data class ConnectRequest(
     val receivedTime: Long = 0,
     val connectConfig: WifiConnectConfig,
 )
 
+/**
+ * Result of a Wi-Fi connection attempt.
+ *
+ * @property hotspotConfig The configuration of the hotspot connected to, or null if failed.
+ * @property exception Any exception that occurred during connection, or null if successful.
+ * @property isWifiConnected True if the connection was successful, false otherwise.
+ */
 data class ConnectWifiLauncherResult(
     val hotspotConfig: WifiConnectConfig?,
     val exception: Exception? = null,
     val isWifiConnected: Boolean = false,
 )
+
+/**
+ * Status of the ConnectWifiLauncher during a Wi-Fi connection attempt.
+ */
 enum class ConnectWifiLauncherStatus {
     INACTIVE, REQUESTING_PERMISSION, LOOKING_FOR_NETWORK, REQUESTING_LINK,
 }
 
+/**
+ * Composable function that provides a [ConnectWifiLauncher] for managing Wi-Fi connections.
+ *
+ * It handles permission requests, network association via [CompanionDeviceManager],
+ * and provides status updates and connection results.
+ *
+ * @param node The [AndroidVirtualNode] representing the local virtual node.
+ * @param logger Optional logger for debugging messages.
+ * @param onStatusChange Optional callback invoked when the launcher status changes.
+ * @param onResult Callback invoked with the result of the Wi-Fi connection attempt.
+ *
+ * @return A [ConnectWifiLauncher] that can be used to initiate Wi-Fi connections.
+ */
 @Composable
 fun meshrabiyaConnectLauncher(
     node: AndroidVirtualNode,

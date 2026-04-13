@@ -1,0 +1,34 @@
+@startuml Logger
+
+package "com.greybox.projectmesh.utils" {
+
+    object Logger {
+
+        - LOGGING_ENABLED: Boolean
+        + TAG_PREFIX: String
+
+        + buildTag(tag: String): String
+        + buildCriticalTag(tag: String): String
+
+        + d(tag: String, message: String)
+        + i(tag: String, message: String)
+        + w(tag: String, message: String)
+        + e(tag: String, message: String, throwable: Throwable)
+        + critical(tag: String, message: String, throwable: Throwable)
+    }
+}
+
+package "android.util" {
+    class Log
+}
+
+Logger --> Log : uses
+
+note right of Logger
+    - Centralized logging utility
+    - Builds standardized tags
+    - Supports debug/info/warn/error logging
+    - Special critical logging always visible
+end note
+
+@enduml

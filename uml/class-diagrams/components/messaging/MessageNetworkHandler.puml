@@ -1,0 +1,29 @@
+@startuml MessageNetworkHandler
+skinparam classAttributeIconSize 0
+
+class MessageNetworkHandler {
+  -httpClient: OkHttpClient
+  -localVirtualAddr: InetAddress
+  -di: DI
+  -scope: CoroutineScope
+  -conversationRepository: ConversationRepository
+  -settingsPrefs: SharedPreferences
+  +sendChatMessage(address: InetAddress, time: Long, message: String, file: URI): Unit
+}
+
+class "MessageNetworkHandler.Companion" as MessageNetworkHandlerCompanion {
+  +handleIncomingMessage(chatMessage: String, time: Long, senderIp: InetAddress, incomingfile: URI): Message
+  -showMessageNotification(conversation: Conversation, message: Message, senderIp: InetAddress): Unit
+}
+
+MessageNetworkHandler --> OkHttpClient
+MessageNetworkHandler --> ConversationRepository
+MessageNetworkHandler --> SharedPreferences
+MessageNetworkHandler --> AppServer : uses DEFAULT_PORT
+MessageNetworkHandlerCompanion --> Message
+MessageNetworkHandlerCompanion --> Conversation
+MessageNetworkHandlerCompanion --> GlobalApp
+MessageNetworkHandlerCompanion --> TestDeviceService
+MessageNetworkHandlerCompanion --> ConversationUtils
+
+@enduml

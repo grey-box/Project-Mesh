@@ -1,0 +1,18 @@
+@startuml NotificationHelper
+skinparam classAttributeIconSize 0
+
+class NotificationHelper <<object>> {
+  -CHANNEL_ID: String = "file_receive_channel"
+  -CHANNEL_NAME: String = "File Receive Notifications"
+  +createNotificationChannel(context: Context): Unit
+  +showFileReceivedNotification(context: Context, fileName: String): Unit
+}
+
+NotificationHelper --> NotificationManager
+NotificationHelper --> NotificationChannel
+NotificationHelper --> NotificationCompat.Builder
+NotificationHelper --> PendingIntent
+NotificationHelper --> MainActivity
+NotificationHelper --> BottomNavItem
+
+@enduml

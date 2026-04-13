@@ -1,0 +1,184 @@
+@startuml
+title HomeScreen.kt (Compose) - View + Flow Overview
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class HomeScreen <<Composable>> {
+    +HomeScreen(viewModel: HomeScreenViewModel, deviceName: String?)
+  }
+
+  class StartHomeScreen <<Composable>> {
+    +StartHomeScreen(uiState: HomeScreenModel, node: AndroidVirtualNode, ... )
+  }
+
+  class LongPressCopyableText <<Composable>> {
+    +LongPressCopyableText(context: Context, text: String, textCopyable: String, ...)
+  }
+
+  class QRCodeView <<Composable>> {
+    +QRCodeView(qrcodeUri: String, barcodeEncoder: BarcodeEncoder, ssid: String?, ...)
+  }
+
+  class NoConcurrencyWarningDialog <<Composable>> {
+    +NoConcurrencyWarningDialog(onDismiss: () -> Unit)
+  }
+
+  class ConcurrencyWarningDialog <<Composable>> {
+    +ConcurrencyWarningDialog(onDismiss: () -> Unit)
+  }
+
+  class stopHotspotConfirmationDialog <<Function>> {
+    +stopHotspotConfirmationDialog(context: Context, onConfirm: (Boolean)->Unit)
+  }
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class HomeScreenViewModel <<ViewModel>> {
+    +uiState: StateFlow<HomeScreenModel>
+    +concurrencyKnown: StateFlow<Boolean>
+    +concurrencySupported: StateFlow<Boolean>
+    +showNoConcurrencyWarning: Flow<Boolean>
+    +showConcurrencyWarning: Flow<Boolean>
+
+    +onSetIncomingConnectionsEnabled(enabled: Boolean)
+    +onClickDisconnectStation()
+    +onConnectBandChanged(band: ConnectBand)
+    +onSetHotspotTypeToCreate(type: HotspotType)
+    +onConnectWifi(config: HotspotConfig)
+
+    +saveConcurrencyKnown(value: Boolean)
+    +saveConcurrencySupported(value: Boolean)
+    +dismissNoConcurrencyWarning()
+    +dismissConcurrencyWarning()
+  }
+
+  class HomeScreenModel <<State>> {
+    +localAddress
+    +connectBandVisible: Boolean
+    +bandMenu: List<ConnectBand>
+    +band: ConnectBand
+
+    +wifiConnectionEnabled: Boolean
+    +hotspotTypeMenu: List<HotspotType>
+    +hotspotTypeToCreate: HotspotType
+
+    +wifiState
+    +hotspotStatus: Boolean
+    +connectUri: String?
+    +nodesOnMesh: Set<Addr>
+
+    +hotspotStatus: Boolean
+  }
+}
+
+package "Meshrabiya / Wifi" as Mesh {
+  class AndroidVirtualNode
+  class VirtualNode
+  class MeshrabiyaConnectLink {
+    +parseUri(uri: String, json: Any): Parsed
+  }
+  class ConnectWifiLauncherResult {
+    +hotspotConfig
+    +exception
+  }
+  enum ConnectWifiLauncherStatus {
+    INACTIVE
+    ...
+  }
+  class BarcodeEncoder
+  class ScanContract
+  class ScanOptions
+  class WifiStationState {
+    +status
+    +config
+  }
+  enum HotspotType {
+    WIFIDIRECT_GROUP
+    ...
+  }
+  enum ConnectBand
+  class MNetLogger
+}
+
+package "Android / Compose Runtime" as Android {
+  class Context
+  class WifiManager
+  class Intent
+  class Toast
+  class PackageManager
+  class AlertDialogBuilder as "AlertDialog.Builder"
+  class PermissionLauncher as "rememberLauncherForActivityResult(RequestPermission)"
+  class QRScannerLauncher as "rememberLauncherForActivityResult(ScanContract)"
+}
+
+' ---------- Structural links ----------
+HomeScreen --> StartHomeScreen : composes
+HomeScreen ..> HomeScreenViewModel : collects uiState\ncollectAsState()
+HomeScreen ..> VirtualNode : DI provides node
+HomeScreen ..> MNetLogger : DI provides logger
+HomeScreen ..> PermissionLauncher : nearby-wifi permission
+
+StartHomeScreen ..> HomeScreenViewModel : collects warnings\n(showNoConcurrencyWarning/showConcurrencyWarning)
+StartHomeScreen ..> AndroidVirtualNode : uses node
+StartHomeScreen ..> BarcodeEncoder : remembers encoder
+StartHomeScreen ..> QRScannerLauncher : QR scan launcher
+StartHomeScreen ..> ConnectWifiLauncherStatus : connectLauncherState
+StartHomeScreen ..> ConnectWifiLauncherResult : onResult callback
+StartHomeScreen ..> MeshrabiyaConnectLink : parse connect link
+StartHomeScreen ..> ScanOptions : launches scan
+StartHomeScreen --> LongPressCopyableText : shows device info
+StartHomeScreen --> QRCodeView : shows QR + credentials
+StartHomeScreen --> NoConcurrencyWarningDialog
+StartHomeScreen --> ConcurrencyWarningDialog
+StartHomeScreen --> stopHotspotConfirmationDialog
+
+stopHotspotConfirmationDialog ..> "AlertDialog.Builder" : build + show
+
+' ---------- Key UI triggers -> ViewModel ----------
+StartHomeScreen ..> HomeScreenViewModel : onSetIncomingConnectionsEnabled(enabled)\n(Start/Stop Hotspot)
+StartHomeScreen ..> HomeScreenViewModel : onClickDisconnectStation()\n(Disconnect WiFi Station)
+StartHomeScreen ..> HomeScreenViewModel : onConnectBandChanged(band)\n(FilterChip)
+StartHomeScreen ..> HomeScreenViewModel : onSetHotspotTypeToCreate(type)\n(FilterChip)
+StartHomeScreen ..> HomeScreenViewModel : onConnectWifi(hotspotConfig)\n(onConnectWifiLauncherResult)
+
+NoConcurrencyWarningDialog ..> HomeScreenViewModel : dismissNoConcurrencyWarning()
+ConcurrencyWarningDialog ..> HomeScreenViewModel : dismissConcurrencyWarning()
+
+' ---------- Behavior notes / guards (as notes) ----------
+note right of HomeScreen
+- On enable hotspot:
+  * If missing nearby-wifi/location permission -> launch permission request
+  * If hotspotTypeToCreate == WIFIDIRECT_GROUP:
+      require WiFi enabled (WifiManager.isWifiEnabled) else Toast and abort
+- Concurrency probing (Android >= 11):
+  if !concurrencyKnown -> saveConcurrencyKnown(true),
+  saveConcurrencySupported(context.hasStaApConcurrency())
+- Error dialog shown when connect launcher returns exception
+end note
+
+note right of StartHomeScreen
+Connect flow:
+- QR scan OR manual URI entry -> connect(uri)
+- connect(uri):
+  * parse MeshrabiyaConnectLink -> hotspotConfig
+  * if hotspotConfig null -> Toast + log
+  * if already in uiState.nodesOnMesh -> Toast + log
+  * else connectLauncher.launch(hotspotConfig)
+- connectLauncher onResult:
+  * hotspotConfig != null -> viewModel.onConnectWifi(config)
+  * else set errorMessage (shown by HomeScreen)
+end note
+
+note bottom of LongPressCopyableText
+Long press -> copies textCopyable to clipboard
+and shows Toast "Text copied to clipboard!"
+end note
+
+note bottom of QRCodeView
+Generates QR bitmap from connectUri and displays
+SSID / Password / MAC / Port next to it
+end note
+
+@enduml

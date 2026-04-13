@@ -62,3 +62,5 @@ kotlin-ide/
 .idea/
 .aider*
 .env
+.idea/misc.xml
+.vscode

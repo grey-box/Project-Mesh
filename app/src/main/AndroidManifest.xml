@@ -1,6 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
+<?xml version="1.0" encoding="utf-8" ?>
+<manifest
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+>
 
     <uses-feature android:name="android.software.companion_device_setup" />
 
@@ -24,24 +26,27 @@
     <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <uses-feature
-        android:name="android.hardware.camera"
-        android:required="false" />
+    android:name="android.hardware.camera"
+    android:required="false"
+  />
     <!--
  If your app targets Android 13 (API level 33)
           or higher, you must declare the NEARBY_WIFI_DEVICES permission.
     -->
-    <uses-permission android:name="android.permission.NEARBY_WIFI_DEVICES"
-        android:usesPermissionFlags="neverForLocation" />
     <uses-permission
-        android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission
-        android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    android:name="android.permission.NEARBY_WIFI_DEVICES"
+    android:usesPermissionFlags="neverForLocation"
+  />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
+    <uses-permission
+    android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+  />
 
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 
 
@@ -55,26 +60,28 @@
     </queries>
 
     <application
-        android:name=".GlobalApp"
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:usesCleartextTraffic="true"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.AppCompat"
-        android:hardwareAccelerated="true"
-        tools:targetApi="31">
+    android:name=".GlobalApp"
+    android:allowBackup="true"
+    android:dataExtractionRules="@xml/data_extraction_rules"
+    android:fullBackupContent="@xml/backup_rules"
+    android:icon="@mipmap/ic_launcher"
+    android:label="@string/app_name"
+    android:usesCleartextTraffic="true"
+    android:roundIcon="@mipmap/ic_launcher_round"
+    android:supportsRtl="true"
+    android:theme="@style/Theme.AppCompat"
+    android:hardwareAccelerated="true"
+    tools:targetApi="31"
+  >
 <!--        <service-->
 <!--            android:name=".MainActivity"-->
 <!--            android:foregroundServiceType="location"/>-->
         <activity
-            android:name=".MainActivity"
-            android:exported="true"
-            android:label="@string/app_name"
-            android:theme="@style/Theme.ProjectMesh.Launcher">
+      android:name=".MainActivity"
+      android:exported="true"
+      android:label="@string/app_name"
+      android:theme="@style/Theme.ProjectMesh.Launcher"
+    >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -82,21 +89,28 @@
             </intent-filter>
         </activity>
         <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.greybox.projectmesh.fileprovider"
-            android:grantUriPermissions="true"
-            android:exported="false">
+      android:name="androidx.core.content.FileProvider"
+      android:authorities="com.greybox.projectmesh.fileprovider"
+      android:grantUriPermissions="true"
+      android:exported="false"
+    >
 
             <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/filepaths"/>
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/filepaths"
+      />
         </provider>
         <activity
-            android:name="com.journeyapps.barcodescanner.CaptureActivity"
-            android:screenOrientation="portrait"
-            android:stateNotNeeded="true"
-            tools:replace="android:screenOrientation" />
-        <activity android:name=".debug.CrashScreenActivity" android:process=":error_handler" android:exported="false"></activity>
+      android:name="com.journeyapps.barcodescanner.CaptureActivity"
+      android:screenOrientation="portrait"
+      android:stateNotNeeded="true"
+      tools:replace="android:screenOrientation"
+    />
+        <activity
+      android:name=".debug.CrashScreenActivity"
+      android:process=":error_handler"
+      android:exported="false"
+    />
     </application>
 
 </manifest>

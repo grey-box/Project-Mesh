@@ -1,0 +1,162 @@
+@startuml
+title SettingsScreen.kt (Compose) - Settings Sections + Callbacks + Dialog + Folder Picker
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class SettingsScreen <<Composable>> {
+    +SettingsScreen(viewModel: SettingsScreenViewModel,\n onThemeChange,\n onLanguageChange,\n onRestartServer,\n onDeviceNameChange,\n onAutoFinishChange,\n onSaveToFolderChange)
+  }
+
+  class SectionHeader <<Composable>>
+  class SettingItem <<Composable>>
+  class LanguageSetting <<Composable>>
+  class ThemeSetting <<Composable>>
+  class ChangeDeviceNameDialog <<Composable>>
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class SettingsScreenViewModel <<ViewModel>> {
+    +theme: StateFlow<AppTheme>
+    +lang: StateFlow<String>
+    +deviceName: StateFlow<String>
+    +autoFinish: StateFlow<Boolean>
+    +saveToFolder: StateFlow<String>
+    +saveTheme(theme: AppTheme)
+    +saveLang(lang: String)
+    +saveDeviceName(name: String)
+    +saveAutoFinish(enabled: Boolean)
+    +saveSaveToFolder(pathOrUri: String)
+    +updateConcurrencySettings(known: Boolean, supported: Boolean)
+  }
+
+  enum AppTheme {
+    System
+    Light
+    Dark
+  }
+}
+
+package "DI" as DI {
+  class localDI
+  class ViewModelFactory
+  class LocalSavedStateRegistryOwner
+  class SharedPreferences
+}
+
+package "Android" as Android {
+  class Context
+  class Intent
+  class Uri
+  class Build
+  class Toast
+  class ContentResolver
+}
+
+package "Compose UI / Material3" as UI {
+  class Column
+  class Row
+  class Text
+  class Spacer
+  class HorizontalDivider
+  class Switch
+  class DropdownMenu
+  class DropdownMenuItem
+  class TextButton
+  class TextField
+  class Dialog
+  class Surface
+  class rememberLauncherForActivityResult
+  class ActivityResultContractsOpenDocumentTree as "ActivityResultContracts.OpenDocumentTree"
+  class PopupProperties
+}
+
+package "Project UI Components" as Comp {
+  class GradientButton
+  class GradientLongButton
+}
+
+' ---- Top wiring ----
+Views.SettingsScreen ..> DI.localDI
+Views.SettingsScreen ..> DI.ViewModelFactory : creates SettingsScreenViewModel
+Views.SettingsScreen ..> VM.SettingsScreenViewModel : viewModel(factory)
+
+Views.SettingsScreen ..> UI.rememberLauncherForActivityResult : directoryLauncher(OpenDocumentTree)
+Views.SettingsScreen ..> DI.SharedPreferences : instance(tag="settings")\n(read only in this file)
+
+note right of Views.SettingsScreen
+UI State sources from ViewModel:
+- currTheme = theme.collectAsState()
+- currLang = lang.collectAsState()
+- currDeviceName = deviceName.collectAsState()
+- currAutoFinish = autoFinish.collectAsState()
+- currSaveToFolder = saveToFolder.collectAsState()
+
+Internal UI state:
+- showDialog: Boolean (device name dialog visibility)
+end note
+
+' ---- Section structure ----
+Views.SettingsScreen --> Views.SectionHeader : "General"
+Views.SettingsScreen --> Views.SettingItem : Language (LanguageSetting)
+Views.SettingsScreen --> Views.SettingItem : Theme (ThemeSetting)
+
+Views.SettingsScreen --> Views.SectionHeader : "Network"
+Views.SettingsScreen --> Views.SettingItem : Server Restart (GradientButton -> onRestartServer)
+Views.SettingsScreen --> Views.SettingItem : Device Name (GradientButton -> showDialog=true)
+Views.SettingsScreen --> Views.ChangeDeviceNameDialog : if(showDialog)
+
+Views.SettingsScreen --> Views.SectionHeader : "Receive"
+Views.SettingsScreen --> Views.SettingItem : Auto Finish (Switch)
+Views.SettingsScreen --> Views.SettingItem : Save to folder (GradientButton -> directoryLauncher)
+
+Views.SettingsScreen --> Views.SectionHeader : "Concurrency"\n(only if SDK< R)
+Views.SettingsScreen --> Views.SettingItem : Reset (GradientLongButton)
+
+' ---- Callback behaviors ----
+note bottom of Views.SettingsScreen
+Callbacks + persistence:
+
+Language:
+- viewModel.saveLang(code)
+- onLanguageChange(code)
+
+Theme:
+- viewModel.saveTheme(theme)
+- onThemeChange(theme)
+
+Device Name:
+- showDialog -> ChangeDeviceNameDialog
+- confirm:
+   viewModel.saveDeviceName(newName)
+   onDeviceNameChange(newName)
+
+Auto Finish Switch:
+- viewModel.saveAutoFinish(isChecked)
+- onAutoFinishChange(isChecked)
+
+Save to Folder:
+- OpenDocumentTree returns Uri?
+- if uri!=null:
+   takePersistableUriPermission(READ|WRITE)
+   viewModel.saveSaveToFolder(uri.toString())
+   onSaveToFolderChange(uri.toString())
+- else:
+   Toast("No directory selected")
+
+Concurrency reset (SDK< R):
+- viewModel.updateConcurrencySettings(false, true)
+- Toast("Reset ... Unknown")
+end note
+
+' ---- Folder name display logic ----
+note right of Views.SettingItem
+folderNameToShow:
+if saveToFolder startsWith "content://":
+  Uri.decode(value).split(":").lastOrNull() ?: "Unknown"
+else:
+  value.split("/").lastOrNull() ?: "Unknown"
+end note
+
+@enduml

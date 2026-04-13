@@ -9,17 +9,17 @@ Project Mesh includes built-in test users to help with development and testing. 
 The application includes two test users:
 
 1. **Online Test Device**
-    - Name: "Test Echo Device (Online)"
-    - IP Address: 192.168.0.99
-    - Status: Always appears as online
-    - Behavior: Automatically responds to messages with an echo reply
+   - Name: "Test Echo Device (Online)"
+   - IP Address: 192.168.0.99
+   - Status: Always appears as online
+   - Behavior: Automatically responds to messages with an echo reply
 
 2. **Offline Test Device**
-    - Name: "Test Echo Device (Offline)"
-    - IP Address: 192.168.0.98
-    - Status: Always appears as offline
-    - Status: Always appears as offline
-    - Behavior: Messages can be sent but will remain stored locally
+   - Name: "Test Echo Device (Offline)"
+   - IP Address: 192.168.0.98
+   - Status: Always appears as offline
+   - Status: Always appears as offline
+   - Behavior: Messages can be sent but will remain stored locally
 
 **Only Online User Shows Up as Online**:
 
@@ -35,6 +35,7 @@ The application includes two test users:
 ## Usage Examples
 
 ### Testing Message Delivery
+
 1. Navigate to the Chat screen
 2. Select "Test Echo Device (Online)" from the conversation list
 3. Send a message
@@ -43,6 +44,7 @@ The application includes two test users:
 <img src="images/OnlineTestDeviceChat.png" width="300" style="border: 2px solid black;" alt="OnlineTestChat">
 
 ### Testing Offline Message Behavior
+
 1. Navigate to the Chat screen
 2. Select "Test Echo Device (Offline)" from the conversation list
 3. Send a message
@@ -74,9 +76,12 @@ const val TEST_DEVICE_NAME_OFFLINE = "Test Echo Device (Offline)"
 ## Test User Integration
 
 ### How Test Users Connect with the Project Mesh Architecture
+
 Test users are integrated into several key components of the Project Mesh architecture to simulate real devices without requiring actual physical connections. Here's how they interface with the core systems:
+
 1. TestDeviceService Integration
-```kotlin 
+
+```kotlin
 // In TestDeviceService.kt
 companion object {
     const val TEST_DEVICE_IP = "192.168.0.99"
@@ -119,22 +124,24 @@ companion object {
             Log.e("TestDeviceService", "Failed to initialize test device", e)
         }
     }
-    
+
     // Additional methods for test device functionality...
 }
 ```
+
 2. Global App Integration
-```kotlin 
+
+```kotlin
 // In GlobalApp.kt
 override fun onCreate() {
     super.onCreate()
-    
+
     // Other initialization code...
 
     //Initialize test device:
     TestDeviceService.initialize()
     Log.d("MainActivity", "Test device initialized")
-    
+
     // Test conversation setup
     insertTestConversations()
 }
@@ -197,8 +204,10 @@ fun insertTestConversations() {
     }
 }
 ```
-3. AppServer Integration 
-```kotlin 
+
+3. AppServer Integration
+
+```kotlin
 // In AppServer.kt
 fun sendChatMessageWithStatus(address: InetAddress, time: Long, message: String, f: URI?): Boolean {
     try {
@@ -218,7 +227,7 @@ fun sendChatMessageWithStatus(address: InetAddress, time: Long, message: String,
             Log.d("AppServer", "Test device echoed message: $message")
             return true
         }
-        
+
         // Normal chat message handling for real devices...
     }
     catch (e: Exception) {
@@ -241,22 +250,24 @@ fun requestRemoteUserInfo(remoteAddr: InetAddress, port: Int = DEFAULT_PORT) {
         DeviceStatusManager.updateDeviceStatus(ipAddress, false)
         return
     }
-    
+
     // Normal remote user info handling for real devices...
 }
 ```
-4. DeviceStatusManager Integration 
-```kotlin 
+
+4. DeviceStatusManager Integration
+
+```kotlin
 // In DeviceStatusManager.kt
 object DeviceStatusManager {
     // Other properties and methods...
-    
+
     //special test device addresses that should be handled differently
     private val specialDevices = setOf(
         "192.168.0.99",  // Online test device
         "192.168.0.98"   // Offline test device
     )
-    
+
     fun updateDeviceStatus(ipAddress: String, isOnline: Boolean, verified: Boolean = false) {
         //if this is a special device, handle according to its predefined status
         if (ipAddress == "192.168.0.99") { // Online test device
@@ -276,21 +287,23 @@ object DeviceStatusManager {
             Log.d("DeviceStatusManager", "Updated test device status for $ipAddress: offline")
             return
         }
-        
+
         // Normal device status handling for real devices...
     }
-    
+
     fun verifyDeviceStatus(ipAddress: String) {
         // Skip verification for special test devices
         if (ipAddress in specialDevices) {
             return
         }
-        
+
         // Normal device verification for real devices...
     }
 }
 ```
+
 5. NetworkServiceViewModel Integration
+
 ```kotlin
 // In NetworkScreenViewModel.kt
 init {
@@ -313,21 +326,23 @@ init {
     }
 }
 ```
+
 6. ConversationsHomeScreen Integration
    Test devices appear in the conversations list as either online or offline contacts, with special handling to ensure they have the correct status regardless of actual network conditions.
 7. ChatScreen Integration
-```kotlin 
+
+```kotlin
 // In ChatScreenViewModel.kt
 fun sendChatMessage(virtualAddress: InetAddress, message: String, file: URI?) {
     // Other processing...
-    
+
     viewModelScope.launch {
         //save to local database
         db.messageDao().addMessage(messageEntity)
 
         //update convo with the new message
         // ...
-        
+
         if (isOnline) {
             try {
                 // Send message to real device

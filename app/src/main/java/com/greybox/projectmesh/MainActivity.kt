@@ -1,95 +1,76 @@
 package com.greybox.projectmesh
 
-import android.annotation.SuppressLint
-import android.app.AlertDialog
-import android.content.Context
-import android.content.Context.MODE_PRIVATE
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
-import android.os.PowerManager
-import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
 import com.greybox.projectmesh.debug.CrashHandler
 import com.greybox.projectmesh.debug.CrashScreenActivity
-import com.greybox.projectmesh.navigation.BottomNavItem
+import com.greybox.projectmesh.messaging.data.entities.Conversation
+import com.greybox.projectmesh.messaging.ui.screens.ChatScreen
+import com.greybox.projectmesh.messaging.ui.screens.ConversationsHomeScreen
+import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
 import com.greybox.projectmesh.navigation.BottomNavigationBar
+import com.greybox.projectmesh.navigation.BottomNavItem
 import com.greybox.projectmesh.server.AppServer
+import com.greybox.projectmesh.testing.TestDeviceService
 import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
+import com.greybox.projectmesh.user.UserRepository
 import com.greybox.projectmesh.viewModel.SharedUriViewModel
-import com.greybox.projectmesh.messaging.ui.screens.ChatScreen
 import com.greybox.projectmesh.views.HomeScreen
-import com.greybox.projectmesh.views.SettingsScreen
+import com.greybox.projectmesh.views.LogScreen
 import com.greybox.projectmesh.views.NetworkScreen
+import com.greybox.projectmesh.views.OnboardingScreen
 import com.greybox.projectmesh.views.PingScreen
 import com.greybox.projectmesh.views.ReceiveScreen
 import com.greybox.projectmesh.views.SelectDestNodeScreen
 import com.greybox.projectmesh.views.SendScreen
-import com.greybox.projectmesh.views.OnboardingScreen
-import com.greybox.projectmesh.testing.TestDeviceService
-import org.kodein.di.DI
-import org.kodein.di.DIAware
-import org.kodein.di.android.closestDI
-import org.kodein.di.compose.withDI
-import org.kodein.di.instance
+import com.greybox.projectmesh.views.SettingsScreen
 import java.io.File
-import java.util.Locale
 import java.net.InetAddress
-import com.greybox.projectmesh.messaging.ui.screens.ChatNodeListScreen
-import com.greybox.projectmesh.messaging.ui.screens.ConversationsHomeScreen
-import com.greybox.projectmesh.user.UserRepository
+import java.util.Locale
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
-import kotlinx.coroutines.launch
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import com.greybox.projectmesh.messaging.data.entities.Conversation
-import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
-import com.greybox.projectmesh.views.LogScreen
+import org.kodein.di.android.closestDI
+import org.kodein.di.compose.withDI
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 
 
 import com.greybox.projectmesh.views.RequestPermissionsScreen
@@ -129,7 +110,7 @@ class MainActivity : ComponentActivity(), DIAware {
                 mutableStateOf(settingPref.getString(
                     "language", "en") ?: "en")
             }
-            var restartServerKey by remember {mutableStateOf(0)}
+            var restartServerKey by remember {mutableIntStateOf(0)}
             var deviceName by remember {
                 mutableStateOf(settingPref.getString("device_name", Build.MODEL) ?: Build.MODEL)
             }

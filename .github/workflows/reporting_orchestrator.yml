@@ -1,0 +1,197 @@
+name: Compile Build Reports
+run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
+
+on:
+  # run anytime a PR is merged to main or a direct push to main
+  push:
+    branches: [main]
+
+  # run on any push to a PR branch
+  pull_request:
+
+  # run on demand
+  workflow_dispatch:
+    inputs:
+      custom-run-name:
+        description: "Custom name for this Actions run"
+        required: false
+        type: string
+
+# cancel any previously-started, yet still active runs of this workflow on the same branch
+concurrency:
+  group: ${{ github.ref }}-${{ github.workflow }}
+  cancel-in-progress: true
+
+jobs:
+  lint-kotlin:
+    name: Lint Kotlin (Gradle Linter)
+    uses: ./.github/workflows/call_gradle_lint.yml
+    with:
+      skip_commit: true
+
+  test-and-report-coverage:
+    name: Test and Report Coverage
+    uses: ./.github/workflows/test_and_report_coverage.yml
+    with:
+      skip_commit: true
+
+  build-documentation:
+    name: Build Dokka Documentation
+    uses: ./.github/workflows/build_documentation.yml
+    with:
+      skip_commit: true
+
+  upload-apks:
+    name: Upload APKs
+    uses: ./.github/workflows/build_artifacts.yml
+
+  submit-dependency-graph:
+    name: Submit Dependency Graph
+    uses: ./.github/workflows/submit_dependency_graph.yml
+
+  lint-codebase:
+    name: Lint Code Base (Super-Linter)
+    uses: ./.github/workflows/call_super_lint.yml
+
+
+  finalize-report-viewer:
+    name: Finalize Report Viewer
+    needs: [lint-kotlin, test-and-report-coverage, build-documentation]
+    if: always()
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      actions: write
+      id-token: write
+      pages: write
+    environment:
+      name: github-pages
+      url: ${{ steps.set-pages-link.outputs.pages-link }}
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0 # necessary to allow branch switching
+
+      # - name: Ensure Report Dir is Empty # add files NOT to delete each run to the list below
+      #   run: |
+      #     export GLOBIGNORE="./build_reports/index.html:./build_reports/styles.css:./build_reports/README.md:./build_reports/.gitignore:./build_reports/include_html.js"
+      #     rm -rf ./build_reports/*
+      #     unset GLOBIGNORE
+
+      - name: Create Clean Build-Reports Directory
+        run: |
+          rm -rf ./build_reports 2> /dev/null
+          mkdir ./build_reports
+
+
+      - name: Download All Artifacts
+        uses: actions/download-artifact@v8
+        with:
+          path: ./build_reports/
+          # TODO: edit to never pull APKs
+
+      - name: Relocate CI Artifacts to Dirs
+        run: |
+          rm -rf ./build_reports/app-debug-apk 2> /dev/null
+          rm -rf ./build_reports/app-release-apk 2> /dev/null
+
+          mkdir ./build_reports/coverage_report
+          cp -a ./build_reports/coverage_report_artifact/. ./build_reports/coverage_report/
+          rm -r ./build_reports/coverage_report_artifact
+
+          mkdir ./build_reports/lint_report_debug
+          cp ./build_reports/lint_report_debug_artifact/lint-results-debug.html ./build_reports/lint_report_debug/lint_report_debug.html
+          rm -r ./build_reports/lint_report_debug_artifact
+
+          ls ./build_reports
+          echo "----"
+          ls ./build_reports/lint_report_debug
+
+          sed -i 's/1px; 1px;/1px 1px;/g' ./build_reports/lint_report_debug/lint_report_debug.html
+
+          mkdir ./build_reports/lint_report_release
+          cp ./build_reports/lint_report_release_artifact/lint-results-release.html ./build_reports/lint_report_release/lint_report_release.html
+          rm -r ./build_reports/lint_report_release_artifact
+
+          ls ./build_reports
+          echo "----"
+          ls ./build_reports/lint_report_release
+
+          sed -i 's/1px; 1px;/1px 1px;/g' ./build_reports/lint_report_release/lint_report_release.html
+
+          mkdir ./build_reports/test_report_debug
+          cp -a ./build_reports/test_report_debug_artifact/. ./build_reports/test_report_debug/
+          rm -r ./build_reports/test_report_debug_artifact
+
+          mkdir ./build_reports/test_report_release
+          cp -a ./build_reports/test_report_release_artifact/. ./build_reports/test_report_release/
+          rm -r ./build_reports/test_report_release_artifact
+
+          mkdir ./build_reports/documentation
+          cp -a ./build_reports/dokka_documentation_artifact/. ./build_reports/documentation/
+          rm -r ./build_reports/dokka_documentation_artifact
+
+          echo "----"
+          ls ./build_reports
+          echo "----"
+          ls ./build_reports/documentation
+      
+      - name: Write Timestamp
+        run: |
+          mkdir ./build_reports/footer_timestamp
+          echo "Last updated at: " > ./build_reports/footer_timestamp/timestamp.txt
+          date +"%F %T %Z" >> ./build_reports/footer_timestamp/timestamp.txt
+
+      - name: Configure Git Identity
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Commit Reports to Viewing Directory
+        # PRs run workflows out of a temp branch instead of the calling branch, so they need to create a temp branch to host the commit for build reports
+        run: |
+          git rm -r --cached --ignore-unmatch ./build_reports
+          git add ./build_reports
+          git status
+          git commit -m "Local commit for cherrypick"
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "Triggered by Push, standard case"
+            git switch gh-pages
+            git cherry-pick -X theirs ${{ github.ref_name }}
+            git push
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Triggered by PR, creating temp branch (will not outlive workflow)"
+            git branch temp_for_cherrypick "$(git rev-parse --short HEAD)"
+            git switch gh-pages
+            git cherry-pick -X theirs temp_for_cherrypick
+            git push
+          else
+            echo "Triggered by: ${{ github.event_name }}. This is unhandled."
+            exit 2
+          fi
+
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      # - name: Upload Reports Viewer Directory to Pages
+      #   uses: actions/upload-pages-artifact@v3
+      #   with:
+      #     path: ./build_reports
+
+      # - name: Deploy to GitHub Pages
+      #   id: deployment
+      #   uses: actions/deploy-pages@v4
+
+      - name: Define Pages Link on Success
+        id: set-pages-link
+        run: |
+          echo "pages-link=https://grey-box.github.io/Project-Mesh/" >> $GITHUB_OUTPUT
+
+      - name: Link Pages in Build Summary
+        run: |
+          echo "All reports can be viewed at ${{ steps.set-pages-link.outputs.pages-link }} about 30s after this workflow is completed" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+  

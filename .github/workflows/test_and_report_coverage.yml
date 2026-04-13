@@ -1,0 +1,152 @@
+name: Measure Test Coverage
+run-name: ${{ github.event.inputs.custom_run_name || github.workflow }}
+
+on:
+  # run when called by another workflow
+  workflow_call:
+    inputs:
+      skip_commit:
+        description: "Skip committing reports"
+        required: false
+        type: boolean
+        default: false
+
+  # run on demand
+  workflow_dispatch:
+    inputs:
+      custom-run-name:
+        description: "Custom name for this Actions run"
+        required: false
+        type: string
+
+# cancel any previously-started, yet still active runs of this workflow on the same branch
+concurrency:
+  group: ${{ github.ref }}-Measure Test Coverage
+  cancel-in-progress: true
+
+jobs:
+  test_and_report_coverage:
+    name: Test and Report Coverage
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Check Out Code
+        uses: actions/checkout@v6
+
+      - name: Define Coverage Minimums
+        run: |
+          echo "min-coverage-overall=80" >> $GITHUB_ENV
+          echo "min-coverage-changed-files=80" >> $GITHUB_ENV
+      
+      - name: Set up JDK
+        uses: actions/setup-java@v5
+        with:
+          distribution: "temurin"
+          java-version: "17"
+
+      - name: Set Up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          add-job-summary: never
+
+      - name: Generate Kover Coverage Report
+        id: koverXmlReport
+        run: ./gradlew koverXmlReport --continue
+        continue-on-error: true
+
+        # if all tests pass, no report is generated, which errors the orchestrator. Generate a simple passing notification in the same location.
+      - name: Insert Passing Report (only on test pass)
+        if: steps.koverXmlReport.outcome == 'success'
+        run: |
+          mkdir ./app/build/reports/kover/html
+          echo "<h1>All tests pass! (or tests not found :/)</h1>" > ./app/build/reports/kover/html/index.html
+
+      - name: Download Kover CLI (only on test failure)
+        if: steps.koverXmlReport.outcome == 'failure'
+        run: wget -O kover-cli.jar https://repo1.maven.org/maven2/org/jetbrains/kotlinx/kover-cli/0.9.3/kover-cli-0.9.3.jar
+        # ensure the versions in the link match the kover version in the top-level build.gradle.kts file
+
+      - name: Format Kover XML Coverage Report Via CLI (only on test failure)
+        if: steps.koverXmlReport.outcome == 'failure'
+        run: java -jar kover-cli.jar report ./app/build/kover/bin-reports/testDebugUnitTest.ic --classfiles ./app/build/tmp/kotlin-classes --src ./app/src/main/java --xml ./app/build/reports/kover/report.xml
+
+      - name: Format Kover HTML Coverage Report Via CLI (only on test failure)
+        if: steps.koverXmlReport.outcome == 'failure'
+        run: java -jar kover-cli.jar report ./app/build/kover/bin-reports/testDebugUnitTest.ic --classfiles ./app/build/tmp/kotlin-classes --src ./app/src/main/java --html ./app/build/reports/kover/html/
+
+      - name: Add Coverage Report to PR (if triggered via valid event)
+        # conditional for graceful handling of Kover limitations
+        id: kover
+        if: ${{ github.event_name == 'pull_request' || github.event_name == 'push' }} 
+        uses: mi-kas/kover-report@v1
+        with:
+          path: ${{ github.workspace }}/app/build/reports/kover/report.xml
+          title: Code Coverage
+          update-comment: true
+          min-coverage-overall: ${{ env.min-coverage-overall }}
+          min-coverage-changed-files: ${{ env.min-coverage-changed-files }}
+          coverage-counter-type: LINE
+
+      - name: Configure Git Identity (if called individually)
+        if: ${{ inputs.skip_commit != true }}
+        run: |
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions[bot]"
+
+      - name: Copy Coverage Report & Test Outputs to Viewing Directory (if called individually)
+        if: ${{ inputs.skip_commit != true }}
+        run: |
+          cp -r ./app/build/reports/kover/html/ ./build_reports/coverage_report
+          cp -r ./app/build/reports/tests/testDebugUnitTest ./build_reports/test_report_debug
+          cp -r ./app/build/reports/tests/testReleaseUnitTest ./build_reports/test_report_release
+          git add --force ./build_reports/
+          git commit -m "Relocate coverage report for viewing"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Upload Coverage Report Artifact (if called by orchestrator)
+        if: ${{ inputs.skip_commit == true }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: coverage_report_artifact
+          path: ./app/build/reports/kover/html
+          retention-days: 1
+
+      - name: Upload Test Debug Artifact (if called by orchestrator)
+        if: ${{ inputs.skip_commit == true }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: test_report_debug_artifact
+          path: ./app/build/reports/tests/testDebugUnitTest
+          retention-days: 1
+
+      - name: Upload Test Release Artifact (if called by orchestrator)
+        if: ${{ inputs.skip_commit == true }}
+        uses: actions/upload-artifact@v6
+        with:
+          name: test_report_release_artifact
+          path: ./app/build/reports/tests/testReleaseUnitTest
+          retention-days: 1
+
+      - name: Add Summary to Workflow Run
+        run: |
+          echo "| Type | Coverage | Passing |" >> $GITHUB_STEP_SUMMARY
+          echo "|---|---|---|" >> $GITHUB_STEP_SUMMARY
+          echo "| Overall Coverage | ${{ steps.kover.outputs.coverage-overall }}% | ${{ steps.kover.outputs.coverage-overall >= env.min-coverage-overall && ':white_check_mark:' || ':x:' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "| Changed File Coverage | ${{ steps.kover.outputs.coverage-changed-files }}% | ${{ steps.kover.outputs.coverage-changed-files >= env.min-coverage-changed-files && ':white_check_mark:' || ':x:' }} |" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "(Changed File Coverage is currently bugged, disregard)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Full coverage report can be viewed at https://grey-box.github.io/Project-Mesh/" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "---" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+
+      - name: Verify Test/Build Outcome
+        if: steps.koverXmlReport.outcome == 'failure'
+        run: |
+          echo "Tests (or build) failed, marking workflow as failed"
+          exit 1

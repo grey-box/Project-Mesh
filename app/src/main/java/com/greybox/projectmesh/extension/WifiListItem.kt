@@ -24,8 +24,18 @@ import com.ustadmobile.meshrabiya.ext.addressToDotNotation
 import com.ustadmobile.meshrabiya.vnet.VirtualNode
 import kotlinx.coroutines.runBlocking
 import com.greybox.projectmesh.user.UserRepository
+
+/**
+ * Displays a single Wi-Fi node in a list with device information and mesh network status.
+ *
+ * This composable shows the device icon, name (from IP address), IP in dot notation,
+ * and mesh network details including ping time and hop count.
+ *
+ * @param wifiAddress The integer IP address of the Wi-Fi node.
+ * @param wifiEntry The [VirtualNode.LastOriginatorMessage] containing the node's mesh message data.
+ * @param onClick Optional lambda invoked when the list item is clicked, providing the node's IP in dot notation.
+ */
 @Composable
-// Display a single connected wifi station
 fun WifiListItem(
     wifiAddress: Int,
     wifiEntry: VirtualNode.LastOriginatorMessage,

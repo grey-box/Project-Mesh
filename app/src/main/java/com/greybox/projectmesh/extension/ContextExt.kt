@@ -14,11 +14,13 @@ import com.ustadmobile.meshrabiya.MeshrabiyaConstants
 /*
 context is a class that provides access to application-specific resources and classes.
 This File contains several context related extension functions that will use in this app.
- */
+*/
 
 /**
- * On Android 13+ we can use the NEARBY_WIFI_DEVICES permission instead of the location permission.
- * On earlier versions, we need fine location permission
+ * The permission string required for accessing nearby Wi-Fi devices.
+ *
+ * On Android 13+ (SDK 33+), uses [Manifest.permission.NEARBY_WIFI_DEVICES].
+ * On earlier versions, falls back to [Manifest.permission.ACCESS_FINE_LOCATION].
  */
 val NEARBY_WIFI_PERMISSION_NAME = if(Build.VERSION.SDK_INT >= 33){
     Manifest.permission.NEARBY_WIFI_DEVICES
@@ -26,32 +28,65 @@ val NEARBY_WIFI_PERMISSION_NAME = if(Build.VERSION.SDK_INT >= 33){
     Manifest.permission.ACCESS_FINE_LOCATION
 }
 
-// check if the app has the nearby wifi devices permission
+/**
+ * Checks whether the app has permission to access nearby Wi-Fi devices (Android 13+)
+ * or fine location (pre-Android 13).
+ *
+ * @receiver The [Context] used to check permissions.
+ * @return `true` if the required permission is granted, `false` otherwise.
+ */
 fun Context.hasNearbyWifiDevicesOrLocationPermission(): Boolean {
     return ContextCompat.checkSelfPermission(
         this, NEARBY_WIFI_PERMISSION_NAME
     ) == PackageManager.PERMISSION_GRANTED
 }
 
-// check if the app has the bluetooth connect permission
+/**
+ * Checks whether the app has permission to connect to Bluetooth devices.
+ *
+ * On Android 12+ (SDK 31+), uses [Manifest.permission.BLUETOOTH_CONNECT].
+ * On earlier versions, always returns `true`.
+ *
+ * @receiver The [Context] used to check permissions.
+ * @return `true` if the permission is granted or not required, `false` otherwise.
+ */
 fun Context.hasBluetoothConnectPermission(): Boolean {
     return if(Build.VERSION.SDK_INT >= 31) {
         ContextCompat.checkSelfPermission(
             this, Manifest.permission.BLUETOOTH_CONNECT
         ) == PackageManager.PERMISSION_GRANTED
-    }else {
+    } else {
         true
     }
 }
 
-// create a DataStore instance that Meshrabiya can use to remember networks
+/**
+ * Provides a [DataStore] instance named "meshr_settings" for storing persistent
+ * network-related preferences used by Meshrabiya.
+ */
 val Context.networkDataStore: DataStore<Preferences> by preferencesDataStore(name = "meshr_settings")
 
-// Check if the device supports WiFi STA/AP Concurrency
+/**
+ * Checks if the device supports Wi-Fi STA/AP concurrency (simultaneous station and access point mode).
+ *
+ * Requires Android 11+ (SDK 30+).
+ *
+ * @receiver The [Context] used to access [WifiManager].
+ * @return `true` if STA/AP concurrency is supported, `false` otherwise.
+ */
 fun Context.hasStaApConcurrency(): Boolean {
     return Build.VERSION.SDK_INT >= 30 && getSystemService(WifiManager::class.java).isStaApConcurrencySupported
 }
 
+/**
+ * Returns a detailed string describing the device and Wi-Fi capabilities.
+ *
+ * Includes Meshrabiya version, Android version, device manufacturer/model,
+ * 5GHz support, local-only station concurrency, STA/AP concurrency, and Wi-Fi Aware support.
+ *
+ * @receiver The [Context] used to access system services and package manager.
+ * @return A formatted [String] describing the device and Wi-Fi features.
+ */
 fun Context.deviceInfo(): String {
     val wifiManager = getSystemService(WifiManager::class.java)
     val hasStaConcurrency = Build.VERSION.SDK_INT >= 31 &&
