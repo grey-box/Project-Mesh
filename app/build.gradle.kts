@@ -41,9 +41,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    lintOptions {
+    lint {
         // affects gradle linter
-        disable "UnusedResources"
+        disable.add("UnusedResources")
     }
     buildFeatures {
         compose = true
