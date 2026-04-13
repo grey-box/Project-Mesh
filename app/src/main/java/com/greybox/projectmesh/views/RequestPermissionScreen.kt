@@ -65,7 +65,10 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
         when (currentStep) {
             0 -> { // Request Nearby Wi-Fi Permission
                 //noinspection ObsoleteSdkInt
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMASU &&
+                    // changed from .M (android 6, sdk level 26) to .TIRAMASU (android 13, sdk level 33) during linting, as NEARBY_WIFI_DEVICES permission was added in Android 13.
+                    // this may be a breaking change, next time someone with better understanding of this codebase/aspect is here, please verify this change
+                    // made by Thalia Wood, 04/13/2026
                     !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
                     nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
                 } else {
