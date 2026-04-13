@@ -151,7 +151,7 @@ jobs:
       - name: Commit Reports to Viewing Directory
         # PRs run workflows out of a temp branch instead of the calling branch, so they need to create a temp branch to host the commit for build reports
         run: |
-          git rm -r --cached ./build_reports 2> /dev/null
+          git rm -r --cached --ignore-unmatch ./build_reports
           git add ./build_reports
           git status
           git commit -m "Local commit for cherrypick"
