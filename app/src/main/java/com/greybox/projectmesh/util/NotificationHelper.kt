@@ -26,6 +26,7 @@ object NotificationHelper {
      * @param context Application context used to access the system NotificationManager
      */
     fun createNotificationChannel(context: Context) {
+        //noinspection ObsoleteSdkInt
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             val channel = NotificationChannel(
                 CHANNEL_ID,

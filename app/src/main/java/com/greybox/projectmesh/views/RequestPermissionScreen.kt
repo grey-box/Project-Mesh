@@ -64,7 +64,7 @@ fun RequestPermissionsScreen(skipPermissions: Boolean) {
         if (currentStep == 6) return@LaunchedEffect
         when (currentStep) {
             0 -> { // Request Nearby Wi-Fi Permission
-                //noinspection
+                //noinspection ObsoleteSdkInt
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
                     !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
                     nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
