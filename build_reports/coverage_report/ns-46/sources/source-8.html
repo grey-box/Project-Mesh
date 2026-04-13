@@ -341,7 +341,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 &nbsp;                }
 &nbsp;            }
 &nbsp;            1 -&gt; { // Request Location Permission
-&nbsp;                //noinspection
+&nbsp;                //noinspection ObsoleteSdkInt
 <b class="nc">&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M &amp;&amp;</b>
 <b class="nc">&nbsp;                    !hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {</b>
 <b class="nc">&nbsp;                    locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)</b>
@@ -350,7 +350,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 &nbsp;                }
 &nbsp;            }
 &nbsp;            2 -&gt; { // Request Notification Permission (Android 13+)
-&nbsp;                //noinspection
+&nbsp;                //noinspection ObsoleteSdkInt
 <b class="nc">&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU &amp;&amp;</b>
 <b class="nc">&nbsp;                    !hasPermission(context, Manifest.permission.POST_NOTIFICATIONS)) {</b>
 <b class="nc">&nbsp;                    notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)</b>
@@ -359,7 +359,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 &nbsp;                }
 &nbsp;            }
 &nbsp;            3 -&gt; { // Request Storage Permission (Android 13+ has different permissions)
-&nbsp;                //noinspection
+&nbsp;                //noinspection ObsoleteSdkInt
 <b class="nc">&nbsp;                val storagePermissions = if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU) {</b>
 &nbsp;                    arrayOf(
 <b class="nc">&nbsp;                        Manifest.permission.READ_MEDIA_IMAGES,</b>
@@ -404,7 +404,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 &nbsp;/** Function to Check If Battery Optimization is Disabled */
 &nbsp;fun isBatteryOptimizationDisabled(context: Context): Boolean {
 &nbsp;    val powerManager = context.getSystemService(Context.POWER_SERVICE) as PowerManager
-&nbsp;    //noinspection
+&nbsp;    //noinspection ObsoleteSdkInt
 &nbsp;    return if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
 &nbsp;        powerManager.isIgnoringBatteryOptimizations(context.packageName)
 &nbsp;    } else {
@@ -414,7 +414,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 &nbsp;
 &nbsp;/** Function to Prompt User to Disable Battery Optimization */
 &nbsp;fun promptDisableBatteryOptimization(context: Context) {
-&nbsp;    //noinspection
+&nbsp;    //noinspection ObsoleteSdkInt
 &nbsp;    if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M) {
 &nbsp;        val message = SpannableString(
 &nbsp;            &quot;To ensure uninterrupted background functionality and maintain a stable connection, &quot; +
@@ -484,7 +484,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-13 20:15</div>
+    <div style="float:right;">generated on 2026-04-13 20:22</div>
 </div>
 </body>
 </html>
