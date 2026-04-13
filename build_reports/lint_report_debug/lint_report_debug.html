@@ -179,7 +179,7 @@ document.getElementById(id).style.display = 'none';
     <div class="mdl-layout__header-row">
       <span class="mdl-layout-title">Lint Report: 138 warnings</span>
       <div class="mdl-layout-spacer"></div>
-      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Mon Apr 13 19:54:11 UTC 2026 by AGP (8.5.1)</nav>
+      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Mon Apr 13 20:14:14 UTC 2026 by AGP (8.5.1)</nav>
     </div>
   </header>
   <div class="mdl-layout__drawer">
@@ -355,14 +355,14 @@ Dismiss</button>            </div>
               <div class="mdl-card__supporting-text">
 <div class="issue">
 <div class="warningslist">
-<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:69</span>: <span class="message">Field requires API level 33 (current min is 26): <code>android.Manifest.permission#NEARBY_WIFI_DEVICES</code></span><br /><pre class="errorlines">
-<span class="lineno">  66 </span>  <span class="number">0</span> -> { <span class="comment">// Request Nearby Wi-Fi Permission</span>
-<span class="lineno">  67 </span>      <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &amp;&amp;
-<span class="lineno">  68 </span>          !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
-<span class="caretline"><span class="lineno">  69 </span>          nearbyWifiPermissionLauncher.launch(<span class="warning">Manifest.permission.NEARBY_WIFI_DEVICES</span>)&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  70 </span>      } <span class="keyword">else</span> {
-<span class="lineno">  71 </span>          currentStep = <span class="number">1</span>
-<span class="lineno">  72 </span>      }
+<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:70</span>: <span class="message">Field requires API level 33 (current min is 26): <code>android.Manifest.permission#NEARBY_WIFI_DEVICES</code></span><br /><pre class="errorlines">
+<span class="lineno">  67 </span>  <span class="comment">//noinspection</span>
+<span class="lineno">  68 </span>  <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &amp;&amp;
+<span class="lineno">  69 </span>      !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
+<span class="caretline"><span class="lineno">  70 </span>      nearbyWifiPermissionLauncher.launch(<span class="warning">Manifest.permission.NEARBY_WIFI_DEVICES</span>)&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  71 </span>  } <span class="keyword">else</span> {
+<span class="lineno">  72 </span>      currentStep = <span class="number">1</span>
+<span class="lineno">  73 </span>  }
 </pre>
 
 </div>
@@ -1498,43 +1498,43 @@ Dismiss</button>            </div>
 <span class="lineno"> 32 </span>                CHANNEL_NAME,
 </pre>
 
-<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:67</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
-<span class="lineno">  64 </span>  <span class="keyword">if</span> (currentStep == <span class="number">6</span>) <span class="keyword">return</span><span class="annotation">@LaunchedEffect</span>
+<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:68</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
 <span class="lineno">  65 </span>  <span class="keyword">when</span> (currentStep) {
 <span class="lineno">  66 </span>      <span class="number">0</span> -> { <span class="comment">// Request Nearby Wi-Fi Permission</span>
-<span class="caretline"><span class="lineno">  67 </span>          <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span> &amp;&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  68 </span>              !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
-<span class="lineno">  69 </span>              nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
-<span class="lineno">  70 </span>          } <span class="keyword">else</span> {
+<span class="lineno">  67 </span>          <span class="comment">//noinspection</span>
+<span class="caretline"><span class="lineno">  68 </span>          <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span> &amp;&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  69 </span>              !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
+<span class="lineno">  70 </span>              nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
+<span class="lineno">  71 </span>          } <span class="keyword">else</span> {
 </pre>
 
-<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:75</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
-<span class="lineno">  72 </span>       }
-<span class="lineno">  73 </span>   }
-<span class="lineno">  74 </span>   <span class="number">1</span> -> { <span class="comment">// Request Location Permission</span>
-<span class="caretline"><span class="lineno">  75 </span>       <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span> &amp;&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  76 </span>           !hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
-<span class="lineno">  77 </span>           locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
-<span class="lineno">  78 </span>       } <span class="keyword">else</span> {
+<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:77</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
+<span class="lineno">  74 </span>   }
+<span class="lineno">  75 </span>   <span class="number">1</span> -> { <span class="comment">// Request Location Permission</span>
+<span class="lineno">  76 </span>       <span class="comment">//noinspection</span>
+<span class="caretline"><span class="lineno">  77 </span>       <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span> &amp;&amp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno">  78 </span>           !hasPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)) {
+<span class="lineno">  79 </span>           locationPermissionLauncher.launch(Manifest.permission.ACCESS_FINE_LOCATION)
+<span class="lineno">  80 </span>       } <span class="keyword">else</span> {
 </pre>
 
-<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:135</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
-<span class="lineno"> 132 </span><span class="javadoc">/** Function to Check If Battery Optimization is Disabled */</span>
-<span class="lineno"> 133 </span><span class="keyword">fun</span> isBatteryOptimizationDisabled(context: Context): Boolean {
-<span class="lineno"> 134 </span>    <span class="keyword">val</span> powerManager = context.getSystemService(Context.POWER_SERVICE) <span class="keyword">as</span> PowerManager
-<span class="caretline"><span class="lineno"> 135 </span>    <span class="keyword">return</span> <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span>) {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 136 </span>        powerManager.isIgnoringBatteryOptimizations(context.packageName)
-<span class="lineno"> 137 </span>    } <span class="keyword">else</span> {
-<span class="lineno"> 138 </span>        <span class="keyword">true</span> <span class="comment">// Battery optimization doesn't apply below Android 6.0</span></pre>
+<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:140</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
+<span class="lineno"> 137 </span><span class="keyword">fun</span> isBatteryOptimizationDisabled(context: Context): Boolean {
+<span class="lineno"> 138 </span>    <span class="keyword">val</span> powerManager = context.getSystemService(Context.POWER_SERVICE) <span class="keyword">as</span> PowerManager
+<span class="lineno"> 139 </span>    <span class="comment">//noinspection</span>
+<span class="caretline"><span class="lineno"> 140 </span>    <span class="keyword">return</span> <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span>) {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 141 </span>        powerManager.isIgnoringBatteryOptimizations(context.packageName)
+<span class="lineno"> 142 </span>    } <span class="keyword">else</span> {
+<span class="lineno"> 143 </span>        <span class="keyword">true</span> <span class="comment">// Battery optimization doesn't apply below Android 6.0</span></pre>
 
-<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:144</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
-<span class="lineno"> 141 </span>
-<span class="lineno"> 142 </span><span class="javadoc">/** Function to Prompt User to Disable Battery Optimization */</span>
-<span class="lineno"> 143 </span><span class="keyword">fun</span> promptDisableBatteryOptimization(context: Context) {
-<span class="caretline"><span class="lineno"> 144 </span>    <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span>) {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno"> 145 </span>        <span class="keyword">val</span> message = SpannableString(
-<span class="lineno"> 146 </span>            <span class="string">"To ensure uninterrupted background functionality and maintain a stable connection, "</span> +
-<span class="lineno"> 147 </span>                    <span class="string">"please disable battery optimization for this app.\n\n"</span> +
+<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:150</span>: <span class="message">Unnecessary; SDK_INT is always >= 26</span><br /><pre class="errorlines">
+<span class="lineno"> 147 </span><span class="javadoc">/** Function to Prompt User to Disable Battery Optimization */</span>
+<span class="lineno"> 148 </span><span class="keyword">fun</span> promptDisableBatteryOptimization(context: Context) {
+<span class="lineno"> 149 </span>    <span class="comment">//noinspection</span>
+<span class="caretline"><span class="lineno"> 150 </span>    <span class="keyword">if</span> (<span class="warning">Build.VERSION.SDK_INT >= Build.VERSION_CODES.M</span>) {&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span>
+<span class="lineno"> 151 </span>        <span class="keyword">val</span> message = SpannableString(
+<span class="lineno"> 152 </span>            <span class="string">"To ensure uninterrupted background functionality and maintain a stable connection, "</span> +
+<span class="lineno"> 153 </span>                    <span class="string">"please disable battery optimization for this app.\n\n"</span> +
 </pre>
 
 </div>
