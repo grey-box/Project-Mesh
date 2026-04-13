@@ -127,6 +127,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 &nbsp;     * @param context Application context used to access the system NotificationManager
 &nbsp;     */
 &nbsp;    fun createNotificationChannel(context: Context) {
+&nbsp;        //noinspection ObsoleteSdkInt
 <b class="nc">&nbsp;        if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.O) {</b>
 <b class="nc">&nbsp;            val channel = NotificationChannel(</b>
 <b class="nc">&nbsp;                CHANNEL_ID,</b>
@@ -205,7 +206,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-13 20:22</div>
+    <div style="float:right;">generated on 2026-04-13 21:44</div>
 </div>
 </body>
 </html>

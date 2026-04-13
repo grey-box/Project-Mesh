@@ -110,7 +110,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 &nbsp;        if (currentStep == 6) return@LaunchedEffect
 &nbsp;        when (currentStep) {
 &nbsp;            0 -&gt; { // Request Nearby Wi-Fi Permission
-&nbsp;                //noinspection
+&nbsp;                //noinspection ObsoleteSdkInt
 &nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M &amp;&amp;
 &nbsp;                    !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
 &nbsp;                    nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)
@@ -262,7 +262,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-13 20:22</div>
+    <div style="float:right;">generated on 2026-04-13 21:44</div>
 </div>
 </body>
 </html>
