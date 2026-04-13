@@ -1,10 +1,10 @@
 {
   "version" : 0,
   "job" : {
-    "id" : "24055028530",
+    "id" : "24363581044",
     "correlator" : "compile_build_reports-dependency-submission"
   },
-  "sha" : "3be8d8f58f6a4e2cccd9786ab21b977de50e22ec",
+  "sha" : "82edd62b4f2c8d20587208eae1e2bfd3c53e2fc7",
   "ref" : "refs/pull/48/merge",
   "detector" : {
     "name" : "GitHub Dependency Graph Gradle Plugin",
@@ -2696,5 +2696,5 @@
       }
     }
   },
-  "scanned" : "2026-04-06T22:50:09Z"
+  "scanned" : "2026-04-13T19:52:42Z"
 }
