@@ -177,9 +177,9 @@ document.getElementById(id).style.display = 'none';
 <div class="mdl-layout mdl-js-layout mdl-layout--fixed-header">
   <header class="mdl-layout__header">
     <div class="mdl-layout__header-row">
-      <span class="mdl-layout-title">Lint Report: 80 warnings</span>
+      <span class="mdl-layout-title">Lint Report: 79 warnings</span>
       <div class="mdl-layout-spacer"></div>
-      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Mon Apr 13 21:44:24 UTC 2026 by AGP (8.5.1)</nav>
+      <nav class="mdl-navigation mdl-layout--large-screen-only">Check performed at Mon Apr 13 23:07:07 UTC 2026 by AGP (8.5.1)</nav>
     </div>
   </header>
   <div class="mdl-layout__drawer">
@@ -187,7 +187,6 @@ document.getElementById(id).style.display = 'none';
     <nav class="mdl-navigation">
       <a class="mdl-navigation__link" href="#overview"><i class="material-icons">dashboard</i>Overview</a>
       <a class="mdl-navigation__link" href="#ScopedStorage"><i class="material-icons warning-icon">warning</i>Affected by scoped storage (2)</a>
-      <a class="mdl-navigation__link" href="#InlinedApi"><i class="material-icons warning-icon">warning</i>Using inlined constants on older versions (1)</a>
       <a class="mdl-navigation__link" href="#OldTargetApi"><i class="material-icons warning-icon">warning</i>Target SDK attribute is not targeting latest version (1)</a>
       <a class="mdl-navigation__link" href="#SimpleDateFormat"><i class="material-icons warning-icon">warning</i>Implied locale in date format (2)</a>
       <a class="mdl-navigation__link" href="#UnusedAttribute"><i class="material-icons warning-icon">warning</i>Attribute unused on older versions (1)</a>
@@ -216,9 +215,6 @@ document.getElementById(id).style.display = 'none';
 <tr>
 <td class="countColumn">2</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
 <a href="#ScopedStorage">ScopedStorage</a>: Affected by scoped storage</td></tr>
-<tr>
-<td class="countColumn">1</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
-<a href="#InlinedApi">InlinedApi</a>: Using inlined constants on older versions</td></tr>
 <tr>
 <td class="countColumn">1</td><td class="issueColumn"><i class="material-icons warning-icon">warning</i>
 <a href="#OldTargetApi">OldTargetApi</a>: Target SDK attribute is not targeting latest version</td></tr>
@@ -330,56 +326,6 @@ To learn more, read these resources: Play policy: <a href="https://goo.gle/polic
               <div class="mdl-card__actions mdl-card--border">
 <button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="explanationScopedStorageLink" onclick="reveal('explanationScopedStorage');">
 Explain</button><button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="ScopedStorageCardLink" onclick="hideid('ScopedStorageCard');">
-Dismiss</button>            </div>
-            </div>
-          </section><a name="InlinedApi"></a>
-<section class="section--center mdl-grid mdl-grid--no-spacing mdl-shadow--2dp" id="InlinedApiCard" style="display: block;">
-            <div class="mdl-card mdl-cell mdl-cell--12-col">
-  <div class="mdl-card__title">
-    <h2 class="mdl-card__title-text">Using inlined constants on older versions</h2>
-  </div>
-              <div class="mdl-card__supporting-text">
-<div class="issue">
-<div class="warningslist">
-<span class="location"><a href="../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt">../../src/main/java/com/greybox/projectmesh/views/RequestPermissionScreen.kt</a>:70</span>: <span class="message">Field requires API level 33 (current min is 26): <code>android.Manifest.permission#NEARBY_WIFI_DEVICES</code></span><br /><pre class="errorlines">
-<span class="lineno">  67 </span>  <span class="comment">//noinspection ObsoleteSdkInt</span>
-<span class="lineno">  68 </span>  <span class="keyword">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &amp;&amp;
-<span class="lineno">  69 </span>      !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {
-<span class="caretline"><span class="lineno">  70 </span>      nearbyWifiPermissionLauncher.launch(<span class="warning">Manifest.permission.NEARBY_WIFI_DEVICES</span>)&nbsp;&nbsp;&nbsp;&nbsp;</span>
-<span class="lineno">  71 </span>  } <span class="keyword">else</span> {
-<span class="lineno">  72 </span>      currentStep = <span class="number">1</span>
-<span class="lineno">  73 </span>  }
-</pre>
-
-</div>
-<div class="metadata"><div class="explanation" id="explanationInlinedApi" style="display: none;">
-This check scans through all the Android API field references in the application and flags certain constants, such as static final integers and Strings, which were introduced in later versions. These will actually be copied into the class files rather than being referenced, which means that the value is available even when running on older devices. In some cases that's fine, and in other cases it can result in a runtime crash or incorrect behavior. It depends on the context, so consider the code carefully and decide whether it's safe and can be suppressed or whether the code needs to be guarded.<br/>
-<br/>
-If you really want to use this API and don't need to support older devices just set the <code>minSdkVersion</code> in your <code>build.gradle</code> or <code>AndroidManifest.xml</code> files.<br/>
-<br/>
-If your code is <b>deliberately</b> accessing newer APIs, and you have ensured (e.g. with conditional execution) that this code will only ever be called on a supported platform, then you can annotate your class or method with the <code>@TargetApi</code> annotation specifying the local minimum SDK to apply, such as <code>@TargetApi(11)</code>, such that this check considers 11 rather than your manifest file's minimum SDK as the required API level.<br/>Note: This issue has an associated quickfix operation in Android Studio and IntelliJ IDEA.<br>
-To suppress this error, use the issue id "InlinedApi" as explained in the <a href="#SuppressInfo">Suppressing Warnings and Errors</a> section.<br/>
-<br/></div>
-</div>
-</div>
-<div class="chips">
-<span class="mdl-chip">
-    <span class="mdl-chip__text">InlinedApi</span>
-</span>
-<span class="mdl-chip">
-    <span class="mdl-chip__text">Correctness</span>
-</span>
-<span class="mdl-chip">
-    <span class="mdl-chip__text">Warning</span>
-</span>
-<span class="mdl-chip">
-    <span class="mdl-chip__text">Priority 6/10</span>
-</span>
-</div>
-              </div>
-              <div class="mdl-card__actions mdl-card--border">
-<button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="explanationInlinedApiLink" onclick="reveal('explanationInlinedApi');">
-Explain</button><button class="mdl-button mdl-js-button mdl-js-ripple-effect" id="InlinedApiCardLink" onclick="hideid('InlinedApiCard');">
 Dismiss</button>            </div>
             </div>
           </section><a name="OldTargetApi"></a>

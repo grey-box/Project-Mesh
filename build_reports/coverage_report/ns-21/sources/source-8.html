@@ -333,7 +333,10 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 <b class="nc">&nbsp;        when (currentStep) {</b>
 &nbsp;            0 -&gt; { // Request Nearby Wi-Fi Permission
 &nbsp;                //noinspection ObsoleteSdkInt
-<b class="nc">&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.M &amp;&amp;</b>
+<b class="nc">&nbsp;                if (Build.VERSION.SDK_INT &gt;= Build.VERSION_CODES.TIRAMISU &amp;&amp;</b>
+&nbsp;                    // changed from .M (android 6, sdk level 26) to .TIRAMISU (android 13, sdk level 33) during linting, as NEARBY_WIFI_DEVICES permission was added in Android 13.
+&nbsp;                    // this may be a breaking change, next time someone with better understanding of this codebase/aspect is here, please verify this change
+&nbsp;                    // made by Thalia Wood, 04/13/2026
 <b class="nc">&nbsp;                    !hasPermission(context, Manifest.permission.NEARBY_WIFI_DEVICES)) {</b>
 <b class="nc">&nbsp;                    nearbyWifiPermissionLauncher.launch(Manifest.permission.NEARBY_WIFI_DEVICES)</b>
 &nbsp;                } else {
@@ -484,7 +487,7 @@ Current scope: Kover HTML Report<span class="separator">|</span>    <a href="../
 
 <div class="footer">
     
-    <div style="float:right;">generated on 2026-04-13 21:44</div>
+    <div style="float:right;">generated on 2026-04-13 23:06</div>
 </div>
 </body>
 </html>
