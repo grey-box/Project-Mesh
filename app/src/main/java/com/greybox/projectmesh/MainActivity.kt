@@ -108,7 +108,7 @@ class MainActivity : ComponentActivity(), DIAware {
                 mutableStateOf(settingPref.getString(
                     "language", "en") ?: "en")
             }
-            var restartServerKey by remember {mutableStateOf(0)}
+            var restartServerKey by remember {mutableIntStateOf(0)}
             var deviceName by remember {
                 mutableStateOf(settingPref.getString("device_name", Build.MODEL) ?: Build.MODEL)
             }
