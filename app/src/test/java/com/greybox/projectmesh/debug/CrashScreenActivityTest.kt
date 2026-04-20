@@ -1,10 +1,14 @@
 package com.greybox.projectmesh.debug
 
 import android.content.Intent
-import com.google.gson.Gson
 import org.junit.Assert.*
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [29], manifest = Config.NONE)
 class CrashScreenActivityTest {
 
     @Test

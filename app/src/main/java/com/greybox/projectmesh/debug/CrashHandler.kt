@@ -1,17 +1,12 @@
 package com.greybox.projectmesh.debug
 
-import android.R.layout
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import android.widget.FrameLayout
-import android.widget.PopupWindow
 import com.google.gson.Gson
-import org.xml.sax.helpers.DefaultHandler
 import java.lang.Exception
 import java.lang.Thread.UncaughtExceptionHandler
 import kotlin.system.exitProcess
-
 
 class CrashHandler(private val context: Context, private val defaultHandler: UncaughtExceptionHandler, private val activityToBeLaunched: Class<*>) : Thread.UncaughtExceptionHandler {
 
@@ -28,7 +23,7 @@ class CrashHandler(private val context: Context, private val defaultHandler: Unc
     private fun launchActivity(applicationContext: Context, activity: Class<*>, exception: Throwable)
     {
         val crashIntent = Intent(applicationContext, activity).also {
-            it.putExtra("CrashData", Gson().toJson(exception))
+            it.putExtra(CRASH_DATA_KEY, Gson().toJson(exception))
             Log.e("Project Mesh Error","Error: ",exception);
         }
 
@@ -38,6 +33,13 @@ class CrashHandler(private val context: Context, private val defaultHandler: Unc
     }
 
     companion object {
+        private const val CRASH_DATA_KEY = "CrashData"
+
+        private data class CrashPayload(
+            val detailMessage: String? = null,
+            val message: String? = null,
+        )
+
         fun init(applicationContext: Context, activityToBeLaunched: Class<*>)
         {
             val handler = CrashHandler(applicationContext,Thread.getDefaultUncaughtExceptionHandler() as UncaughtExceptionHandler, activityToBeLaunched)
@@ -46,14 +48,18 @@ class CrashHandler(private val context: Context, private val defaultHandler: Unc
 
         fun getThrowableFromIntent(intent: Intent): Throwable?
         {
+            val crashData = intent.getStringExtra(CRASH_DATA_KEY)?.takeIf { it.isNotBlank() } ?: return null
             return try {
-                Gson().fromJson(intent.getStringExtra("CrashData"), Throwable::class.java)
+                Gson().fromJson(crashData, Throwable::class.java)
+            } catch (_: Exception) {
+                try {
+                    val payload = Gson().fromJson(crashData, CrashPayload::class.java)
+                    payload.detailMessage?.takeIf { it.isNotBlank() }?.let(::Throwable)
+                        ?: payload.message?.takeIf { it.isNotBlank() }?.let(::Throwable)
+                } catch (_: Exception) {
+                    null
+                }
             }
-            catch (e: Exception) {
-                Log.e("CrashHandler","getThrowableFromIntent: ",e);
-                null
-            }
-
         }
     }
 }
