@@ -372,6 +372,10 @@ class GlobalApp : Application(), DIAware {
         bind<SharedPreferences>(tag = "settings") with singleton {
             applicationContext.getSharedPreferences("settings", Context.MODE_PRIVATE)
         }
+
+        bind<SharedPreferences>(tag = "mesh") with singleton {
+            applicationContext.getSharedPreferences("project_mesh_prefs", Context.MODE_PRIVATE)
+        }
         bind<UserRepository>() with singleton {
             UserRepository(instance<MeshDatabase>().userDao())
         }

@@ -68,6 +68,7 @@ fun ReceiveScreen(
             defaultArgs = null,
         )
     ),
+    autoFinish: Boolean,
     onAutoFinishChange: (Boolean) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState(ReceiveScreenModel())
