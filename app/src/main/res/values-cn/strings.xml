@@ -4,15 +4,21 @@
     <string name="start_hotspot">启动热点</string>
     <string name="stop_hotspot">停止热点</string>
     <string name="connect_via_qr_code_scan">通过二维码扫描连接</string>
-    <string name="connect_via_entering_connect_uri">通过输入链接地址连接</string>
+    <string
+    name="connect_via_entering_connect_uri"
+  >通过输入链接地址连接</string>
     <string name="share_connect_uri">分享链接地址</string>
     <string name="wifi_station_connection">WiFi站（客户端）连接</string>
     <string name="prompt_scan_qr_code">扫描另一台设备加入网格</string>
     <string name="hotspot_status">热点状态</string>
     <string name="hotspot_status_online">在线</string>
     <string name="hotspot_status_offline">离线</string>
-    <string name="instruction">或者，在下方输入链接地址：\n1. 确保蓝牙已开启\n2. 允许所有人通过快速分享共享数据\n3. 获得链接地址之后，点击复制\n4. 将链接粘贴到下方文本框\n5. 点击“通过输入链接地址连接”</string>
-    <string name="instruction_start_hotspot">要分享连接URI：\n1. 确保此设备上的蓝牙已启用\n2. 点击“分享连接URI”\n3. 选择快速分享\n4. 选择您想共享URI的附近设备</string>
+    <string
+    name="instruction"
+  >或者，在下方输入链接地址：\n1. 确保蓝牙已开启\n2. 允许所有人通过快速分享共享数据\n3. 获得链接地址之后，点击复制\n4. 将链接粘贴到下方文本框\n5. 点击“通过输入链接地址连接”</string>
+    <string
+    name="instruction_start_hotspot"
+  >要分享连接URI：\n1. 确保此设备上的蓝牙已启用\n2. 点击“分享连接URI”\n3. 选择快速分享\n4. 选择您想共享URI的附近设备</string>
     <string name="prompt_enter_uri">输入链接地址(以"meshrabiya://"开头)</string>
     <string name="send_file">发送文件</string>
     <string name="from">来自</string>

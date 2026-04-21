@@ -1,0 +1,130 @@
+@startuml
+
+class "ChatNodeListScreen" <<Composable>> {
+  + onNodeSelected: (String) -> Unit
+}
+
+class "ChatScreen" <<Composable>> {
+  + virtualAddress: InetAddress
+  + userName: String?
+  + isOffline: Boolean
+  + onClickButton: () -> Unit
+}
+
+class "UserStatusBar" <<Composable>> {
+  + userName: String
+  + isOnline: Boolean
+  + userAddress: String
+}
+
+class "DisplayAllMessages" <<Composable>> {
+  + uiState: ChatScreenModel
+  + onClickButton: () -> Unit
+}
+
+class "MessageBubble" <<Composable>> {
+  + chatMessage: Message
+  + sentBySelf: Boolean
+  + messageContent: @Composable
+  + sender: String
+  + modifier: Modifier
+}
+
+class "ConversationsHomeScreen" <<Composable>> {
+  + onConversationSelected: (String) -> Unit
+}
+
+class "ConversationsList" <<Composable>> {
+  + conversations: List<Conversation>
+  + onConversationClick: (Conversation) -> Unit
+}
+
+class "ConversationItem" <<Composable>> {
+  + conversation: Conversation
+  + onClick: () -> Unit
+}
+
+class "EmptyConversationsView" <<Composable>>
+class "ErrorView" <<Composable>> {
+  + errorMessage: String
+  + onRetry: () -> Unit
+}
+
+class "NetworkScreenViewModel"
+class "NetworkScreenModel"
+class "ChatScreenViewModel"
+class "ChatScreenModel"
+class "ConversationsHomeScreenViewModel"
+class "ConversationsHomeScreenModel"
+class "Conversation"
+class "Message"
+class "WifiListItem" <<Composable>>
+class "AppServer"
+class "DeviceStatusManager"
+class "GlobalApp"
+class "MessageUtils"
+class "LongPressCopyableText" <<Composable>>
+class "ViewModelFactory"
+class "InetAddress"
+
+ChatNodeListScreen ..> "NetworkScreenViewModel" : uses
+ChatNodeListScreen ..> "NetworkScreenModel" : collects state
+ChatNodeListScreen ..> "WifiListItem" : displays nodes
+ChatNodeListScreen ..> "ViewModelFactory" : creates VM
+
+ChatScreen ..> "ChatScreenViewModel" : uses
+ChatScreen ..> "ChatScreenModel" : collects state
+ChatScreen ..> "UserStatusBar" : displays
+ChatScreen ..> "DisplayAllMessages" : displays
+ChatScreen ..> "AppServer" : sends files
+ChatScreen ..> "DeviceStatusManager" : observes status
+ChatScreen ..> "GlobalApp" : fetches user info
+ChatScreen ..> "ViewModelFactory" : creates VM
+ChatScreen ..> "InetAddress" : uses
+
+DisplayAllMessages ..> "ChatScreenModel" : reads
+DisplayAllMessages ..> "MessageBubble" : displays
+DisplayAllMessages ..> "Message" : iterates
+DisplayAllMessages ..> "GlobalApp" : fetches sender name
+DisplayAllMessages ..> "LongPressCopyableText" : uses
+
+MessageBubble ..> "Message" : displays
+
+ConversationsHomeScreen ..> "ConversationsHomeScreenViewModel" : uses
+ConversationsHomeScreen ..> "ConversationsHomeScreenModel" : collects state
+ConversationsHomeScreen ..> "ConversationsList" : displays
+ConversationsHomeScreen ..> "EmptyConversationsView" : displays
+ConversationsHomeScreen ..> "ErrorView" : displays
+ConversationsHomeScreen ..> "ViewModelFactory" : creates VM
+
+ConversationsList ..> "ConversationItem" : renders list
+ConversationsList ..> "Conversation" : uses
+
+ConversationItem ..> "Conversation" : displays
+ConversationItem ..> "MessageUtils" : formats timestamp
+
+note right of "ChatNodeListScreen"
+Shows available chat nodes
+using NetworkScreenViewModel
+and WifiListItem
+end note
+
+note right of "ChatScreen"
+Main chat UI
+- resolves user info
+- tracks online/offline state
+- sends text messages
+- sends files
+- displays conversation history
+end note
+
+note right of "ConversationsHomeScreen"
+Conversation home screen
+- loading state
+- error state
+- empty state
+- list of conversations
+- opens selected conversation
+end note
+
+@enduml

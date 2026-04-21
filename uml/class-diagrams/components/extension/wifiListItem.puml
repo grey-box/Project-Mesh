@@ -1,0 +1,42 @@
+@startuml
+
+class "WifiListItem (Composable)" {
+  + WifiListItem(
+      wifiAddress: Int,
+      wifiEntry: VirtualNode.LastOriginatorMessage,
+      onClick: ((String) -> Unit)?
+    )
+}
+
+class "VirtualNode.LastOriginatorMessage" {
+  + originatorMessage
+  + hopCount: Int
+}
+
+class "GlobalApp" {
+  + GlobalUserRepo
+}
+
+class "UserRepository" {
+  + getUserByIp(ip: String): User?
+}
+
+class "addressToDotNotation" {
+  + addressToDotNotation(Int): String
+}
+
+"WifiListItem (Composable)" ..> "VirtualNode.LastOriginatorMessage" : uses
+"WifiListItem (Composable)" ..> "GlobalApp" : accesses
+"WifiListItem (Composable)" ..> "UserRepository" : fetches user
+"WifiListItem (Composable)" ..> "addressToDotNotation" : converts IP
+
+note right of "WifiListItem (Composable)"
+- Displays a WiFi node item
+- Converts IP to dot notation
+- Fetches user name using repository (blocking call)
+- Shows device name or fallback
+- Displays mesh status (ping + hops)
+- Optional clickable behavior
+end note
+
+@enduml

@@ -1,17 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".debug.CrashScreenActivity">
+<?xml version="1.0" encoding="utf-8" ?>
+<androidx.constraintlayout.widget.ConstraintLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/main"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  tools:context=".debug.CrashScreenActivity"
+>
 
     <TextView
-        android:id="@+id/textView2"
-        android:layout_width="383dp"
-        android:layout_height="708dp"
-        android:text="TextView"
-        tools:layout_editor_absoluteX="13dp"
-        tools:layout_editor_absoluteY="14dp" />
+    android:id="@+id/textView2"
+    android:layout_width="383dp"
+    android:layout_height="708dp"
+    android:text="TextView"
+    tools:layout_editor_absoluteX="13dp"
+    tools:layout_editor_absoluteY="14dp"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+  />
+  <!--Layout constraints (toStartOf, toTopOf) added by Thalia Wood to bypass linting error blocking build. Please review and adjust based on the UI intent-->
 </androidx.constraintlayout.widget.ConstraintLayout>

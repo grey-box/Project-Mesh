@@ -1,12 +1,16 @@
 # User Profiles in Project Mesh
 
 ## Overview
+
 Project Mesh implements a user profile system that allows devices to identify themselves on the mesh network. User profiles consist of a unique identifier (UUID), a display name, and network address information. This system enables personalized messaging and device identification across the mesh network.
+
 ## Key Components
+
 ### User Entity
+
 The core of the user profile system is the UserEntity class, which stores all user data:
 
-```kotlin 
+```kotlin
 // In UserEntity.kt
 @Serializable
 @Entity(tableName = "users")
@@ -18,9 +22,11 @@ data class UserEntity(
 )
 ```
 
-### User Repository 
+### User Repository
+
 The UserRepository manages all database operations related to user profiles:
-```kotlin 
+
+```kotlin
 // In UserRepository.kt
 class UserRepository(private val userDao: UserDao) {
 
@@ -49,8 +55,11 @@ class UserRepository(private val userDao: UserDao) {
     // Other repository methods...
 }
 ```
+
 ### UserData Access Object (DAO)
+
 The UserDao interface defines database operations:
+
 ```kotlin
 // In UserDao.kt
 @Dao
@@ -79,12 +88,14 @@ interface UserDao {
 ```
 
 ## User Profile Lifecycle
+
 ### First-time Setup
 
 <img src="images/User_Onboarding.png" width="300" style="border: 2px solid black;" alt="User_Onboarding">
 
 When a user first launches the app, they go through an onboarding process to set up their profile:
-```kotlin 
+
+```kotlin
 // In OnboardingViewModel.kt
 fun handleFirstTimeSetup(onComplete: () -> Unit) {
     viewModelScope.launch {
@@ -108,6 +119,7 @@ fun handleFirstTimeSetup(onComplete: () -> Unit) {
 ```
 
 ### User Information Exchange
+
 When devices connect, they exchange user information:
 **Before Name Exchange**:
 
@@ -117,11 +129,11 @@ When devices connect, they exchange user information:
 
 <img src="images/NetworkScreenPostUpdateBob.png" width="300" style="border: 2px solid black;" alt="NetworkScreenPostUpdate">
 
-```kotlin 
+```kotlin
 // In AppServer.kt - requesting user info
 fun requestRemoteUserInfo(remoteAddr: InetAddress, port: Int = DEFAULT_PORT) {
     // Special handling for test devices...
-    
+
     scope.launch {
         try {
             val url = "http://${remoteAddr.hostAddress}:$port/myinfo"
@@ -130,7 +142,7 @@ fun requestRemoteUserInfo(remoteAddr: InetAddress, port: Int = DEFAULT_PORT) {
 
             val response = httpClient.newCall(request).execute()
             val userJson = response.body?.string()
-            
+
             if (!userJson.isNullOrEmpty()) {
                 // Decode JSON
                 val remoteUser = json.decodeFromString(UserEntity.serializer(), userJson)
@@ -141,7 +153,7 @@ fun requestRemoteUserInfo(remoteAddr: InetAddress, port: Int = DEFAULT_PORT) {
                     remoteUserWithIp.name,
                     remoteUserWithIp.address
                 )
-                
+
                 // Update user status...
             }
         } catch (e: Exception) {
@@ -172,16 +184,17 @@ private fun handleMyInfoRequest(): Response {
 ```
 
 ### Profile Updates
+
 Users can update their profile information in the Settings screen:
-*Found in Settings Under Network > Device Name*:
+_Found in Settings Under Network > Device Name_:
 
 <img src="images/UserNameSettings.png" width="300" style="border: 2px solid black;" alt="UserNameSettings">
 
-*User name can be Updated*  :
+_User name can be Updated_ :
 
 <img src="images/EditingUserName.png" width="300" style="border: 2px solid black;" alt="EditingUserName">
 
-```kotlin 
+```kotlin
 // In SettingsScreen.kt
 onDeviceNameChange = { newDeviceName ->
     Log.d("BottomNavApp", "Device name changed to: $newDeviceName")
@@ -197,7 +210,7 @@ onDeviceNameChange = { newDeviceName ->
                 name = newDeviceName,
                 address = appServer.localVirtualAddr.hostAddress
             )
-            
+
             // 2. Broadcast updated name to connected users
             val connectedUsers = userRepository.getAllConnectedUsers()
             connectedUsers.forEach { user ->
@@ -216,17 +229,19 @@ onDeviceNameChange = { newDeviceName ->
 ```
 
 ### Online Status Tracking
+
 The application tracks which users are online using the DeviceStatusManager:
-```kotlin 
+
+```kotlin
 // In DeviceStatusManager.kt
 object DeviceStatusManager {
     private val _deviceStatusMap = MutableStateFlow<Map<String, Boolean>>(emptyMap())
     val deviceStatusMap: StateFlow<Map<String, Boolean>> = _deviceStatusMap.asStateFlow()
-    
+
     // Updates a device's online status
     fun updateDeviceStatus(ipAddress: String, isOnline: Boolean, verified: Boolean = false) {
         // Special handling for test devices...
-        
+
         // For normal devices
         if (verified) {
             _deviceStatusMap.update { current ->
@@ -239,15 +254,18 @@ object DeviceStatusManager {
             // Handle unverified status updates...
         }
     }
-    
+
     // Other status management methods...
 }
 ```
+
 ## Integration with UI
+
 User profiles are displayed in various parts of the UI:
 
-### Netowork List 
-```kotlin 
+### Netowork List
+
+```kotlin
 // In WifiListItem.kt
 @Composable
 fun WifiListItem(
@@ -256,7 +274,7 @@ fun WifiListItem(
     onClick: ((nodeAddress: String) -> Unit)? = null,
 ) {
     // Other UI elements...
-    
+
     // obtain the device name according to the ip address
     val user = runBlocking {
         GlobalApp.GlobalUserRepo.userRepository.getUserByIp(wifiAddressDotNotation)
@@ -268,12 +286,12 @@ fun WifiListItem(
     else {
         Text(text = "Loading...", fontWeight = FontWeight.Bold)
     }
-    
+
     // Other UI elements...
 }
 ```
 
-### ChatScreen 
+### ChatScreen
 
 ```kotlin
 // In ChatScreen.kt
@@ -310,13 +328,13 @@ fun UserStatusBar(
                     // Row styling...
                 ) {
                     // Status indicator dot...
-                    
+
                     // Status text
                     Text(
                         text = if (isOnline) "Online" else "Offline",
                         // Text styling...
                     )
-                    
+
                     // IP address
                     Text(
                         text = userAddress,
@@ -331,7 +349,7 @@ fun UserStatusBar(
 
 ### Conversations
 
-User profiles are linked to conversations for messaging: 
+User profiles are linked to conversations for messaging:
 
 ```kotlin
 // In ConversationRepository.kt
@@ -356,7 +374,7 @@ suspend fun getOrCreateConversation(localUuid: String, remoteUser: UserEntity): 
         )
         conversationDao.insertConversation(conversation)
     }
-    
+
     return conversation
 }
 ```
@@ -370,6 +388,7 @@ suspend fun getOrCreateConversation(localUuid: String, remoteUser: UserEntity): 
 5. **Address Management**: IP addresses are managed dynamically based on network connectivity.
 
 ## Best Practices
+
 When working with user profiles:
 
 - **Always check for null**: IP addresses and user objects might be null, especially during initial setup.

@@ -1,0 +1,41 @@
+@startuml
+title PingScreenViewModel (Kotlin) - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+
+package "com.greybox.projectmesh.viewModel" {
+
+  class PingScreenModel <<data>> {
+    +deviceName: String?
+    +virtualAddress: InetAddress
+    +allOriginatorMessages: List<VirtualNode.LastOriginatorMessage>
+  }
+
+  class PingScreenViewModel <<ViewModel>> {
+    -_uiState: MutableStateFlow<PingScreenModel>
+    +uiState: Flow<PingScreenModel>
+    -node: AndroidVirtualNode
+    -appServer: AppServer
+    -lastTimeReceived: Long
+    --
+    +init()
+  }
+}
+
+' --- Relationships / dependencies ---
+PingScreenViewModel --> PingScreenModel : exposes/updates
+PingScreenViewModel ..> DI : injected
+PingScreenViewModel ..> SavedStateHandle : ctor
+PingScreenViewModel ..> InetAddress : ctor
+PingScreenViewModel ..> AndroidVirtualNode : collects state
+PingScreenViewModel ..> AppServer : uses
+PingScreenModel ..> InetAddress
+PingScreenModel ..> "VirtualNode.LastOriginatorMessage"
+
+note right of PingScreenViewModel
+init launches a coroutine (viewModelScope.launch)
+collects node.state and updates _uiState
+end note
+
+@enduml

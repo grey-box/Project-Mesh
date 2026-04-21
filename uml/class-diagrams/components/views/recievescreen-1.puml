@@ -1,0 +1,179 @@
+@startuml
+title ReceiveScreen.kt (Compose) - Incoming Transfers + Auto-Accept + Actions (Open/Download/Delete)
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class ReceiveScreen <<Composable>> {
+    +ReceiveScreen(viewModel: ReceiveScreenViewModel, onAutoFinishChange: (Boolean) -> Unit)
+  }
+
+  class HandleIncomingTransfers <<Composable>> {
+    +HandleIncomingTransfers(
+      uiState: ReceiveScreenModel,
+      onAccept,
+      onDecline,
+      onDelete,
+      onAutoFinishChange
+    )
+  }
+
+  class onDownload <<Function>> {
+    +onDownload(context: Context, transfer: IncomingTransferInfo, uriOrPath: String)
+  }
+
+  class saveFileToDefaultPath <<Function>>
+  class saveFileToMediaStore <<Function>>
+  class saveFileToContentUri <<Function>>
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class ReceiveScreenViewModel <<ViewModel>> {
+    +uiState: StateFlow<ReceiveScreenModel>
+    +onAccept(transfer: IncomingTransferInfo)
+    +onDecline(transfer: IncomingTransferInfo)
+    +onDelete(transfer: IncomingTransferInfo)
+  }
+
+  class ReceiveScreenModel <<State>> {
+    +incomingTransfers: List<IncomingTransferInfo>
+  }
+}
+
+package "com.greybox.projectmesh.server" as Server {
+  class AppServer
+
+  enum Status {
+    PENDING
+    COMPLETED
+    DECLINED
+    FAILED
+  }
+
+  class IncomingTransferInfo {
+    +id
+    +name
+    +deviceName
+    +fromHost: InetAddress
+    +requestReceivedTime
+    +status: Status
+    +transferred
+    +size
+    +transferTime
+    +file: File?
+  }
+}
+
+package "Android / Storage / Intents" as Android {
+  class Context
+  class SharedPreferences
+  class Environment
+  class FileProvider
+  class Intent
+  class MimeTypeMap
+  class Toast
+  class Uri
+  class DocumentsContract
+  class MediaStore
+  class ContentResolver
+  class ContentValues
+  class File
+  class Build
+  class InetAddress
+}
+
+package "DI" as DIBlock {
+  class localDI
+  class "DI" as DIContainer
+}
+
+package "Compose UI" as UI {
+  class LazyColumn
+  class ListItem
+  class IconButton
+  class Icon
+  class Text
+  class Column
+  class Row
+  class Spacer
+  class HorizontalDivider
+  class LaunchedEffect
+}
+
+package "Formatting Helpers" as Helpers {
+  class autoConvertByte <<Function>>
+  class autoConvertMS <<Function>>
+}
+
+Views.ReceiveScreen ..> VM.ReceiveScreenViewModel : collectAsState(uiState)
+Views.ReceiveScreen --> Views.HandleIncomingTransfers : passes uiState + VM callbacks
+
+Views.HandleIncomingTransfers ..> DIBlock.localDI : resolve DI
+Views.HandleIncomingTransfers ..> Android.SharedPreferences : instance(tag="settings")
+Views.HandleIncomingTransfers ..> Android.Context : LocalContext
+Views.HandleIncomingTransfers ..> Android.Environment : Downloads fallback
+Views.HandleIncomingTransfers ..> Server.IncomingTransferInfo : displays
+Views.HandleIncomingTransfers ..> Server.Status : checks status
+
+VM.ReceiveScreenViewModel ..> VM.ReceiveScreenModel : exposes state
+VM.ReceiveScreenViewModel ..> Server.IncomingTransferInfo : accepts / declines / deletes
+
+VM.ReceiveScreenModel ..> Server.IncomingTransferInfo : holds list
+
+Server.IncomingTransferInfo ..> Server.Status : uses
+Server.IncomingTransferInfo ..> Android.File : optional file
+Server.IncomingTransferInfo ..> Android.InetAddress : fromHost
+
+note right of Views.HandleIncomingTransfers
+defaultUri:
+- settingPref.getString("save_to_folder", null)
+- else Downloads/Project Mesh
+
+autoFinishEnabled:
+- loaded from settingPref.getBoolean("auto_finish", false)
+end note
+
+UI.LaunchedEffect ..> Android.SharedPreferences : load auto_finish
+UI.LaunchedEffect ..> VM.ReceiveScreenModel : reacts to incomingTransfers
+
+note right of UI.LaunchedEffect
+Auto-finish behavior:
+If autoFinishEnabled == true,
+accept each transfer with status == PENDING
+end note
+
+Views.HandleIncomingTransfers --> UI.LazyColumn : render incomingTransfers
+UI.LazyColumn --> UI.ListItem : per transfer
+
+note left of UI.ListItem
+ListItem click:
+open file only if
+- transfer.file != null
+- status == COMPLETED
+
+Uses FileProvider + ACTION_VIEW intent.
+If no handler exists, show Toast.
+On exception, show error Toast.
+end note
+
+note bottom of Views.HandleIncomingTransfers
+Per transfer status:
+- PENDING: Accept / Decline
+- COMPLETED: Delete / Download
+- DECLINED or FAILED: Delete
+end note
+
+Views.onDownload ..> Views.saveFileToContentUri : if path starts with content://
+Views.onDownload ..> Views.saveFileToDefaultPath : otherwise
+
+Views.saveFileToDefaultPath ..> Views.saveFileToMediaStore : if SDK >= Q
+Views.saveFileToDefaultPath ..> Android.File : legacy file copy
+
+Views.saveFileToMediaStore ..> Android.MediaStore : insert into Downloads
+Views.saveFileToContentUri ..> Android.DocumentsContract : createDocument + write stream
+
+Views.HandleIncomingTransfers ..> Helpers.autoConvertByte : format size
+Views.HandleIncomingTransfers ..> Helpers.autoConvertMS : format transfer time
+
+@enduml

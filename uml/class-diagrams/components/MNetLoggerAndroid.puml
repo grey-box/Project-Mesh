@@ -1,0 +1,44 @@
+@startuml
+title MNetLoggerAndroid - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+class MNetLoggerAndroid {
+  -deviceInfo: String
+  -minLogLevel: Int
+  -logHistoryLines: Int
+  -logFile: File?
+  -_recentLogs: MutableStateFlow<List<LogLine>>
+  -logChannel: Channel<LogLine>
+  +recentLogs: Flow<List<LogLine>>
+  +invoke(priority: Int, message: String, exception: Exception?): Unit
+  +invoke(priority: Int, message: () -> String, exception: Exception?): Unit
+  +exportAsString(context: Context): String
+}
+
+class LogLine
+class Context
+class File
+class Flow
+class MutableStateFlow
+class Channel
+
+MNetLoggerAndroid --> LogLine
+MNetLoggerAndroid --> Context
+MNetLoggerAndroid --> File
+MNetLoggerAndroid --> Flow
+MNetLoggerAndroid --> MutableStateFlow
+MNetLoggerAndroid --> Channel
+
+note right of MNetLoggerAndroid
+Tests validate:
+- log-level filtering
+- newest-first history updates
+- trimming to max history length
+- optional file persistence
+- export formatting with device info
+end note
+
+@enduml

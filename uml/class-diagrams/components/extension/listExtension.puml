@@ -1,0 +1,21 @@
+@startuml
+
+class "List<T>" {
+}
+
+class "updateItem Extension" {
+  + updateItem(condition: (T) -> Boolean, function: (T) -> T): List<T>
+}
+
+"updateItem Extension" ..> "List<T>" : extends
+"updateItem Extension" ..> "List<T>" : returns updated list
+
+note right of "updateItem Extension"
+Extension function on List<T>
+- Finds first item matching condition
+- Applies transformation function
+- Returns original list if no match found
+- Returns new updated list otherwise
+end note
+
+@enduml

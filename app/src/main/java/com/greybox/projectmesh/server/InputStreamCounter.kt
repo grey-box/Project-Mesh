@@ -22,13 +22,6 @@ class InputStreamCounter(
         }
     }
 
-    override fun read(b: ByteArray): Int {
-        return super.read(b).also {
-            if(it != -1)
-                bytesRead += it
-        }
-    }
-
     override fun read(b: ByteArray, off: Int, len: Int): Int {
         return super.read(b, off, len).also {
             if(it != -1)

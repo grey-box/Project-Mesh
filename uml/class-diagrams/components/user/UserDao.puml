@@ -1,0 +1,16 @@
+@startuml UserDao
+skinparam classAttributeIconSize 0
+
+interface UserDao <<Dao>> {
+  +getUserByUuid(uuid: String): UserEntity?
+  +insertUser(user: UserEntity): Unit
+  +updateUser(user: UserEntity): Unit
+  +hasWithID(uuid: String): Boolean
+  +getUserByIp(ip: String): UserEntity?
+  +getAllConnectedUsers(): List<UserEntity>
+  +getAllUsers(): List<UserEntity>
+}
+
+UserDao ..> UserEntity
+
+@enduml

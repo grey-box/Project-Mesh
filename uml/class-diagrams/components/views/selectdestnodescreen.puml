@@ -1,0 +1,80 @@
+@startuml
+title SelectDestNodeScreen.kt (Compose) - ViewModel Injection + In-Progress vs Node List UI
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class SelectDestNodeScreen <<Composable>> {
+    +SelectDestNodeScreen(uris: List<Uri>, popBackWhenDone: ()->Unit, viewModel: SelectDestNodeScreenViewModel)
+  }
+
+  class DisplayAllNodesToSelect <<Composable>> {
+    +DisplayAllNodesToSelect(uiState: SelectDestNodeScreenModel, onClickReceiver: (Int)->Unit)
+  }
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class SelectDestNodeScreenViewModel <<ViewModel>> {
+    +uiState: StateFlow<SelectDestNodeScreenModel>
+    +onClickReceiver(key: Int)
+    <<constructed with uris + popBackWhenDone>>
+  }
+
+  class SelectDestNodeScreenModel <<State>> {
+    +contactingInProgressDevice: String?
+    +allNodes: Map<Int, WifiEntry>
+  }
+}
+
+package "com.greybox.projectmesh.extension" as Ext {
+  class WifiListItem <<Composable>> {
+    +WifiListItem(wifiAddress: Int, wifiEntry: WifiEntry, onClick: (Int)->Unit)
+  }
+  class WifiEntry <<Model>>
+}
+
+package "DI" as DI {
+  class localDI
+  class ViewModelFactory
+  class LocalSavedStateRegistryOwner
+}
+
+package "Android" as Android {
+  class Uri
+}
+
+package "Compose UI" as UI {
+  class LazyColumn
+  class Column
+  class CircularProgressIndicator
+  class Text
+}
+
+' ---- Wiring ----
+Views.SelectDestNodeScreen ..> DI.localDI : provide DI
+Views.SelectDestNodeScreen ..> DI.LocalSavedStateRegistryOwner : owner
+Views.SelectDestNodeScreen ..> DI.ViewModelFactory : creates VM(di, savedStateHandle, uris, popBackWhenDone)
+Views.SelectDestNodeScreen ..> VM.SelectDestNodeScreenViewModel : viewModel(factory)
+Views.SelectDestNodeScreen ..> VM.SelectDestNodeScreenModel : collectAsState(initial)
+Views.SelectDestNodeScreen --> Views.DisplayAllNodesToSelect : uiState + onClickReceiver
+
+' ---- UI branching ----
+note right of Views.DisplayAllNodesToSelect
+Branching logic:
+if uiState.contactingInProgressDevice != null:
+  show progress item:
+   - CircularProgressIndicator
+   - Text("Contacting {device}\nThis might take a few seconds.")
+else:
+  show node list:
+   for each (key, wifiEntry) in uiState.allNodes.entries.toList():
+     WifiListItem(wifiAddress=key, wifiEntry=value)
+     onClick -> onClickReceiver(key)
+end note
+
+Views.DisplayAllNodesToSelect --> UI.LazyColumn : container
+UI.LazyColumn --> UI.Column : in-progress item (optional)
+UI.LazyColumn --> Ext.WifiListItem : list items (else branch)
+
+@enduml

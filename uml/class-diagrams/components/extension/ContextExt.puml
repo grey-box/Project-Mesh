@@ -1,0 +1,35 @@
+@startuml
+title ContextExt - Class Diagram
+
+skinparam classAttributeIconSize 0
+hide empty members
+set namespaceSeparator none
+
+class "ContextExtKt" as ContextExt {
+  + NEARBY_WIFI_PERMISSION_NAME: String
+  + hasNearbyWifiDevicesOrLocationPermission(context: Context): Boolean
+  + hasBluetoothConnectPermission(context: Context): Boolean
+  + hasStaApConcurrency(context: Context): Boolean
+  + deviceInfo(context: Context): String
+}
+
+class Context
+class WifiManager
+class PackageManager
+class DataStore
+class Preferences
+
+ContextExt ..> Context
+ContextExt ..> WifiManager
+ContextExt ..> PackageManager
+ContextExt ..> DataStore
+ContextExt ..> Preferences
+
+note right of ContextExt
+Tests focus on:
+- permission helper results
+- Wi-Fi concurrency capability gating
+- device info string composition
+end note
+
+@enduml

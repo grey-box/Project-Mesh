@@ -1,0 +1,105 @@
+@startuml
+title LogScreen.kt (Compose) - View + Selection/Copy Flow
+
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+package "com.greybox.projectmesh.views" as Views {
+  class LogScreen <<Composable>> {
+    +LogScreen(viewModel: LogScreenViewModel)
+  }
+
+  class ShowLogScreen <<Composable>> {
+    +ShowLogScreen(uiState: LogScreenModel)
+  }
+}
+
+package "com.greybox.projectmesh.viewModel" as VM {
+  class LogScreenViewModel <<ViewModel>> {
+    +uiState: StateFlow<LogScreenModel>
+  }
+
+  class LogScreenModel <<State>> {
+    +logs: List<LogLine>
+  }
+
+  class LogLine <<Model>> {
+    +lineId: Int
+    +time: Long
+    +line: String
+  }
+}
+
+package "Android / Compose Runtime" as Android {
+  class LocalContext
+  class Toast
+  class Clipboard as "LocalClipboardManager"
+  class AnnotatedString
+  class SimpleDateFormat
+  class Date
+}
+
+package "DI / Logging" as DI {
+  class localDI
+  class MNetLogger
+  class MNetLoggerAndroid
+}
+
+' ----- Structure -----
+LogScreen --> LogScreenViewModel : inject via ViewModelFactory
+LogScreen ..> LogScreenModel : collectAsState(initial)
+LogScreen --> ShowLogScreen : passes uiState
+
+ShowLogScreen ..> LocalContext : context
+ShowLogScreen ..> localDI : get logger
+ShowLogScreen ..> MNetLogger : instance()
+ShowLogScreen ..> MNetLoggerAndroid : cast
+ShowLogScreen ..> Clipboard : clipboardManager
+ShowLogScreen ..> SimpleDateFormat : remember("HH:mm:ss.SS")
+
+' ----- UI State (local) -----
+note right of ShowLogScreen
+Local UI state:
+- selectionMode: Boolean
+- selectedLineIds: Set<Int>
+
+Derived per line:
+- formattedTime = formatter.format(Date(time))
+- logText = "[time] line"
+- isSelected = lineId in selectedLineIds
+end note
+
+' ----- Selection toolbar flows -----
+note left of ShowLogScreen
+Toolbar visible only when selectionMode == true
+
+Buttons:
+1) Select All:
+   selectedLineIds = all uiState.logs.lineId
+
+2) Copy:
+   selectedLogs = uiState.logs filtered by selectedLineIds
+   joinToString("\n") -> "[time] line"
+   clipboardManager.setText(AnnotatedString(selectedLogs))
+   Toast("Logs copied!")
+   selectionMode=false
+   selectedLineIds=empty
+
+3) Cancel:
+   selectionMode=false
+   selectedLineIds=empty
+end note
+
+' ----- Gesture flows per log row -----
+note bottom of VM.LogLine
+Row gesture handling:
+- onLongPress:
+    if !selectionMode -> selectionMode=true, selectedLineIds={lineId}
+- onTap:
+    if selectionMode:
+      toggle membership of lineId in selectedLineIds
+- Checkbox (only if selectionMode):
+    checked change -> add/remove lineId
+end note
+
+@enduml

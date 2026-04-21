@@ -93,7 +93,7 @@ class MessageMigrationUtils(
         }
     }
 
-    private fun createConversationId(uuid1: String, uuid2: String): String {
+    internal fun createConversationId(uuid1: String, uuid2: String): String {
         // Special cases for test devices
         if (uuid2 == "test-device-uuid") {
             return "local-user-test-device-uuid"

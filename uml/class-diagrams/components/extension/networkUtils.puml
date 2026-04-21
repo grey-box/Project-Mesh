@@ -1,0 +1,22 @@
+@startuml
+
+class "DI" {
+}
+
+class "AndroidVirtualNode" {
+  + address: InetAddress
+}
+
+class "getLocalIpFromDI" {
+  + getLocalIpFromDI(di: DI): String
+}
+
+"getLocalIpFromDI" ..> "DI" : uses
+"getLocalIpFromDI" ..> "AndroidVirtualNode" : retrieves
+
+note right of "getLocalIpFromDI"
+- Fetches AndroidVirtualNode from DI
+- Returns node.address.hostAddress
+end note
+
+@enduml

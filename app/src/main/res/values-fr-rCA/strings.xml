@@ -1,15 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8" ?>
 <resources>
     <string name="app_name">Project Mesh</string>
     <string name="ip_address">Addresse IP</string>
     <string name="start_hotspot">Démarrer le point d’accès</string>
     <string name="stop_hotspot">Arrêter le point d’accès</string>
-    <string name="connect_via_qr_code_scan">Connectez-vous via le scan du Code QR</string>
-    <string name="connect_via_entering_connect_uri">Se connecter en saisissant l’URI de
+    <string
+    name="connect_via_qr_code_scan"
+  >Connectez-vous via le scan du Code QR</string>
+    <string
+    name="connect_via_entering_connect_uri"
+  >Se connecter en saisissant l’URI de
         Connexion</string>
     <string name="share_connect_uri">Partager l’URI de Connexion</string>
-    <string name="wifi_station_connection">Connexion à la station WIFI (client)</string>
-    <string name="prompt_scan_qr_code">Scannez un autre appareil pour rejoindre le Mesh</string>
+    <string
+    name="wifi_station_connection"
+  >Connexion à la station WIFI (client)</string>
+    <string
+    name="prompt_scan_qr_code"
+  >Scannez un autre appareil pour rejoindre le Mesh</string>
     <string name="hotspot_status">Statut du point d’accès</string>
     <string name="hotspot_status_online">En ligne</string>
     <string name="hotspot_status_offline">Hors ligne</string>
@@ -20,13 +28,17 @@
                                 "4. Collez l’URI dans le champ de texte ci-dessous\n"
                                 "5. Cliquez sur « Se connecter via la saisie de l'URI de connexion »""
     </string>
-    <string name="instruction_start_hotspot">"Poru partager l’URI de connexion:\n"
+    <string
+    name="instruction_start_hotspot"
+  >"Poru partager l’URI de connexion:\n"
                         "1. Assurez-vous que le Bluetooth est activé sur cet appareil\n"
                         "2. Cliquez sur « Partager l’URI de connexion »"\n"
                         "3. Select Quick Share\n"
                         "4. Choisissez un appareil à proximité avec lequel vous souhaitez partager l’URI."
     </string>
-    <string name="prompt_enter_uri">Entrez l’URI de connexion (Commence par "meshrabiya://")</string>
+    <string
+    name="prompt_enter_uri"
+  >Entrez l’URI de connexion (Commence par "meshrabiya://")</string>
 
     <string name="send_file">Envoyer un fichier</string>
     <string name="from">De</string>
@@ -51,7 +63,9 @@
 
     <string name="band">Bande</string>
     <string name="hotspot_type">Type de point d’accès</string>
-    <string name="search_nearby_devices">Rechercher des appareils à proximité</string>
+    <string
+    name="search_nearby_devices"
+  >Rechercher des appareils à proximité</string>
     <string name="searching">Recherche en cours</string>
     <string name="cancel">Annuler</string>
 
@@ -60,4 +74,5 @@
     <string name="concurrency">Concurrence STA/AP</string>
     <string name="manual_test">Test manuel</string>
     <string name="reset">Réinitialiser</string>
+    <string name="log">Registre</string>
 </resources>

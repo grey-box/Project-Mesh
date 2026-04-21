@@ -23,6 +23,7 @@ import org.kodein.di.instance
 import timber.log.Timber
 import java.net.InetAddress
 
+
 data class SelectDestNodeScreenModel(
     val allNodes: Map<Int, VirtualNode.LastOriginatorMessage> = emptyMap(),
     val uris: List<Uri> = emptyList(),
