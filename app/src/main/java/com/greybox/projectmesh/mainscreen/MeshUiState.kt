@@ -52,6 +52,8 @@ sealed class MeshUiEvent {
     data class UpdateTheme(val theme: String) : MeshUiEvent()
     data class UpdateLanguage(val code: String) : MeshUiEvent()
     data class PermissionsGranted(val granted: Boolean) : MeshUiEvent()
+    data  class UpdateAutoFinish(val enabled: Boolean) : MeshUiEvent()
+    data class UpdateSaveToFolder(val path: String) : MeshUiEvent()
     data object ClearError : MeshUiEvent()
     data object CompleteOnboarding : MeshUiEvent()
 }

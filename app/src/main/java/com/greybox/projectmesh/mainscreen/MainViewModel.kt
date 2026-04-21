@@ -81,9 +81,12 @@ class MainViewModel(
             is MeshUiEvent.UpdateDeviceName -> updateDeviceName(event.name)
             is MeshUiEvent.UpdateTheme -> updateTheme(event.theme)
             is MeshUiEvent.UpdateLanguage -> updateLanguage(event.code)
+            is MeshUiEvent.UpdateAutoFinish -> updateAutoFinish(event.enabled)
+            is MeshUiEvent.UpdateSaveToFolder -> updateSaveToFolder(event.path)
             is MeshUiEvent.PermissionsGranted -> handlePermissions(event.granted)
             is MeshUiEvent.ClearError -> clearError()
             is MeshUiEvent.CompleteOnboarding -> completeOnboarding()
+
         }
     }
 
@@ -151,6 +154,16 @@ class MainViewModel(
     private fun updateLanguage(code: String) {
         settingPrefs.edit().putString("language", code).apply()
         _uiState.update { it.copy(languageCode = code) }
+    }
+
+    private fun updateAutoFinish(enabled: Boolean) {
+        settingPrefs.edit().putBoolean("auto_finish", enabled).apply()
+        _uiState.update { it.copy(autoFinish = enabled) }
+    }
+
+    private fun updateSaveToFolder(path: String) {
+        settingPrefs.edit().putString("save_to_folder", path).apply()
+        _uiState.update { it.copy(saveToFolder = path) }
     }
 
     private fun handlePermissions(granted: Boolean) {

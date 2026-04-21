@@ -75,6 +75,7 @@ fun SettingsScreen(
     onLanguageChange: (String) -> Unit,
     onRestartServer: () -> Unit,
     onDeviceNameChange: (String) -> Unit,
+    autoFinish: Boolean,
     onAutoFinishChange: (Boolean) -> Unit,
     onSaveToFolderChange: (String) -> Unit
 ) {

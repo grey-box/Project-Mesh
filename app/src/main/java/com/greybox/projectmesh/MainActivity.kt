@@ -205,6 +205,7 @@ class MainActivity : ComponentActivity(), DIAware {
                             onRestartServer = {restartServerKey++},
                             onDeviceNameChange = {newName -> mainViewModel.onEvent(MeshUiEvent.UpdateDeviceName(newName)) },
                             deviceName = deviceName,
+                            autoFinish = autoFinish,
                             onAutoFinishChange = { autoFinishValue -> mainViewModel.onEvent(MeshUiEvent.UpdateAutoFinish(autoFinishValue)) },
                             onSaveToFolderChange = { saveToFolder -> mainViewModel.onEvent(MeshUiEvent.UpdateSaveToFolder(saveToFolder)) }
                         )
@@ -252,6 +253,7 @@ fun BottomNavApp(di: DI,
                  onRestartServer: () -> Unit,
                  onDeviceNameChange: (String) -> Unit,
                  deviceName: String,
+                 autoFinish: Boolean,
                  onAutoFinishChange: (Boolean) -> Unit,
                  onSaveToFolderChange: (String) -> Unit
 ) = withDI(di)
@@ -346,6 +348,7 @@ fun BottomNavApp(di: DI,
                 )
             }
             composable(BottomNavItem.Receive.route) { ReceiveScreen(
+                autoFinish = autoFinish,
                 onAutoFinishChange = onAutoFinishChange
             ) }
             composable(BottomNavItem.Log.route) {
@@ -392,6 +395,7 @@ fun BottomNavApp(di: DI,
                             Log.e("BottomNavApp", "Local UUID not found; cannot update user")
                         }
                     },
+                    autoFinish = autoFinish,
                     onAutoFinishChange = onAutoFinishChange,
                     onSaveToFolderChange = onSaveToFolderChange,
                 )
