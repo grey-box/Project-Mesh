@@ -1,6 +1,5 @@
 package com.greybox.projectmesh.messaging.repository
 
-import android.util.Log
 import com.greybox.projectmesh.messaging.data.dao.ConversationDao
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.data.entities.Message
@@ -9,6 +8,7 @@ import com.greybox.projectmesh.user.UserEntity
 import kotlinx.coroutines.flow.Flow
 import org.kodein.di.DI
 import org.kodein.di.DIAware
+import timber.log.Timber
 
 class ConversationRepository(
     private val conversationDao: ConversationDao,
@@ -22,9 +22,9 @@ class ConversationRepository(
 
     //get specific convo by id
     suspend fun getConversationById(conversationId: String): Conversation? {
-        Log.d("ConversationRepository", "Getting conversation by ID: $conversationId")
+        Timber.tag("ConversationRepository").d("Getting conversation by ID: $conversationId")
         val result = conversationDao.getConversationById(conversationId)
-        Log.d("ConversationRepository", "Result for ID $conversationId: ${result != null}")
+        Timber.tag("ConversationRepository").d("Result for ID $conversationId: ${result != null}")
         return result
     }
 
@@ -32,15 +32,16 @@ class ConversationRepository(
         //create a unique conversation ID using both UUIDs in order to ensure consistency
         val conversationId = ConversationUtils.createConversationId(localUuid, remoteUser.uuid)
 
-        Log.d("ConversationRepository", "Looking for conversation with ID: $conversationId")
-        Log.d("ConversationRepository", "Local UUID: $localUuid, Remote UUID: ${remoteUser.uuid}")
+        Timber.tag("ConversationRepository").d("Looking for conversation with ID: $conversationId")
+        Timber.tag("ConversationRepository").d("Local UUID: $localUuid, Remote UUID: ${remoteUser
+            .uuid}")
 
         //try to get an existing conversation
         var conversation = conversationDao.getConversationById(conversationId)
 
         //if no conversation exists, create a new one
         if(conversation == null){
-            Log.d("ConversationRepository", "Conversation not found, creating new one with ${remoteUser.name}")
+            Timber.d("ConversationRepository", "Conversation not found, creating new one with ${remoteUser.name}")
 
             conversation = Conversation(
                 id = conversationId,
@@ -53,9 +54,11 @@ class ConversationRepository(
                 isOnline = remoteUser.address != null
             )
             conversationDao.insertConversation(conversation)
-            Log.d("ConversationRepository", "Created new conversation with ${remoteUser.name}")
+            Timber.tag("ConversationRepository").d("Created new conversation with ${remoteUser
+                .name}")
         } else {
-            Log.d("ConversationRepository", "Found existing conversation with ${remoteUser.name}")
+            Timber.tag("ConversationRepository").d("Found existing conversation with ${remoteUser
+                .name}")
         }
         return conversation
     }
@@ -98,9 +101,9 @@ class ConversationRepository(
             )
 
             // Log for debugging
-            Log.d("ConversationRepository", "Updated user $userUuid connection status: online=$isOnline, address=$userAddress")
+            Timber.tag("ConversationRepository").d("Updated user $userUuid connection status: online=$isOnline, address=$userAddress")
         } catch (e: Exception) {
-            Log.e("ConversationRepository", "Failed to update user connection status", e)
+            Timber.tag("ConversationRepository").e(e,"Failed to update user connection status")
         }
     }
 

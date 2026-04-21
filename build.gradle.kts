@@ -13,6 +13,6 @@ java {
         // version must be at least 11, 
         //  but can be any higher as source and target compatibility are 
         //  both specified in app/build.gradle.kts
-        languageVersion = JavaLanguageVersion.of(17)
+        languageVersion = JavaLanguageVersion.of(21)
     }
 }

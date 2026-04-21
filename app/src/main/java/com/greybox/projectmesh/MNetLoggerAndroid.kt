@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.io.File
 import java.text.DateFormat
 import java.util.Date
@@ -52,12 +53,12 @@ class MNetLoggerAndroid(
 
     private fun doLog(priority: Int, message: String, exception: Exception?) {
         when (priority) {
-            Log.VERBOSE -> Log.v(MeshrabiyaConstants.LOG_TAG, message, exception)
-            Log.DEBUG -> Log.d(MeshrabiyaConstants.LOG_TAG, message, exception)
-            Log.INFO -> Log.i(MeshrabiyaConstants.LOG_TAG, message, exception)
-            Log.WARN -> Log.w(MeshrabiyaConstants.LOG_TAG, message, exception)
-            Log.ERROR -> Log.e(MeshrabiyaConstants.LOG_TAG, message, exception)
-            Log.ASSERT -> Log.wtf(MeshrabiyaConstants.LOG_TAG, message, exception)
+            Log.VERBOSE -> Timber.tag(MeshrabiyaConstants.LOG_TAG).v(exception, message)
+            Log.DEBUG -> Timber.tag(MeshrabiyaConstants.LOG_TAG).d(exception, message)
+            Log.INFO -> Timber.tag(MeshrabiyaConstants.LOG_TAG).i(exception, message)
+            Log.WARN -> Timber.tag(MeshrabiyaConstants.LOG_TAG).w(exception, message)
+            Log.ERROR -> Timber.tag(MeshrabiyaConstants.LOG_TAG).e(exception, message)
+            Log.ASSERT -> Timber.tag(MeshrabiyaConstants.LOG_TAG).wtf(exception, message)
         }
 
         val logDisplay = buildString {

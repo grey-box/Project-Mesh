@@ -1,8 +1,6 @@
 //script to help migrate existing messages
 package com.greybox.projectmesh.messaging.utils
 
-import android.content.Context
-import android.util.Log
 import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.db.MeshDatabase
 import com.greybox.projectmesh.testing.TestDeviceService
@@ -11,6 +9,7 @@ import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
+import timber.log.Timber
 
 class MessageMigrationUtils(
     override val di: DI
@@ -26,7 +25,8 @@ class MessageMigrationUtils(
             try {
                 //get all messages by id
                 val messages = db.messageDao().getAll()
-                Log.d("MessageMigration", "Found ${messages.size} messages to check for migration")
+                Timber.tag("MessageMigration").d("Found ${messages.size} messages to check for " +
+                        "migration")
 
                 //group messages by their current chat names
                 val messagesByChat = messages.groupBy { it.chat }
@@ -35,7 +35,7 @@ class MessageMigrationUtils(
                 messagesByChat.forEach { (chatName, messagesInChat) ->
                     //skip messages that already appear by using convo id format
                     if (chatName.contains("-") && (chatName.count { it == '-' } >= 1)){
-                        Log.d("MessageMigration", "Chat $chatName already appears to use conversation ID format")
+                        Timber.tag("MessageMigration").d("Chat $chatName already appears to use conversation ID format")
                         return@forEach
                     }
 
@@ -56,10 +56,9 @@ class MessageMigrationUtils(
                                     "unknown-${chatName}"
                                 }
                             }catch (e: Exception) {
-                                Log.e(
-                                    "MessageMigration",
-                                    "Error finding user for chat $chatName",
-                                    e
+                                Timber.tag(
+                                    "MessageMigration").e(e,
+                                    "Error finding user for chat $chatName"
                                 )
                                 "unknown-${chatName}"
                             }
@@ -71,7 +70,7 @@ class MessageMigrationUtils(
                     val newChatName = createConversationId(localUuid, userUuid)
 
                     if (chatName != newChatName) {
-                        Log.d("MessageMigration", "Migrating ${messagesInChat.size} messages from '$chatName' to '$newChatName'")
+                        Timber.tag("MessageMigration").d("Migrating ${messagesInChat.size} messages from '$chatName' to '$newChatName'")
 
                         //Create new messages with the updated chat name
                         val updatedMessages = messagesInChat.map {
@@ -84,11 +83,12 @@ class MessageMigrationUtils(
                             db.messageDao().addMessage(message)
                         }
 
-                        Log.d("MessageMigration", "Successfully migrated messages for chat 'chatName'")
+                        Timber.tag("MessageMigration").d("Successfully migrated messages for chat" +
+                                " 'chatName'")
                     }
                 }
             }catch (e:Exception){
-                Log.e("MessageMigration", "Error during message migration", e)
+                Timber.tag("MessageMigration").e(e,"Error during message migration")
             }
         }
     }

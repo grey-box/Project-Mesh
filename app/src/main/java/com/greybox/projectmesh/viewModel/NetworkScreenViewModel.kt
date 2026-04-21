@@ -1,6 +1,5 @@
 package com.greybox.projectmesh.viewModel
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +7,6 @@ import com.greybox.projectmesh.DeviceStatusManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.delay
 import org.kodein.di.DI
 import com.greybox.projectmesh.server.AppServer
 import com.ustadmobile.meshrabiya.ext.addressToByteArray
@@ -19,10 +17,8 @@ import com.greybox.projectmesh.testing.TestDeviceEntry
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.kodein.di.instance
+import timber.log.Timber
 import java.net.InetAddress
-import com.greybox.projectmesh.GlobalApp
-import com.greybox.projectmesh.testing.TestDeviceService
-import kotlinx.coroutines.withTimeoutOrNull
 
 data class NetworkScreenModel(
     val connectingInProgressSsid: String? = null,
@@ -56,7 +52,7 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
                 disconnectedNodes.forEach { nodeAddress ->
                     val ipAddress = InetAddress.getByAddress(nodeAddress.addressToByteArray()).hostAddress
                     DeviceStatusManager.handleNetworkDisconnect(ipAddress)
-                    Log.d("NetworkScreenViewModel", "Detected disconnection of node: $ipAddress")
+                    Timber.tag("NetworkScreenViewModel").d("Detected disconnection of node: $ipAddress")
                 }
 
                 // Update previous nodes for next comparison
@@ -66,9 +62,10 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
                 val allNodesWithTest = nodeState.originatorMessages.toMutableMap()
                 allNodesWithTest[testEntry.first] = testEntry.second
 
-                Log.d("NetworkScreenViewModel", "Updating nodes. Count: ${allNodesWithTest.size}")
-                Log.d("NetworkScreenViewModel", "Test device address: ${testEntry.first}")
-                Log.d("NetworkScreenViewModel", "All nodes: ${allNodesWithTest.keys}")
+                Timber.tag("NetworkScreenViewModel").d("Updating nodes. Count: ${allNodesWithTest
+                    .size}")
+                Timber.tag("NetworkScreenViewModel").d("Test device address: ${testEntry.first}")
+                Timber.tag("NetworkScreenViewModel").d("All nodes: ${allNodesWithTest.keys}")
 
                 // update the UI state with the new state
                 _uiState.update { prev ->
@@ -132,7 +129,9 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
 
                                     //Update central status manager to show device as online
                                     DeviceStatusManager.updateDeviceStatus(ipStr, true)
-                                    Log.d("NetworkScreenViewModel", "Pinged user: ${user.name} at $ipStr")
+                                    Timber.tag("NetworkScreenViewModel").d("Pinged user: ${user
+                                    .name}
+                                     at $ipStr")
                                 }
                             } catch (e: Exception) {
                                 //if ping fails, mark user as offline
@@ -144,7 +143,8 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
 
                                 //update central status manager to show device as offline
                                 DeviceStatusManager.updateDeviceStatus(ipStr, false)
-                                Log.d("NetworkScreenViewModel", "User ${user.name} appears to be offline")
+                                Timber.tag("NetworkScreenViewModel").d("User ${user.name} appears
+                                 to be offline")
                             }
                         }
                     }
@@ -169,19 +169,20 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
                             } ?: false
 
                             if (!isReachable) {
-                                Log.d(
-                                    "NetworkScreenViewModel",
-                                    "Marking device $deviceIp as offline - not reachable"
-                                )
+                                Timber.tag(
+                                    "NetworkScreenViewModel").d(
+                                    "Marking device $deviceIp as offline - not reachable")
                                 DeviceStatusManager.updateDeviceStatus(deviceIp, false)
                             }
                         }catch (e: Exception){
-                            Log.d("NetworkScreenViewModel", "Error checking device $deviceIp: ${e.message}")
+                            Timber.tag("NetworkScreenViewModel").d("Error checking device
+                            $deviceIp:
+                            ${e.message}")
                             DeviceStatusManager.updateDeviceStatus(deviceIp, false)
                         }
                     }
                 }catch (e: Exception) {
-                    Log.e("NetworkScreenViewModel", "Error during periodic ping", e)
+                    Timber.tag("NetworkScreenViewModel").e("Error during periodic ping", e)
                 }
                 //wait for 30 secs before next ming
                 delay(30000)

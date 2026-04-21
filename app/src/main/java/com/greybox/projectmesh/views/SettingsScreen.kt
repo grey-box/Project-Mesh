@@ -2,7 +2,6 @@ package com.greybox.projectmesh.views
 
 import android.content.Intent
 import android.content.SharedPreferences
-import android.graphics.Paint.Align
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
@@ -55,8 +54,6 @@ import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.ui.theme.GradientButton
 import com.greybox.projectmesh.ui.theme.GradientLongButton
-import com.greybox.projectmesh.viewModel.HomeScreenViewModel
-import com.greybox.projectmesh.viewModel.SendScreenViewModel
 import com.greybox.projectmesh.viewModel.SettingsScreenViewModel
 import org.kodein.di.compose.localDI
 import org.kodein.di.instance

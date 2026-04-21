@@ -32,6 +32,12 @@ android {
                 "proguard-rules.pro"
             )
         }
+
+        debug {
+            isDebuggable = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-debug"
+        }
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
@@ -42,6 +48,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -166,4 +173,7 @@ dependencies {
 
     // For JSON serialisation
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+
+    // For Debug Build
+    implementation("com.jakewharton.timber:timber:5.0.1")
 }

@@ -1,6 +1,6 @@
 package com.greybox.projectmesh.utils
 
-import android.util.Log
+import timber.log.Timber
 
 /**
  * Centralized logging utility for the app.
@@ -21,28 +21,28 @@ object Logger {
 
     fun d(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.d(buildTag(tag), message)
+            Timber.tag(buildTag(tag)).d(message)
         }
     }
 
     fun i(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.i(buildTag(tag), message)
+            Timber.tag(buildTag(tag)).i(message)
         }
     }
 
     fun w(tag: String, message: String) {
         if (LOGGING_ENABLED) {
-            Log.w(buildTag(tag), message)
+            Timber.tag(buildTag(tag)).w(message)
         }
     }
 
     fun e(tag: String, message: String, throwable: Throwable? = null) {
         if (LOGGING_ENABLED) {
             if (throwable != null) {
-                Log.e(buildTag(tag), message, throwable)
+                Timber.tag(buildTag(tag)).e(throwable, message)
             } else {
-                Log.e(buildTag(tag), message)
+                Timber.tag(buildTag(tag)).e(message)
             }
         }
     }
@@ -51,9 +51,9 @@ object Logger {
     fun critical(tag: String, message: String, throwable: Throwable? = null) {
         val criticalTag = buildCriticalTag(tag)
         if (throwable != null) {
-            Log.e(criticalTag, message, throwable)
+            Timber.tag(criticalTag).e(throwable, message)
         } else {
-            Log.e(criticalTag, message)
+            Timber.tag(criticalTag).e(message)
         }
     }
 }

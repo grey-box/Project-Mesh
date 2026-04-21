@@ -13,16 +13,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import org.kodein.di.DI
 import com.greybox.projectmesh.server.AppServer
-import com.greybox.projectmesh.server.AppServer.Companion.DEFAULT_PORT
 import com.greybox.projectmesh.server.AppServer.OutgoingTransferInfo
-import com.greybox.projectmesh.server.AppServer.Status
 import com.ustadmobile.meshrabiya.ext.addressToDotNotation
 import com.ustadmobile.meshrabiya.ext.requireAddressAsInt
 import com.greybox.projectmesh.messaging.utils.ConversationUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -31,11 +27,11 @@ import java.net.InetAddress
 import com.greybox.projectmesh.messaging.repository.ConversationRepository
 import com.greybox.projectmesh.user.UserEntity
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import com.greybox.projectmesh.DeviceStatusManager
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 import java.net.URI
 
 class ChatScreenViewModel(
@@ -75,13 +71,15 @@ class ChatScreenViewModel(
     }
 
     private val savedConversationId = savedStateHandle.get<String>("conversationId")
-    //Log.d("ChatDebug", "GOT CONVERSATION ID FROM SAVED STATE: $savedConversationId")
+    //Timber.tag("ChatDebug").d("GOT CONVERSATION ID FROM SAVED STATE: $savedConversationId")
 
     private val conversationId = passedConversationId ?:
     ConversationUtils.createConversationId(localUuid, userUuid)
 
     private val chatName = savedConversationId ?: conversationId
-    //Log.d("ChatDebug", "USING CHAT NAME: $chatName (saved: $savedConversationId, generated: $conversationId)")
+    //Timber.tag("ChatDebug").d("USING CHAT NAME: $chatName (saved: $savedConversationId,
+    // generated:
+    // $conversationId)")
 
 
 
@@ -115,7 +113,7 @@ class ChatScreenViewModel(
 
         // If we have a conversation ID from navigation, use it directly
         val effectiveChatName = if (savedConversationId != null) {
-            Log.d("ChatDebug", "USING SAVED CONVERSATION ID: $savedConversationId INSTEAD OF GENERATED: $chatName")
+            Timber.tag("ChatDebug").d("USING SAVED CONVERSATION ID: $savedConversationId INSTEAD OF GENERATED: $chatName")
             savedConversationId
         } else {
             chatName
@@ -123,17 +121,16 @@ class ChatScreenViewModel(
 
         viewModelScope.launch {
             // Debug logs
-            Log.d("ChatDebug", "Will query messages with chatName: $chatName")
-            Log.d("ChatDebug", "Using Conversation ID for messages: $conversationId")
-            Log.d("ChatDebug", "User UUID: $userUuid")
+            Timber.tag("ChatDebug").d("Will query messages with chatName: $chatName")
+            Timber.tag("ChatDebug").d("Using Conversation ID for messages: $conversationId")
+            Timber.tag("ChatDebug").d("User UUID: $userUuid")
 
             //check database content in background
             withContext(Dispatchers.IO) {
                 val allMessages = db.messageDao().getAll()
-                Log.d("ChatDebug", "All messages in database: ${allMessages.size}")
+                Timber.d("ChatDebug", "All messages in database: ${allMessages.size}")
                 for (msg in allMessages) {
-                    Log.d(
-                        "ChatDebug",
+                    Timber.tag("ChatDebug").d(
                         "Message: id=${msg.id}, chat=${msg.chat}, content=${msg.content}, sender=${msg.sender}"
                     )
                 }
@@ -158,13 +155,14 @@ class ChatScreenViewModel(
                     _uiState.update { prev ->
                         prev.copy(allChatMessages = initialMessages)
                     }
-                    Log.d("ChatDebug", "IMMEDIATELY LOADED ${initialMessages.size} MESSAGES FOR OFFLINE ACCESS")
+                    Timber.tag("ChatDebug").d("IMMEDIATELY LOADED ${initialMessages.size} " +
+                            "MESSAGES FOR OFFLINE ACCESS")
                 } else {
-                    Log.d("ChatDebug", "NO INITIAL MESSAGES FOUND FOR CHAT: $chatName")
+                    Timber.tag("ChatDebug").d("NO INITIAL MESSAGES FOUND FOR CHAT: $chatName")
                 }
 
             } catch (e: Exception) {
-                Log.e("ChatDebug", "ERROR LOADING INITIAL MESSAGES: ${e.message}", e)
+                Timber.e("ChatDebug", "ERROR LOADING INITIAL MESSAGES: ${e.message}", e)
             }
 
             val messagesFlow = if (isTestDevice) {
@@ -175,7 +173,7 @@ class ChatScreenViewModel(
                 }
 
                 if (testDeviceName != null) {
-                    Log.d("ChatDebug", "Using multi-name query with: [$chatName, $testDeviceName]")
+                    Timber.tag("ChatDebug").d("Using multi-name query with: [$chatName,$testDeviceName]")
                     db.messageDao().getChatMessagesFlowMultipleNames(
                         listOf(chatName, testDeviceName)
                     )
@@ -188,7 +186,7 @@ class ChatScreenViewModel(
 
             //collect messages from the chosen flow
             messagesFlow.collect { newChatMessages ->
-                Log.d("ChatDebug", "Received ${newChatMessages.size} messages")
+                Timber.tag("ChatDebug").d("Received ${newChatMessages.size} messages")
                 _uiState.update { prev ->
                     prev.copy(allChatMessages = newChatMessages)
                 }
@@ -206,14 +204,11 @@ class ChatScreenViewModel(
 
                     // Only update if status changed
                     if (_deviceOnlineStatus.value != isOnline) {
-                        Log.d(
-                            "ChatDebug",
-                            "Device status changed: $ipAddress is now ${if (isOnline) "online" else "offline"}"
-                        )
+                        Timber.tag("ChatDebug").d("Device status changed: $ipAddress is now ${if (isOnline) "online" else "offline"}")
                         _deviceOnlineStatus.value = isOnline
 
                         if (isOnline) {
-                            Log.d("ChatDebug", "Device came back online - refreshing message history")
+                            Timber.d("ChatDebug", "Device came back online - refreshing message history")
                             // Force refresh messages from database
                             withContext(Dispatchers.IO) {
                                 val refreshedMessages = db.messageDao().getChatMessagesSync(chatName)
@@ -247,10 +242,10 @@ class ChatScreenViewModel(
 
                 //Mark this conversation as read
                 conversationRepository.markAsRead(conversationId)
-                Log.d("ChatScreenViewModel", "Marked conversation as read: $conversationId")
+                Timber.tag("ChatScreenViewModel").d("Marked conversation as read: $conversationId")
             }
         } catch (e: Exception) {
-            Log.e("ChatScreenViewModel", "Error marking conversation as read", e)
+            Timber.tag("ChatScreenViewModel").e(e,"Error marking conversation as read")
         }
     }
 
@@ -269,7 +264,7 @@ class ChatScreenViewModel(
         //use same conversationid as chat name
         val messageEntity = Message(0, sendTime, message, "Me", chatName, file)
 
-        Log.d("ChatDebug", "Sending message to chat: $chatName")
+        Timber.tag("ChatDebug").d("Sending message to chat: $chatName")
         viewModelScope.launch {
             //save to local database
             db.messageDao().addMessage(messageEntity)
@@ -295,13 +290,9 @@ class ChatScreenViewModel(
                         message = messageEntity
                     )
 
-                    Log.d("ChatScreenViewModel", "Updated conversation with sent message")
+                    Timber.tag("ChatScreenViewModel").d("Updated conversation with sent message")
                 } catch (e: Exception) {
-                    Log.e(
-                        "ChatScreenViewModel",
-                        "Failed to update conversation with sent message",
-                        e
-                    )
+                    Timber.tag("ChatScreenViewModel").e(e,"Failed to update conversation with sent message")
                 }
             }
 
@@ -317,23 +308,24 @@ class ChatScreenViewModel(
 
                     // Update UI based on delivery status
                     if (!delivered) {
-                        Log.d("ChatDebug", "Message delivery failed")
+                        Timber.tag("ChatDebug").d("Message delivery failed")
                         _uiState.update { prev ->
                             prev.copy(offlineWarning = "Message delivery failed. Device may be offline.")
                         }
                         // Force device status verification
                         DeviceStatusManager.verifyDeviceStatus(ipAddress)
                     } else {
-                        Log.d("ChatDebug", "Message delivered successfully")
+                        Timber.tag("ChatDebug").d("Message delivered successfully")
                     }
                 } catch (e: Exception) {
-                    Log.e("ChatScreenViewModel", "Error sending message: ${e.message}", e)
+                    Timber.tag("ChatScreenViewModel").e(e, "Error sending message: ${e.message}")
                     _uiState.update { prev ->
                         prev.copy(offlineWarning = "Error sending message: ${e.message}")
                     }
                 }
             } else {
-                Log.d("ChatScreenViewModel", "Device $ipAddress appears to be offline, message saved locally only")
+                Timber.tag("ChatScreenViewModel").d("Device $ipAddress appears to be offline, " +
+                        "message saved locally only")
                 _uiState.update { prev ->
                     prev.copy(offlineWarning = "Device appears to be offline. Message saved locally only.")
                 }

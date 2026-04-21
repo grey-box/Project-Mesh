@@ -1,10 +1,9 @@
 package com.greybox.projectmesh.testing
 
-import android.util.Log
-import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.GlobalApp.GlobalUserRepo.userRepository
 import com.greybox.projectmesh.messaging.data.entities.Message
 import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 import java.net.InetAddress
 
 class TestDeviceService {
@@ -41,13 +40,14 @@ class TestDeviceService {
                         }
                     }
                     isInitialized = true
-                    Log.d("TestDeviceService", "Test device initialized successfully with IP: $TEST_DEVICE_IP")
+                    Timber.tag("TestDeviceService").d("Test device initialized successfully with " +
+                            "IP: $TEST_DEVICE_IP")
 
                     //initialize offline test device
                     initializeOfflineDevice()
                 }
             } catch (e: Exception) {
-                Log.e("TestDeviceService", "Failed to initialize test device", e)
+                Timber.tag("TestDeviceService").e(e,"Failed to initialize test device")
             }
         }
 
@@ -74,10 +74,10 @@ class TestDeviceService {
                         }
                     }
                     offlineDeviceInitialized = true
-                    Log.d("TestDeviceService", "Offline test device initialized successfully")
+                    Timber.tag("TestDeviceService").d("Offline test device initialized successfully")
                 }
             } catch (e: Exception) {
-                Log.e("TestDeviceService", "Failed to initialize offline test device", e)
+                Timber.tag("TestDeviceService").e(e, "Failed to initialize offline test device")
             }
         }
 

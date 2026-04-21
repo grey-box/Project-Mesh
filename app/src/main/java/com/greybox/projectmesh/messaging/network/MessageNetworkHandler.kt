@@ -5,9 +5,7 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.util.Log
 import androidx.core.app.NotificationCompat
-import com.google.gson.Gson
 import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.MainActivity
 import com.greybox.projectmesh.R
@@ -17,7 +15,6 @@ import com.greybox.projectmesh.messaging.utils.ConversationUtils
 import com.greybox.projectmesh.messaging.repository.ConversationRepository
 import com.greybox.projectmesh.server.AppServer
 import com.greybox.projectmesh.testing.TestDeviceService
-import com.greybox.projectmesh.util.NotificationHelper
 import java.net.InetAddress
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -29,11 +26,8 @@ import okhttp3.Request
 import org.kodein.di.DI
 import org.kodein.di.DIAware
 import org.kodein.di.instance
-import com.greybox.projectmesh.user.UserRepository
-import kotlinx.coroutines.runBlocking
 import android.content.SharedPreferences
-import android.os.Parcel
-import android.os.Parcelable
+import timber.log.Timber
 import java.net.URI
 
 class MessageNetworkHandler(
@@ -69,7 +63,7 @@ class MessageNetworkHandler(
                     .get()
                     .build()
 
-                Log.d("MessageNetworkHandler", "Request URL: ${request.url}")
+                Timber.tag("MessageNetworkHandler").d("Request URL: ${request.url}")
                 //Turn this into JSON
                 /*
                 val gs = Gson()
@@ -89,20 +83,25 @@ class MessageNetworkHandler(
                 try {
                     httpClient.newCall(request).execute().use { response ->
                         if (response.isSuccessful) {
-                            Log.d("MessageNetworkHandler", "Message sent successfully")
+                            Timber.tag("MessageNetworkHandler").d("Message sent successfully")
                         } else {
-                            Log.e("MessageNetworkHandler", "Failed to send message: ${response.code}")
+                            Timber.tag("MessageNetworkHandler").e("Failed to send message: " +
+                                    "${response
+                                .code}")
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e("MessageNetworkHandler", "Failed to send message, connection error: ${e.message}", e)
+                    Timber.tag("MessageNetworkHandler").e(e,"Failed to send message, connection " +
+                            "error: ${e.message}")
                 }
 
             } catch (e: Exception) {
-                Log.e("MessageNetworkHandler", "Failed to send message to ${address.hostAddress}")
+                Timber.tag("MessageNetworkHandler").e("Failed to send message to ${address
+                    .hostAddress}")
             }
         }
     }
+
     companion object {
         //process incoming messages and route them to the correct conversation
         fun handleIncomingMessage(
@@ -111,8 +110,8 @@ class MessageNetworkHandler(
             senderIp: InetAddress,
             incomingfile: URI?
         ): Message {
-            Log.d(
-                "MessageNetworkHandler",
+            Timber.tag(
+                "MessageNetworkHandler").d(
                 "Handling incoming message: $chatMessage, from: ${senderIp.hostAddress}, has file: ${incomingfile != null}"
             )
 
@@ -134,8 +133,8 @@ class MessageNetworkHandler(
             val localUuid = GlobalApp.GlobalUserRepo.prefs.getString("UUID", null) ?: "local-user"
             val chatName = ConversationUtils.createConversationId(localUuid, userUuid)
 
-            Log.d(
-                "MessageNetworkHandler",
+            Timber.tag(
+                "MessageNetworkHandler").d(
                 "Creating message with chat name: $chatName, sender: $sender"
             )
 
@@ -168,9 +167,9 @@ class MessageNetworkHandler(
                         )
                     }
 
-                    Log.d("MessageNetworkHandler", "Updated conversation with new message")
+                    Timber.tag("MessageNetworkHandler").d("Updated conversation with new message")
                 } catch (e: Exception) {
-                    Log.e("MessageNetworkHandler", "Failed to update conversation", e)
+                    Timber.tag("MessageNetworkHandler").e(e,"Failed to update conversation")
                 }
             }
             return message
@@ -190,7 +189,7 @@ class MessageNetworkHandler(
                         ?.getDeclaredField("INSTANCE")?.get(null) as? Context
                         ?: throw Exception("Cannot get application context")
                 } catch (e: Exception) {
-                    Log.e("MessageNetworkHandler", "Failed to get application context", e)
+                    Timber.tag("MessageNetworkHandler").e(e,"Failed to get application context")
                     return
                 }
 
@@ -228,9 +227,9 @@ class MessageNetworkHandler(
                 val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.notify(message.hashCode(), notification)
 
-                Log.d("MessageNetworkHandler", "Showed notification for message with file")
+                Timber.tag("MessageNetworkHandler").d("Showed notification for message with file")
             } catch (e: Exception) {
-                Log.e("MessageNetworkHandler", "Failed to show notification", e)
+                Timber.tag("MessageNetworkHandler").e(e, "Failed to show notification")
             }
         }
     }

@@ -1,11 +1,9 @@
 package com.greybox.projectmesh.messaging.ui.viewmodels
 
 import android.content.SharedPreferences
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.greybox.projectmesh.DeviceStatusManager
-import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.messaging.repository.ConversationRepository
 import com.greybox.projectmesh.messaging.ui.models.ConversationsHomeScreenModel
 import kotlinx.coroutines.Dispatchers
@@ -16,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.instance
+import timber.log.Timber
 
 class ConversationsHomeScreenViewModel(
     di: DI
@@ -74,7 +73,7 @@ class ConversationsHomeScreenViewModel(
                         else null
                     )
 
-                    Log.d("ConversationsViewModel",
+                    Timber.tag("ConversationsViewModel").d(
                         "Updated conversation status for ${currentConversations.find { it.userUuid == userUuid }?.userName}: online=$isOnline")
                 }
 
@@ -83,7 +82,7 @@ class ConversationsHomeScreenViewModel(
                     refreshConversations()
                 }
             } catch (e: Exception) {
-                Log.e("ConversationsViewModel", "Error updating conversation statuses", e)
+                Timber.tag("ConversationsViewModel").e(e,"Error updating conversation statuses")
             }
         }
     }
@@ -97,11 +96,12 @@ class ConversationsHomeScreenViewModel(
 
                 //get local device id
                 val localUuid = sharedPrefs.getString("UUID", null) ?: "local-user"
-                Log.d("ConversationsViewModel", "Local UUID: $localUuid")
+                Timber.tag("ConversationsViewModel").d("Local UUID: $localUuid")
 
                 //collect conversations from repository
                 conversationRepository.getAllConversations().collect { conversations ->
-                    Log.d("ConversationsViewModel", "Loaded ${conversations.size} conversations")
+                    Timber.tag("ConversationsViewModel").d("Loaded ${conversations.size} " +
+                            "conversations")
 
                     //filter out conversations with self
                     val filteredConversations = conversations.filter { conversation ->
@@ -109,12 +109,13 @@ class ConversationsHomeScreenViewModel(
                     }
 
                     conversations.forEach { conversation ->
-                        Log.d("ConversationsViewModel", "Conversation: ID=${conversation.id}, UserUUID=${conversation.userUuid}, Name=${conversation.userName}")
+                        Timber.tag("ConversationsViewModel").d("Conversation: ID=${conversation
+                            .id}, UserUUID=${conversation.userUuid}, Name=${conversation.userName}")
                     }
 
-                    Log.d("ConversationsViewModel", "Filtering out conversations with UUID: $localUuid")
+                    Timber.tag("ConversationsViewModel").d("Filtering out conversations with UUID:$localUuid")
 
-                    Log.d("ConversationsViewModel", "After filtering self: ${filteredConversations.size} conversations")
+                    Timber.tag("ConversationsViewModel").d("After filtering self:${filteredConversations.size} conversations")
 
 
                     //update the UI state with the conversations
@@ -127,7 +128,7 @@ class ConversationsHomeScreenViewModel(
                     }
                 }
             }catch (e: Exception) {
-                Log.e("ConversationsViewModel", "Error loading conversations", e)
+                Timber.tag("ConversationsViewModel").e(e,"Error loading conversations")
 
                 _uiState.update {
                     it.copy (
@@ -150,7 +151,7 @@ class ConversationsHomeScreenViewModel(
             try {
                 conversationRepository.markAsRead(conversationId)
             } catch (e: Exception) {
-                Log.e("ConversationsViewModel", "Error marking conversation as read", e)
+                Timber.tag("ConversationsViewModel").e(e, "Error marking conversation as read")
             }
         }
     }
