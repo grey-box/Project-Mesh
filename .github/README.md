@@ -24,20 +24,14 @@ The CI pipeline behaves as follows:
 ## General TODO
 
 ### Ongoing
-
-- For all workflows, add current build summary as commit/pr comments
-- Add script to preview to change iFrame title and onscreen title + pass/fail indicator
-- For orchestrator
-  - determine how to allow multiple reusable workflows to share build cache
-  - add setting on manual run whether to commit anything/deploy to pages
-
+- Address linting flags
 
 ### Backlog
 
-- Break workflows out into multiple intelligently-grouped jobs for improved execution visibility
-- Add graceful error handling if specific preview reports cannot be generated
-- Add graceful error handling to note that coverage reporting can only be generated on PRs and pushes, not workflow dispatches
-- Research if it's possible to ask to run workflows on any push
-
-### Integration
-
+- seems Very complex, but find a way to generate the site for any commit in any branch, not just most recent in main/cicd testing/most recent pr
+- Add script to preview to change iFrame title and onscreen title + pass/fail indicator
+- For orchestrator
+  - add setting on manual run whether to commit anything/deploy to pages
+- Address all remaining errors and warnings in pipe
+- Add trigger for Build APKs that specifically builds them with no TTL (default 1 day rn) when run from a PR merge
+- Increase test coverage
