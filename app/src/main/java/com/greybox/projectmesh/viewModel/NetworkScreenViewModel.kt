@@ -196,17 +196,16 @@ class NetworkScreenViewModel(di:DI, savedStateHandle: SavedStateHandle): ViewMod
     */
     }
 
-    fun onNodeSelected(ipAddress: String) {
-        viewModelScope.launch {
-            try {
-                val addr = withContext(Dispatchers.IO) {
-                    InetAddress.getByName(ipAddress)
-                }
-                appServer.requestRemoteUserInfo(addr)
-                appServer.pushUserInfoTo(addr)
-            } catch (e: Exception) {
-                Log.e("NetworkScreenViewModel", "Failed to request user info for $ipAddress", e)
+    suspend fun onNodeSelected(ipAddress: String) {
+        try {
+            val addr = withContext(Dispatchers.IO) {
+                InetAddress.getByName(ipAddress)
             }
+            appServer.requestRemoteUserInfo(addr)
+            appServer.pushUserInfoTo(addr)
+        } catch (e: Exception) {
+            Timber.tag("NetworkScreenViewModel")git stat
+                .e(e, "Failed to request user info for $ipAddress")
         }
     }
 
