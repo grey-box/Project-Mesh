@@ -60,4 +60,6 @@
 
     <string name="chat">Chat</string>
 
+    <string name="server_restart_complete">Server restart complete</string>
+
 </resources>

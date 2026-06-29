@@ -40,6 +40,7 @@ import org.kodein.di.DI
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 import timber.log.Timber
+import com.greybox.projectmesh.util.isIpv4
 
 @Composable
 fun AppNavHost(di: DI,
@@ -212,7 +213,7 @@ fun AppNavHost(di: DI,
                     Text("Error: Missing address parameter")
                 } else {
                     // Check if this is an IP address or conversation ID
-                    val isValidIpAddress = ipParam.matches(Regex("^\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\\.\\d{1,3}\$"))
+                    val isValidIpAddress = isIpv4(ipParam)
 
                     val validatedAddress = remember(ipParam) {
                         if (isValidIpAddress) {

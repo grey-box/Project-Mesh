@@ -49,4 +49,5 @@
     <string name="log">Registro</string>
 
     <string name="chat">Chat</string>
+    <string name="server_restart_complete">Reinicio del servidor completado</string>
 </resources>
