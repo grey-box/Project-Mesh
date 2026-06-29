@@ -7,9 +7,7 @@ import android.content.Context.MODE_PRIVATE
 import android.content.Intent
 import android.content.SharedPreferences
 import android.net.Uri
-import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
@@ -61,8 +59,6 @@ import org.kodein.di.android.closestDI
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 import java.io.File
-import java.util.Locale
-import java.net.InetAddress
 import com.greybox.projectmesh.messaging.ui.screens.ChatNodeListScreen
 import com.greybox.projectmesh.messaging.ui.screens.ConversationsHomeScreen
 import com.greybox.projectmesh.user.UserRepository
@@ -88,16 +84,21 @@ import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.lifecycle.lifecycleScope
 import com.greybox.projectmesh.logging.ReleaseTree
 import kotlinx.coroutines.launch
+import android.os.Environment
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
 import com.greybox.projectmesh.views.LogScreen
 import com.greybox.projectmesh.navigation.AppNavHost
-
 import com.greybox.projectmesh.views.RequestPermissionsScreen
 import com.greybox.projectmesh.BuildConfig
 import org.kodein.di.compose.localDI
-
 import timber.log.Timber
+import com.greybox.projectmesh.app.AppViewModel
+import com.greybox.projectmesh.app.DeepLink
+import com.greybox.projectmesh.ViewModelFactory
+import com.greybox.projectmesh.util.LocaleUtil
+import androidx.core.os.bundleOf
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 
 class MainActivity : ComponentActivity(), DIAware {
     override val di by closestDI()
@@ -116,8 +117,7 @@ class MainActivity : ComponentActivity(), DIAware {
 
         // crash screen
         CrashHandler.init(applicationContext, CrashScreenActivity::class.java)
-        val settingPref: SharedPreferences by di.instance(tag = "settings")
-        val appServer: AppServer by di.instance()
+  
         // Run this task asynchronously (default directory creation)
         lifecycleScope.launch(Dispatchers.IO) {
             ensureDefaultDirectory()
@@ -127,114 +127,52 @@ class MainActivity : ComponentActivity(), DIAware {
         Timber.tag("MainActivity").d("Test device initialized")
 
         setContent {
-            val meshPrefs = getSharedPreferences("project_mesh_prefs", MODE_PRIVATE)
-            var hasRunBefore by rememberSaveable {
-                mutableStateOf(meshPrefs.getBoolean("hasRunBefore", false))
-            }
-            // Check if the app was launched from a notification
             val launchedFromNotification = intent?.getBooleanExtra("from_notification", false) ?: false
-            // Request all permission in order
             RequestPermissionsScreen(skipPermissions = launchedFromNotification)
-            var appTheme by remember {
-                mutableStateOf(AppTheme.valueOf(
-                    settingPref.getString("app_theme", AppTheme.SYSTEM.name) ?:
-                    AppTheme.SYSTEM.name))
-            }
-            var languageCode by remember {
-                mutableStateOf(settingPref.getString(
-                    "language", "en") ?: "en")
-            }
-            var restartServerKey by remember {mutableStateOf(0)}
-            var deviceName by remember {
-                mutableStateOf(settingPref.getString("device_name", Build.MODEL) ?: Build.MODEL)
-            }
 
-            var autoFinish by remember {
-                mutableStateOf(settingPref.getBoolean("auto_finish", false))
-            }
-
-            var saveToFolder by remember {
-                mutableStateOf(
-                    settingPref.getString("save_to_folder", null)
-                        ?: "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh"
+            val appViewModel: AppViewModel = viewModel(
+                factory = ViewModelFactory(
+                    di = localDI(),
+                    owner = LocalSavedStateRegistryOwner.current,
+                    vmFactory = { di, savedStateHandle -> AppViewModel(di, savedStateHandle) },
+                    defaultArgs = bundleOf(),
                 )
-            }
+            )
 
-            // State to trigger recomposition when locale changes
-            var localeState by rememberSaveable { mutableStateOf(Locale.getDefault()) }
+            LaunchedEffect(Unit) {appViewModel.applyDeepLink(parseDeepLink(intent)) }
 
-            // Remember the current screen across recompositions
-            var currentScreen by rememberSaveable { mutableStateOf(BottomNavItem.Home.route) }
-            LaunchedEffect(intent?.getStringExtra("navigateTo")) {
-                if (intent?.getStringExtra("navigateTo") == BottomNavItem.Receive.route) {
-                    currentScreen = BottomNavItem.Receive.route
+            val ui by appViewModel.state.collectAsStateWithLifecycle()
+            val context = LocalContext.current
+            LaunchedEffect(ui.userMessage?.id) {
+                ui.userMessage?.let{
+                    Toast.makeText(context, it.textRes, Toast.LENGTH_SHORT).show()
+                    appViewModel.onUserMessageShown()
                 }
             }
 
-            //check for special navigation intents
-            val action = intent.action
-            if (action == "OPEN_CHAT_SCREEN") {
-                val ip = intent.getStringExtra("ip")
-                if (ip != null) {
-                    try {
-                        // Try to create InetAddress to validate it first
-                        InetAddress.getByName(ip)
-                        // If that succeeds, navigate to chat screen with this IP
-                        val route = "chatScreen/$ip"
-                        currentScreen = route
-                    } catch (e: Exception) {
-                        Timber.tag("MainActivity").e(e, "Invalid IP address in intent: %s", ip)
-                        // Fall back to home screen
-                        currentScreen = BottomNavItem.Home.route
-                    }
-                }
-            } else if (action == "OPEN_CHAT_CONVERSATION") {
-                val conversationId = intent.getStringExtra("conversationId")
-                if (conversationId != null) {
-                    // Navigate to chat screen with this conversation ID
-                    val route = "chatScreen/$conversationId"
-                    currentScreen = route
-                }
-            }
-
-            LaunchedEffect(restartServerKey) {
-                if (restartServerKey > 0){
-                    appServer.restart()
-                    Toast.makeText(this@MainActivity, "Server restart complete", Toast.LENGTH_SHORT).show()
-                }
-            }
-            // Observe language changes and apply locale
-            LaunchedEffect(languageCode) {
-                localeState = updateLocale(languageCode)
-            }
-            key(localeState) {
-                ProjectMeshTheme(appTheme = appTheme) {
-                    if (!hasRunBefore) {
-                        OnboardingScreen(
-                            onComplete = {meshPrefs.edit().putBoolean("hasRunBefore", true).apply()
-                                hasRunBefore = true }
-                        )
-                    }
-                    else{
-                        AppNavHost(
-                            di,
-                            startDestination = currentScreen,
-                            onThemeChange = { selectedTheme -> appTheme = selectedTheme},
-                            onLanguageChange = { selectedLanguage ->  languageCode = selectedLanguage},
-                            onNavigateToScreen = {screen ->
-                                currentScreen = screen },
-                            onRestartServer = {restartServerKey++},
-                            onDeviceNameChange = {deviceName = it},
-                            deviceName = deviceName,
-                            onAutoFinishChange = {autoFinish = it},
-                            onSaveToFolderChange = {saveToFolder = it}
-                        )
+            val locale = LocaleUtil.applyLocale(context, ui.languageCode)
+            key(locale) {
+                ProjectMeshTheme(appTheme = ui.theme) {
+                    if (!ui.hasRunBefore) {
+                        OnboardingScreen(onComplete = appViewModel::completeOnboarding)
+                    } else {
+                        AppNavHost(di, ui.startDestination, onScreenChanged = appViewModel::onScreenChanged)
                     }
                 }
             }
         }
         Timber.tag("BuildCheck").d("Build Type is: ${BuildConfig.BUILD_TYPE}")
     }
+
+    private fun parseDeepLink(intent: Intent): DeepLink? = when {
+        intent.getStringExtra("navigateTo") == BottomNavItem.Receive.route -> DeepLink.OpenReceive
+        intent.action == "OPEN_CHAT_SCREEN" ->
+            intent.getStringExtra("ip")?.let { DeepLink.OpenChat(it) }
+        intent.action == "OPEN_CHAT_CONVERSATION" ->
+            intent.getStringExtra("conversationId")?.let { DeepLink.OpenConversation(it) }
+        else -> null
+    }
+
 
     private fun ensureDefaultDirectory() {
         val defaultDirectory = File(
@@ -255,15 +193,6 @@ class MainActivity : ComponentActivity(), DIAware {
             Timber.tag("DirectoryCheck").d("Default directory already exists: ${defaultDirectory
                 .absolutePath}")
         }
-    }
-
-    private fun updateLocale(languageCode: String): Locale {
-        val locale = Locale(languageCode)
-        val config = resources.configuration
-        config.setLocale(locale)
-        @Suppress("DEPRECATION")
-        resources.updateConfiguration(config, resources.displayMetrics)
-        return locale
     }
 }
 

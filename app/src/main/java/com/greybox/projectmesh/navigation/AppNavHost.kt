@@ -41,20 +41,19 @@ import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 import timber.log.Timber
 import com.greybox.projectmesh.util.isIpv4
+import com.greybox.projectmesh.data.SettingsRepository
+import android.widget.Toast
+import androidx.compose.runtime.rememberCoroutineScope
+import com.greybox.projectmesh.R
 
 @Composable
-fun AppNavHost(di: DI,
-                 startDestination: String,
-                 onThemeChange: (AppTheme) -> Unit,
-                 onLanguageChange: (String) -> Unit,
-                 onNavigateToScreen: (String) -> Unit,
-                 onRestartServer: () -> Unit,
-                 onDeviceNameChange: (String) -> Unit,
-                 deviceName: String,
-                 onAutoFinishChange: (Boolean) -> Unit,
-                 onSaveToFolderChange: (String) -> Unit
+fun AppNavHost(
+    di: DI,
+    startDestination: String,
+    onScreenChanged: (String) -> Unit,         
 ) = withDI(di)
 {
+    val settings: SettingsRepository by di.instance()
     val appServer: AppServer by di.instance()
     val navController = rememberNavController()
     // Observe the current route directly through the back stack entry
@@ -63,7 +62,7 @@ fun AppNavHost(di: DI,
     LaunchedEffect(currentRoute.value?.destination?.route) {
         if(currentRoute.value?.destination?.route == BottomNavItem.Settings.route){
             currentRoute.value?.destination?.route?.let { route ->
-                onNavigateToScreen(route)
+                onScreenChanged(route)
             }
         }
     }
@@ -73,7 +72,10 @@ fun AppNavHost(di: DI,
     ){ innerPadding ->
         NavHost(navController, startDestination = startDestination, Modifier.padding(innerPadding))
         {
-            composable(BottomNavItem.Home.route) { HomeScreen(deviceName = deviceName) }
+            composable(BottomNavItem.Home.route) { 
+                val deviceName by settings.deviceName.collectAsState()
+                HomeScreen(deviceName = deviceName) }
+
             composable(BottomNavItem.Network.route) {
                 // Just call NetworkScreen with no click callback
                 NetworkScreen(
@@ -114,7 +116,7 @@ fun AppNavHost(di: DI,
                 )
             }
             composable(BottomNavItem.Receive.route) { ReceiveScreen(
-                onAutoFinishChange = onAutoFinishChange
+                onAutoFinishChange = { settings.setAutoFinish(it) }
             ) }
             composable(BottomNavItem.Log.route) {
                 LogScreen()
@@ -123,11 +125,21 @@ fun AppNavHost(di: DI,
                 // Retrieve required instances from DI with explicit types
                 val settingsPrefs: SharedPreferences by di.instance<SharedPreferences>(tag = "settings")
                 val userRepository: UserRepository by di.instance<UserRepository>()
+                val scope = rememberCoroutineScope()
+                val context = LocalContext.current
+
                 SettingsScreen(
-                    onThemeChange = onThemeChange,
-                    onLanguageChange = onLanguageChange,
-                    onRestartServer = onRestartServer,
-                    onDeviceNameChange = { newDeviceName ->
+                    onThemeChange = settings::setTheme,
+                    onLanguageChange = settings::setLanguage,
+                    onRestartServer = {
+                        scope.launch {
+                            appServer.restart()
+                            Toast.makeText(context,
+                                        context.getString(R.string.server_restart_complete),
+                                        Toast.LENGTH_SHORT).show() }
+                     },
+
+                    onDeviceNameChange = { newDeviceName -> settings.setDeviceName(newDeviceName)
                         Timber.tag("BottomNavApp").d("Device name changed to: $newDeviceName")
                         // Retrieve the local UUID from SharedPreferences
                         val localUuid = settingsPrefs.getString("UUID", null)
@@ -161,8 +173,8 @@ fun AppNavHost(di: DI,
                             Timber.tag("BottomNavApp").e("Local UUID not found; cannot update user")
                         }
                     },
-                    onAutoFinishChange = onAutoFinishChange,
-                    onSaveToFolderChange = onSaveToFolderChange,
+                    onAutoFinishChange = { settings.setAutoFinish(it) },
+                    onSaveToFolderChange = settings::setSaveToFolder,
                 )
             }
             //I'm guessing I can put my Chat button here?
