@@ -1,10 +1,12 @@
 package com.greybox.projectmesh.views
 
 import android.content.Intent
-import android.content.SharedPreferences
+
 import android.net.Uri
 import android.os.Build
 import android.widget.Toast
+import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -30,7 +32,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -56,7 +58,7 @@ import com.greybox.projectmesh.ui.theme.GradientButton
 import com.greybox.projectmesh.ui.theme.GradientLongButton
 import com.greybox.projectmesh.viewModel.SettingsScreenViewModel
 import org.kodein.di.compose.localDI
-import org.kodein.di.instance
+
 
 
 @Composable
@@ -68,24 +70,19 @@ fun SettingsScreen(
             vmFactory = { di, savedStateHandle -> SettingsScreenViewModel(di, savedStateHandle)},
             defaultArgs = null,
         )),
-    onThemeChange: (AppTheme) -> Unit,
-    onLanguageChange: (String) -> Unit,
-    onRestartServer: () -> Unit,
-    onDeviceNameChange: (String) -> Unit,
-    onAutoFinishChange: (Boolean) -> Unit,
-    onSaveToFolderChange: (String) -> Unit
 ) {
-    val di = localDI()
+
     val context = LocalContext.current
-    val currTheme = viewModel.theme.collectAsState()
-    val currLang = viewModel.lang.collectAsState()
-    val currDeviceName = viewModel.deviceName.collectAsState()
-    val currAutoFinish = viewModel.autoFinish.collectAsState()
-    val currSaveToFolder = viewModel.saveToFolder.collectAsState()
+    val ui by viewModel.state.collectAsStateWithLifecycle()
 
-    var showDialog by remember { mutableStateOf(false) }
+    LaunchedEffect(ui.userMessage?.id){
+        ui.userMessage?.let {
+            Toast.makeText(context, it.textRes, Toast.LENGTH_SHORT).show()
+            viewModel.onUserMessageShown()
+        }
+    }
 
-    val settingPref: SharedPreferences by di.instance(tag = "settings")
+
 
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()))
     {
@@ -103,10 +100,9 @@ fun SettingsScreen(
                 label = stringResource(id = R.string.language),
                 trailingContent = {
                     LanguageSetting(
-                        currentLanguage = currLang.value,
-                        onLanguageSelected = { selectedLanguageCode ->
-                            viewModel.saveLang(selectedLanguageCode)
-                            onLanguageChange(selectedLanguageCode)
+                        currentLanguage = ui.languageCode,
+                        onLanguageSelected = {
+                            viewModel.setLanguage(it)
                         }
                     )
                 }
@@ -115,10 +111,9 @@ fun SettingsScreen(
                 label = stringResource(id = R.string.theme),
                 trailingContent = {
                     ThemeSetting(
-                        currentTheme = currTheme.value,
-                        onThemeSelected = { selectedTheme ->
-                            viewModel.saveTheme(selectedTheme)
-                            onThemeChange(selectedTheme)
+                        currentTheme = ui.theme,
+                        onThemeSelected = {
+                            viewModel.setTheme(it)
                         }
                     )
                 }
@@ -130,25 +125,24 @@ fun SettingsScreen(
                 trailingContent = {
                     GradientButton(
                         text = stringResource(id = R.string.restart),
-                        onClick = onRestartServer
+                        onClick = { viewModel.restartServer() }
                     )
                 }
             )
             SettingItem(
                 label = stringResource(id = R.string.device_name),
                 trailingContent = {
-                    GradientButton(text = currDeviceName.value, onClick = { showDialog = true })
+                    GradientButton(text = ui.deviceName, onClick = { viewModel.showDeviceNameDialog() })
                 }
             )
-            if (showDialog) {
+            if (ui.showDeviceNameDialog) {
                 ChangeDeviceNameDialog(
-                    onDismiss = { showDialog = false },
-                    onConfirm = { newDeviceName ->
-                        viewModel.saveDeviceName(newDeviceName)
-                        onDeviceNameChange(newDeviceName)
-                        showDialog = false
+                    onDismiss = { viewModel.dismissDeviceNameDialog()},
+                    onConfirm = { 
+                        viewModel.setDeviceName(it)
+                        viewModel.dismissDeviceNameDialog()
                     },
-                    deviceName = currDeviceName.value
+                    deviceName = ui.deviceName
                 )
             }
             // Receive Setting Section (Auto Finish, Save to folder)
@@ -158,10 +152,9 @@ fun SettingsScreen(
                     Box(modifier = Modifier.width(130.dp).height(70.dp))
                     {
                         Switch(
-                            checked = currAutoFinish.value,
-                            onCheckedChange = { isChecked ->
-                                viewModel.saveAutoFinish(isChecked)
-                                onAutoFinishChange(isChecked)
+                            checked = ui.autoFinish,
+                            onCheckedChange = { 
+                                viewModel.setAutoFinish(it)
                             },
                             colors = SwitchDefaults.colors(
                                 checkedThumbColor = Color.White,
@@ -184,18 +177,17 @@ fun SettingsScreen(
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
                     Toast.makeText(context, "Directory selected: $uri", Toast.LENGTH_LONG).show()
-                    viewModel.saveSaveToFolder(uri.toString())
-                    onSaveToFolderChange(uri.toString())
+                    viewModel.setSaveToFolder(uri.toString())
                 } else {
                     Toast.makeText(context, "No directory selected", Toast.LENGTH_LONG).show()
                 }
             }
-            val folderNameToShow = if (currSaveToFolder.value.startsWith("content://")) {
+            val folderNameToShow = if (ui.saveToFolder.startsWith("content://")) {
                 // Decode Uri and extract the folder name for content URIs
-                Uri.decode(currSaveToFolder.value).split(":").lastOrNull() ?: "Unknown"
+                Uri.decode(ui.saveToFolder).split(":").lastOrNull() ?: "Unknown"
             } else {
                 // Extract the last directory from the file path for plain file paths
-                currSaveToFolder.value.split("/").lastOrNull() ?: "Unknown"
+                ui.saveToFolder.split("/").lastOrNull() ?: "Unknown"
             }
             SettingItem(label = stringResource(id = R.string.save_to_folder),
                 trailingContent = {
@@ -212,12 +204,7 @@ fun SettingsScreen(
                         GradientLongButton(
                             text = stringResource(id = R.string.reset),
                             onClick = {
-                                viewModel.updateConcurrencySettings(false, true)
-                                Toast.makeText(
-                                    context,
-                                    "Reset STA/AP Concurrency Status -> Unknown",
-                                    Toast.LENGTH_SHORT
-                                ).show()
+                                viewModel.resetConcurrency()
                             }
                         )
                     }

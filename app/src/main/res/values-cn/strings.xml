@@ -50,5 +50,6 @@
 
     <string name="chat">聊天</string>
     <string name="server_restart_complete">服务器重启完成</string>
+    <string name="concurrency_reset">已重置 STA/AP 并发状态 -&gt; 未知</string>
 
 </resources>

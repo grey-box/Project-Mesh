@@ -1,6 +1,6 @@
 package com.greybox.projectmesh.navigation
 
-import android.content.SharedPreferences
+
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
@@ -20,9 +20,7 @@ import com.greybox.projectmesh.DeviceStatusManager
 import com.greybox.projectmesh.messaging.ui.screens.ChatScreen
 import com.greybox.projectmesh.messaging.ui.screens.ConversationChatScreen
 import com.greybox.projectmesh.messaging.ui.screens.ConversationsHomeScreen
-import com.greybox.projectmesh.server.AppServer
 import com.greybox.projectmesh.ui.theme.AppTheme
-import com.greybox.projectmesh.user.UserRepository
 import com.greybox.projectmesh.viewModel.SharedUriViewModel
 import com.greybox.projectmesh.views.HomeScreen
 import com.greybox.projectmesh.views.LogScreen
@@ -33,18 +31,15 @@ import com.greybox.projectmesh.views.SelectDestNodeScreen
 import com.greybox.projectmesh.views.SendScreen
 import com.greybox.projectmesh.views.SettingsScreen
 import java.net.InetAddress
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.compose.withDI
 import org.kodein.di.instance
 import timber.log.Timber
 import com.greybox.projectmesh.util.isIpv4
 import com.greybox.projectmesh.data.SettingsRepository
-import android.widget.Toast
-import androidx.compose.runtime.rememberCoroutineScope
-import com.greybox.projectmesh.R
+
+
+
 
 @Composable
 fun AppNavHost(
@@ -54,7 +49,7 @@ fun AppNavHost(
 ) = withDI(di)
 {
     val settings: SettingsRepository by di.instance()
-    val appServer: AppServer by di.instance()
+   // val appServer: AppServer by di.instance()
     val navController = rememberNavController()
     // Observe the current route directly through the back stack entry
     val currentRoute = navController.currentBackStackEntryFlow.collectAsState(initial = null)
@@ -121,62 +116,12 @@ fun AppNavHost(
             composable(BottomNavItem.Log.route) {
                 LogScreen()
             }
+            
             composable(BottomNavItem.Settings.route) {
-                // Retrieve required instances from DI with explicit types
-                val settingsPrefs: SharedPreferences by di.instance<SharedPreferences>(tag = "settings")
-                val userRepository: UserRepository by di.instance<UserRepository>()
-                val scope = rememberCoroutineScope()
-                val context = LocalContext.current
-
-                SettingsScreen(
-                    onThemeChange = settings::setTheme,
-                    onLanguageChange = settings::setLanguage,
-                    onRestartServer = {
-                        scope.launch {
-                            appServer.restart()
-                            Toast.makeText(context,
-                                        context.getString(R.string.server_restart_complete),
-                                        Toast.LENGTH_SHORT).show() }
-                     },
-
-                    onDeviceNameChange = { newDeviceName -> settings.setDeviceName(newDeviceName)
-                        Timber.tag("BottomNavApp").d("Device name changed to: $newDeviceName")
-                        // Retrieve the local UUID from SharedPreferences
-                        val localUuid = settingsPrefs.getString("UUID", null)
-                        if (localUuid != null) {
-                            // Update the local user info and broadcast in an IO coroutine
-                            CoroutineScope(Dispatchers.IO).launch {
-                                // 1. Update the local user in the database
-                                userRepository.insertOrUpdateUser(
-                                    uuid = localUuid,
-                                    name = newDeviceName,
-                                    address = appServer.localVirtualAddr.hostAddress  // <-- local IP here
-                                )
-                                Timber.tag("BottomNavApp").d("Updated local user with new name:$newDeviceName")
-
-                                // 2. Retrieve all connected users (those with a non-null address)
-                                val connectedUsers = userRepository.getAllConnectedUsers()
-                                connectedUsers.forEach { user ->
-                                    user.address?.let { ip ->
-                                        try {
-                                            val remoteAddr = InetAddress.getByName(ip)
-                                            Timber.tag("BottomNavApp").d("Broadcasting updated info to: $ip")
-                                            appServer.pushUserInfoTo(remoteAddr)
-                                        } catch (e: Exception) {
-                                            Timber.tag("BottomNavApp").e(e, "Error processing IP " +
-                                                    "address:$ip")
-                                        }
-                                    }
-                                }
-                            }
-                        } else {
-                            Timber.tag("BottomNavApp").e("Local UUID not found; cannot update user")
-                        }
-                    },
-                    onAutoFinishChange = { settings.setAutoFinish(it) },
-                    onSaveToFolderChange = settings::setSaveToFolder,
-                )
+                     SettingsScreen()
             }
+
+            
             //I'm guessing I can put my Chat button here?
             composable(BottomNavItem.Chat.route) {
                 //latest status of DeviceStatus manager

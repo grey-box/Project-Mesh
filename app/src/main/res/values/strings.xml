@@ -61,5 +61,6 @@
     <string name="chat">Chat</string>
 
     <string name="server_restart_complete">Server restart complete</string>
+    <string name="concurrency_reset">Reset STA/AP Concurrency Status -&gt; Unknown</string>
 
 </resources>

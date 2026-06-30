@@ -49,5 +49,7 @@
     <string name="log">Registro</string>
 
     <string name="chat">Chat</string>
+    <string name="concurrency_reset">Estado de concurrencia STA/AP restablecido -&gt; Desconocido</string>
+
     <string name="server_restart_complete">Reinicio del servidor completado</string>
 </resources>
