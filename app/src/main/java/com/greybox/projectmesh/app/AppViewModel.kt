@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.viewModelScope
 import com.greybox.projectmesh.arch.StateViewModel
-import com.greybox.projectmesh.arch.UserMessage
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.navigation.BottomNavItem
 import com.greybox.projectmesh.ui.theme.AppTheme
@@ -23,7 +22,6 @@ data class AppUiState(
     val languageCode: String = "en",
     val deviceName: String = "",
     val startDestination: String = BottomNavItem.Home.route,
-    val userMessage: UserMessage? = null,
 )
 
 /** Parsed from the launch Intent in onCreate — the Android Intent never enters the VM. */
@@ -81,8 +79,8 @@ class AppViewModel(
     )
 
     /** The ONE carrier→state mapping, shared by seed and mirror. Repo-owned fields
-     *  only — never startDestination/userMessage; the VM owns those, and copying
-     *  them here would clobber the user's current screen. */
+     *  only — never startDestination. the VM owns this and copying
+     *  it here would clobber the user's current screen. */
     private fun AppUiState.withShellSettings(s: ShellSettings) = copy(
         theme = s.theme,
         languageCode = s.languageCode,
@@ -131,10 +129,7 @@ class AppViewModel(
         }
         onScreenChanged(dest)
     }
-
-    /** Clear the one-shot user message after the UI has shown it. */
-    fun onUserMessageShown() = setState { copy(userMessage = null) }
-
+    
     companion object {
         /** Decision #6 — accepted conversation-ID shape: sorted UUIDs joined by
         *  '-' (sender: AppServer.kt:651). Test-device IDs such as

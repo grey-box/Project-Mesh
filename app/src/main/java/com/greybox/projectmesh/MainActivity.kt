@@ -11,7 +11,6 @@ import android.os.Bundle
 import android.os.PowerManager
 import android.provider.Settings
 import android.util.Log
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.Column
@@ -143,12 +142,7 @@ class MainActivity : ComponentActivity(), DIAware {
 
             val ui by appViewModel.state.collectAsStateWithLifecycle()
             val context = LocalContext.current
-            LaunchedEffect(ui.userMessage?.id) {
-                ui.userMessage?.let{
-                    Toast.makeText(context, it.textRes, Toast.LENGTH_SHORT).show()
-                    appViewModel.onUserMessageShown()
-                }
-            }
+            
 
             val locale = LocaleUtil.applyLocale(context, ui.languageCode)
             key(locale) {
