@@ -49,22 +49,34 @@ class SettingsScreenViewModel(
     )
 
     init {
+        // Decision #7: seed synchronously before the mirror launches
+        // (see StateViewModel contract KDoc).
+        setState { withFormSettings(currentFormSettings()) }
+
         combine(
             settings.theme, settings.languageCode, settings.deviceName,
             settings.autoFinish, settings.saveToFolder,
         ) { theme, lang, name, autoFinish, folder ->
             FormSettings(theme, lang, name, autoFinish, folder)
-        }.onEach { s ->
-            // Mirror ONLY repo-owned fields; never touch showDeviceNameDialog/userMessage.
-            setState {
-                copy(
-                    theme = s.theme, languageCode = s.languageCode, deviceName = s.deviceName,
-                    autoFinish = s.autoFinish, saveToFolder = s.saveToFolder,
-                )
-            }
-        }.launchIn(viewModelScope)
+        }.onEach { s -> setState { withFormSettings(s) } }
+            .launchIn(viewModelScope)
     }
 
+    /** Snapshot of the repo's current values — synchronous, because they're StateFlows. */
+    private fun currentFormSettings() = FormSettings(
+        theme = settings.theme.value,
+        languageCode = settings.languageCode.value,
+        deviceName = settings.deviceName.value,
+        autoFinish = settings.autoFinish.value,
+        saveToFolder = settings.saveToFolder.value,
+    )
+
+    /** The ONE carrier→state mapping, shared by seed and mirror. Repo-owned fields
+     *  only — never showDeviceNameDialog/userMessage (VM-owned). */
+    private fun SettingsUiState.withFormSettings(s: FormSettings) = copy(
+        theme = s.theme, languageCode = s.languageCode, deviceName = s.deviceName,
+        autoFinish = s.autoFinish, saveToFolder = s.saveToFolder,
+    )
     // --- simple pass-throughs to the repository (single writer) ---
     fun setTheme(theme: AppTheme) = settings.setTheme(theme)
     fun setLanguage(code: String) = settings.setLanguage(code)

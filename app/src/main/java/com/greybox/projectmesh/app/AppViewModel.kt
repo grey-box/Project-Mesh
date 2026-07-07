@@ -52,23 +52,19 @@ class AppViewModel(
         val theme: AppTheme, val languageCode: String,
         val deviceName: String, val hasRunBefore: Boolean,
     )
+        init {
+        // Decision #7: seed synchronously from the repo's CURRENT values before the
+        // mirror launches — the first frame reads state.value ahead of the collector
+        // coroutine's first dispatch, so unseeded defaults (hasRunBefore=false,
+        // theme=SYSTEM) would flash for one frame on an existing install.
+        setState { withShellSettings(currentShellSettings()) }
 
-    init {
+        // Mirror: every LATER repo change flows into state.
         combine(
             settings.theme, settings.languageCode, settings.deviceName, settings.hasRunBefore,
         ) { theme, lang, name, hasRun -> ShellSettings(theme, lang, name, hasRun) }
-            .onEach { s ->
-                // Mirror ONLY repo-owned fields. Do NOT touch startDestination/userMessage —
-                // the VM owns those; copying them here would clobber the user's current screen.
-                setState {
-                    copy(
-                        theme = s.theme,
-                        languageCode = s.languageCode,
-                        deviceName = s.deviceName,
-                        hasRunBefore = s.hasRunBefore,
-                    )
-                }
-            }.launchIn(viewModelScope)
+            .onEach { s -> setState { withShellSettings(s) } }
+            .launchIn(viewModelScope)
 
         // Restore start destination across process death (replaces rememberSaveable).
         savedStateHandle.get<String>(KEY_START_DEST)?.let { restored ->
@@ -76,6 +72,23 @@ class AppViewModel(
         }
     }
 
+    /** Snapshot of the repo's current values — synchronous, because they're StateFlows. */
+    private fun currentShellSettings() = ShellSettings(
+        theme = settings.theme.value,
+        languageCode = settings.languageCode.value,
+        deviceName = settings.deviceName.value,
+        hasRunBefore = settings.hasRunBefore.value,
+    )
+
+    /** The ONE carrier→state mapping, shared by seed and mirror. Repo-owned fields
+     *  only — never startDestination/userMessage; the VM owns those, and copying
+     *  them here would clobber the user's current screen. */
+    private fun AppUiState.withShellSettings(s: ShellSettings) = copy(
+        theme = s.theme,
+        languageCode = s.languageCode,
+        deviceName = s.deviceName,
+        hasRunBefore = s.hasRunBefore,
+    )
     /** Mark onboarding complete; the repo flow propagates the new value into state. */
     fun completeOnboarding() { settings.setHasRunBefore(true) }
 
