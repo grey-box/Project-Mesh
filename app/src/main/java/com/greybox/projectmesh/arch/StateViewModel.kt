@@ -18,10 +18,20 @@ import kotlinx.coroutines.flow.update
  *    nullable field to the state (e.g. userMessage: UserMessage?) and expose an
  *    onXShown() method the UI calls to clear it. Do NOT use Channel/SharedFlow
  *    for one-off events (delivery is not guaranteed across lifecycle changes).
+ *  - The single userMessage slot is LAST-WRITER-WINS, deliberately: a second
+ *    message may replace one the UI has not shown yet, and onXShown() clears
+ *    whatever is there. Acceptable for toasts. If a screen ever needs every
+ *    message delivered, upgrade THAT screen's field to a List<UserMessage>
+ *    queue — never to a Channel/SharedFlow (see previous bullet).
+ *  - When state mirrors a repository, the FIRST statement of init must seed
+ *    the state synchronously from the repo flows' current .value s, through
+ *    the same carrier->state mapping the mirror uses (ADR 0002, plan
+ *    Decision #7 / Risk #9). The mirror's combine(...).launchIn is not
+ *    guaranteed to emit before the first frame reads state.value, so an
+ *    unseeded default state can flash for a frame.
  *  - UI collects with collectAsStateWithLifecycle().
  *  - Derived hot flows use stateIn(viewModelScope, WhileSubscribed(5_000), initial).
  */
-
 abstract class StateViewModel<S>(initialState: S) : ViewModel() {
     private val _state = MutableStateFlow(initialState)
     val state: StateFlow<S> = _state.asStateFlow()
