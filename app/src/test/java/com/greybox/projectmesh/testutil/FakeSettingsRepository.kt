@@ -1,4 +1,4 @@
-package com.greybox.projectmesh.test.testutil
+package com.greybox.projectmesh.testutil
 
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.ui.theme.AppTheme

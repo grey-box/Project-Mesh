@@ -1,4 +1,4 @@
-package com.greybox.projectmesh.test.testutil
+package com.greybox.projectmesh.testutil
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
