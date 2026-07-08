@@ -31,14 +31,10 @@ import com.greybox.projectmesh.views.SelectDestNodeScreen
 import com.greybox.projectmesh.views.SendScreen
 import com.greybox.projectmesh.views.SettingsScreen
 import java.net.InetAddress
-import org.kodein.di.DI
 import org.kodein.di.compose.withDI
-import org.kodein.di.instance
+import org.kodein.di.DI
 import timber.log.Timber
 import com.greybox.projectmesh.util.isIpv4
-import com.greybox.projectmesh.data.SettingsRepository
-
-
 
 
 @Composable
@@ -48,7 +44,6 @@ fun AppNavHost(
     onScreenChanged: (String) -> Unit,         
 ) = withDI(di)
 {
-    val settings: SettingsRepository by di.instance()
    // val appServer: AppServer by di.instance()
     val navController = rememberNavController()
     // Observe the current route directly through the back stack entry
@@ -109,9 +104,9 @@ fun AppNavHost(
                     popBackWhenDone = {navController.popBackStack()},
                 )
             }
-            composable(BottomNavItem.Receive.route) { ReceiveScreen(
-                onAutoFinishChange = { settings.setAutoFinish(it) }
-            ) }
+            
+            composable(BottomNavItem.Receive.route) { ReceiveScreen() }
+
             composable(BottomNavItem.Log.route) {
                 LogScreen()
             }

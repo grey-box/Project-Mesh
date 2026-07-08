@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="CompilerConfiguration">
-    <bytecodeTargetLevel target="21" />
+    <bytecodeTargetLevel target="21">
+      <module name="Project_Mesh" target="17" />
+      <module name="Project_Mesh.app" target="17" />
+      <module name="Project_Mesh.main" target="17" />
+      <module name="Project_Mesh.test" target="17" />
+    </bytecodeTargetLevel>
   </component>
 </project>
