@@ -42,7 +42,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -81,16 +80,16 @@ import com.ustadmobile.meshrabiya.vnet.wifi.state.WifiStationState
 import org.kodein.di.compose.localDI
 import org.kodein.di.direct
 import org.kodein.di.instance
-import androidx.compose.runtime.State
 import com.greybox.projectmesh.extension.hasStaApConcurrency
 import com.greybox.projectmesh.ui.theme.TransparentButton
-import com.greybox.projectmesh.viewModel.HomeScreenModel
 import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
 import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
 import com.greybox.projectmesh.components.ConnectWifiLauncherResult
 import com.greybox.projectmesh.components.ConnectWifiLauncherStatus
 import com.greybox.projectmesh.components.meshrabiyaConnectLauncher
 import com.ustadmobile.meshrabiya.log.MNetLogger
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.greybox.projectmesh.viewModel.HomeUiState
 
 @Composable
 // We customize the viewModel since we need to inject dependencies
@@ -101,30 +100,26 @@ fun HomeScreen(
             owner = LocalSavedStateRegistryOwner.current,
             vmFactory = { di, savedStateHandle -> HomeScreenViewModel(di, savedStateHandle) },
             defaultArgs = null)),
-    deviceName: String?
 )
 {
     val context = LocalContext.current
     val di = localDI()
-    val uiState: HomeScreenModel by viewModel.uiState.collectAsState(initial = HomeScreenModel())
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     val node: VirtualNode by di.instance()
     val logger: MNetLogger by di.instance()
-    val currConcurrencyKnown = viewModel.concurrencyKnown.collectAsState()
-    val currConcurrencySupported = viewModel.concurrencySupported.collectAsState()
 
     // Request nearby wifi permission since it is necessary to start a hotspot
     val requestNearbyWifiPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ){ granted -> if (granted){
         if(context.hasNearbyWifiDevicesOrLocationPermission()){
-            viewModel.onSetIncomingConnectionsEnabled(true)
+            viewModel.setIncomingConnectionsEnabled(true)
         }
     } }
 
     // if not known and android version >= 11, then use official api to check concurrency
-    if(!currConcurrencyKnown.value && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
-        viewModel.saveConcurrencyKnown(true)
-        viewModel.saveConcurrencySupported(context.hasStaApConcurrency())
+    if(!uiState.concurrencyKnown && Build.VERSION.SDK_INT >= Build.VERSION_CODES.R){
+        viewModel.onConcurrencyDetected(context.hasStaApConcurrency())
     }
 
     var errorMessage by remember { mutableStateOf<String?>(null) }
@@ -147,18 +142,17 @@ fun HomeScreen(
                     }
                 }
             }
-            viewModel.onSetIncomingConnectionsEnabled(enabled)
+            viewModel.setIncomingConnectionsEnabled(enabled)
         },
-        onClickDisconnectWifiStation = viewModel::onClickDisconnectStation,
-        deviceName = deviceName,
+        onClickDisconnectWifiStation = viewModel::disconnectStation,
+        onDismissNoConcurrencyWarning = viewModel::dismissNoConcurrencyWarning,
+        onDismissConcurrencyWarning = viewModel::dismissConcurrencyWarning,
         context = context,
-        currConcurrencyKnown = currConcurrencyKnown,
-        currConcurrencySupported = currConcurrencySupported,
-        onSetBand = viewModel::onConnectBandChanged,
-        onSetHotspotTypeToCreate = viewModel::onSetHotspotTypeToCreate,
+        onSetBand = viewModel::setBand,
+        onSetHotspotTypeToCreate = viewModel::setHotspotType,
         onConnectWifiLauncherResult = { result ->
             if(result.hotspotConfig != null) {
-                viewModel.onConnectWifi(result.hotspotConfig)
+                viewModel.connectWifi(result.hotspotConfig)
             }else {
                 errorMessage = result.exception?.message
             }
@@ -180,22 +174,21 @@ fun HomeScreen(
     }
 }
 
+
 // Display the home screen
 @Composable
 fun StartHomeScreen(
-    uiState: HomeScreenModel,
+    uiState: HomeUiState,
     node: AndroidVirtualNode,
     onSetIncomingConnectionsEnabled: (Boolean) -> Unit = { },
     onClickDisconnectWifiStation: () -> Unit = { },
-    viewModel: HomeScreenViewModel = viewModel(),
-    deviceName: String?,
     context: Context,
-    currConcurrencyKnown: State<Boolean>,
-    currConcurrencySupported: State<Boolean>,
     onSetBand: (ConnectBand) -> Unit = { },
     onSetHotspotTypeToCreate: (HotspotType) -> Unit = { },
     onConnectWifiLauncherResult: (ConnectWifiLauncherResult) -> Unit,
-    logger: MNetLogger
+    logger: MNetLogger,
+    onDismissNoConcurrencyWarning: () -> Unit = { },
+    onDismissConcurrencyWarning: () -> Unit = { }
 ){
     val di = localDI()
     val barcodeEncoder = remember { BarcodeEncoder() }
@@ -211,8 +204,7 @@ fun StartHomeScreen(
         onResult = onConnectWifiLauncherResult,
     )
     var userEnteredConnectUri by rememberSaveable { mutableStateOf("") }
-    val showNoConcurrencyWarning by viewModel.showNoConcurrencyWarning.collectAsState()
-    val showConcurrencyWarning by viewModel.showConcurrencyWarning.collectAsState()
+
     // connect to other device via connect uri
     fun connect(uri: String, logger: MNetLogger): Unit {
         try {
@@ -254,13 +246,13 @@ fun StartHomeScreen(
     }
 
     // Show warning popup when device does not support STA/AP concurrency
-    if (showNoConcurrencyWarning) {
-        NoConcurrencyWarningDialog(onDismiss = { viewModel.dismissNoConcurrencyWarning() })
+    if (uiState.showNoConcurrencyWarning) {
+        NoConcurrencyWarningDialog(onDismiss = onDismissNoConcurrencyWarning)
     }
 
     // Show warning popup when device does not support STA/AP concurrency
-    if (showConcurrencyWarning) {
-        ConcurrencyWarningDialog(onDismiss = { viewModel.dismissConcurrencyWarning() })
+    if (uiState.showConcurrencyWarning) {
+        ConcurrencyWarningDialog(onDismiss = onDismissConcurrencyWarning)
     }
 
     // Function to check if Wi-Fi Direct is supported
@@ -276,7 +268,7 @@ fun StartHomeScreen(
             LongPressCopyableText(
                 context,
                 text = stringResource(id = R.string.device_name) + ": ",
-                textCopyable = deviceName.toString(),
+                textCopyable = uiState.deviceName,
                 textSize = 14,
                 padding = 6
             )
@@ -351,7 +343,7 @@ fun StartHomeScreen(
                         enabled = if(stationState == null || stationState.status == WifiStationState.Status.INACTIVE)
                             true
                         else
-                            currConcurrencySupported.value
+                            uiState.concurrencySupported
                     )
                 }
             }
@@ -426,7 +418,7 @@ fun StartHomeScreen(
                             enabled = if(!uiState.hotspotStatus)
                                 true
                             else
-                                currConcurrencySupported.value
+                                uiState.concurrencySupported
                         )
                     }
                     Text(modifier = Modifier.padding(6.dp), text = stringResource(id = R.string.instruction))
@@ -449,7 +441,7 @@ fun StartHomeScreen(
                         enabled = if (!uiState.hotspotStatus)
                             true
                         else
-                            currConcurrencySupported.value
+                            uiState.concurrencySupported
                     )
                 }
                 // If the stationState is not INACTIVE, it displays a ListItem that represents

@@ -69,7 +69,7 @@ import kotlinx.coroutines.flow.asStateFlow
     override val concurrencyKnown: StateFlow<Boolean> = _concurrencyKnown.asStateFlow()
 
     private val _concurrencySupported =
-        MutableStateFlow(settingsPrefs.getBoolean(KEY_CONCURRENCY_SUPPORTED, false))
+        MutableStateFlow(settingsPrefs.getBoolean(KEY_CONCURRENCY_SUPPORTED, true))
     override val concurrencySupported: StateFlow<Boolean> = _concurrencySupported.asStateFlow()
 
     override val localUuid: String? get() = settingsPrefs.getString(KEY_UUID, null)

@@ -67,9 +67,8 @@ fun AppNavHost(
     ){ innerPadding ->
         NavHost(navController, startDestination = startDestination, Modifier.padding(innerPadding))
         {
-            composable(BottomNavItem.Home.route) { 
-                val deviceName by settings.deviceName.collectAsState()
-                HomeScreen(deviceName = deviceName) }
+            composable(BottomNavItem.Home.route) { HomeScreen() }
+
 
             composable(BottomNavItem.Network.route) {
                 // Just call NetworkScreen with no click callback
