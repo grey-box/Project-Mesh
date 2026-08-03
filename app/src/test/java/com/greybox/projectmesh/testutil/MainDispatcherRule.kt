@@ -14,7 +14,7 @@ import org.junit.runner.Description
  * viewModelScope hardcodes Main.immediate, which does not exist on the JVM —
  * without this rule every StateViewModel constructor throws.
  *
- * Defaults to StandardTestDispatcher (queued, not eager) so the Decision-#7
+ * Defaults to StandardTestDispatcher (queued, not eager) so the
  * seed tests stay discriminating: the repo mirror cannot run until the test
  * advances the dispatcher, so state correctness before any advance can only
  * come from the synchronous seed.

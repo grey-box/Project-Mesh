@@ -26,8 +26,8 @@ data class AppUiState(
 
 /** Parsed from the launch Intent in onCreate — the Android Intent never enters the VM. */
 sealed interface DeepLink {
-    data class OpenChat(val ip: String) : DeepLink                     //OPEN_CHAT_SCREEN (live, IPv4-validated, fallback Home)
-    data class OpenConversation(val conversationId: String) : DeepLink  //OPEN_CHAT_CONVERSATION (stored, shape-validated — Decision #6)
+    data class OpenChat(val ip: String) : DeepLink
+    data class OpenConversation(val conversationId: String) : DeepLink 
     data object OpenReceive : DeepLink
 }
 
@@ -51,7 +51,7 @@ class AppViewModel(
         val deviceName: String, val hasRunBefore: Boolean,
     )
         init {
-        // Decision #7: seed synchronously from the repo's CURRENT values before the
+        // seed synchronously from the repo's CURRENT values before the
         // mirror launches — the first frame reads state.value ahead of the collector
         // coroutine's first dispatch, so unseeded defaults (hasRunBefore=false,
         // theme=SYSTEM) would flash for one frame on an existing install.
@@ -98,14 +98,14 @@ class AppViewModel(
 
     /**
      * Resolve the launch deep link to a start destination — exactly once per logical
-     * launch (Decision #4). Guarded by a [savedStateHandle] flag so a later recreate
+     * launch. Guarded by a [savedStateHandle] flag so a later recreate
      * (rotation or process death) re-delivering the same Intent does NOT override the
      * restored [AppUiState.startDestination].
      *
      * This is also the deep-link trust boundary: the extras arrive through an
      * exported=true Activity, so both payload variants are validated before route
-     * interpolation — [DeepLink.OpenChat] via [isIpv4] (Decision #3),
-     * [DeepLink.OpenConversation] via [CONVERSATION_ID_REGEX] (Decision #6).
+     * interpolation — [DeepLink.OpenChat] via [isIpv4],
+     * [DeepLink.OpenConversation] via [CONVERSATION_ID_REGEX].
      * Invalid values fall back to Home; the link is still consumed either way.
      */
     fun applyDeepLink(deepLink: DeepLink?) {
@@ -117,7 +117,7 @@ class AppViewModel(
                 if (isIpv4(deepLink.ip)) "chatScreen/${deepLink.ip}"
                 else BottomNavItem.Home.route
             is DeepLink.OpenConversation ->
-                // Decision #6: SAME trust boundary as OpenChat (exported=true Activity).
+                // SAME trust boundary as OpenChat (exported=true Activity).
                 // Unvalidated, an embedded '/' fails single-segment {ip} matching and
                 // onScreenChanged would persist the malformed route into KEY_START_DEST,
                 // so the restore path replays it. Invalid -> Home, symmetric with OpenChat.
@@ -131,7 +131,7 @@ class AppViewModel(
     }
     
     companion object {
-        /** Decision #6 — accepted conversation-ID shape: sorted UUIDs joined by
+        /** accepted conversation-ID shape: sorted UUIDs joined by
         *  '-' (sender: AppServer.kt:651). Test-device IDs such as
         *  "local-user-test-device-uuid" also match. Regex.matches() requires a
         *  FULL match, so '/', whitespace, and empty strings are all rejected. */

@@ -71,7 +71,7 @@ class HomeScreenViewModel(
     )
 
     init {
-        // Decision #7: seed synchronously before the mirrors launch. The 5GHz
+        // seed synchronously before the mirrors launch. The 5GHz
         // capability check is also synchronous, so it belongs to the seed too.
         setState { withHomeSettings(currentHomeSettings()) }
         if (node.meshrabiyaWifiManager.is5GhzSupported) {

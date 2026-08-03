@@ -25,8 +25,7 @@ import kotlinx.coroutines.flow.update
  *    queue — never to a Channel/SharedFlow (see previous bullet).
  *  - When state mirrors a repository, the FIRST statement of init must seed
  *    the state synchronously from the repo flows' current .value s, through
- *    the same carrier->state mapping the mirror uses (ADR 0002, plan
- *    Decision #7 / Risk #9). The mirror's combine(...).launchIn is not
+ *    the same carrier->state mapping the mirror uses. The mirror's combine(...).launchIn is not
  *    guaranteed to emit before the first frame reads state.value, so an
  *    unseeded default state can flash for a frame.
  *  - UI collects with collectAsStateWithLifecycle().

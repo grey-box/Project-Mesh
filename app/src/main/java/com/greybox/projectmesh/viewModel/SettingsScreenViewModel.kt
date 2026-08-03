@@ -49,7 +49,7 @@ class SettingsScreenViewModel(
     )
 
     init {
-        // Decision #7: seed synchronously before the mirror launches
+        // seed synchronously before the mirror launches
         // (see StateViewModel contract KDoc).
         setState { withFormSettings(currentFormSettings()) }
 
