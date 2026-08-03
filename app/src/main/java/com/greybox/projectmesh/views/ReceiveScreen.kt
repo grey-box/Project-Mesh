@@ -3,7 +3,6 @@ package com.greybox.projectmesh.views
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
-import android.content.SharedPreferences
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -34,9 +33,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import com.greybox.projectmesh.data.SettingsRepository
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -55,7 +52,6 @@ import org.kodein.di.instance
 import java.io.File
 import androidx.compose.material3.HorizontalDivider
 import com.greybox.projectmesh.viewModel.ReceiveScreenModel
-import timber.log.Timber
 import com.greybox.projectmesh.BuildConfig
 
 @Composable
@@ -68,7 +64,6 @@ fun ReceiveScreen(
             defaultArgs = null,
         )
     ),
-    onAutoFinishChange: (Boolean) -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsState(ReceiveScreenModel())
     HandleIncomingTransfers(
@@ -76,9 +71,9 @@ fun ReceiveScreen(
         onAccept = viewModel::onAccept,
         onDecline = viewModel::onDecline,
         onDelete = viewModel::onDelete,
-        onAutoFinishChange = onAutoFinishChange
     )
 }
+
 
 @Composable
 fun HandleIncomingTransfers(
@@ -86,19 +81,13 @@ fun HandleIncomingTransfers(
     onAccept: (AppServer.IncomingTransferInfo) -> Unit = {},
     onDecline: (AppServer.IncomingTransferInfo) -> Unit = {},
     onDelete: (AppServer.IncomingTransferInfo) -> Unit = {},
-    onAutoFinishChange: (Boolean) -> Unit
 ){
     val di: DI = localDI()
-    val settingPref: SharedPreferences by di.instance(tag="settings")
+    val settings: SettingsRepository by di.instance()
     val context = LocalContext.current
-    var autoFinishEnabled by remember { mutableStateOf(false) }
-    val defaultUri = settingPref.getString("save_to_folder", null)
-        ?: "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh"
+    val autoFinishEnabled by settings.autoFinish.collectAsState()
+    val defaultUri by settings.saveToFolder.collectAsState()
 
-    LaunchedEffect(onAutoFinishChange) {
-        autoFinishEnabled = settingPref.getBoolean("auto_finish", false)
-        Timber.tag("ReceiveScreen").d("autoFinishEnabled: $autoFinishEnabled")
-    }
     LaunchedEffect(autoFinishEnabled, uiState.incomingTransfers) {
         if (autoFinishEnabled) {
             uiState.incomingTransfers

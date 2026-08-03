@@ -56,8 +56,10 @@
     <string name="cancel">Annuler</string>
 
     <string name="elapsed_time">Temps écoulé</string>
-
+<string name="server_restart_complete">Redémarrage du serveur terminé</string>
     <string name="concurrency">Concurrence STA/AP</string>
     <string name="manual_test">Test manuel</string>
     <string name="reset">Réinitialiser</string>
+    <string name="concurrency_reset">État de concurrence STA/AP réinitialisé -&gt; Inconnu</string>
+
 </resources>

@@ -1,10 +1,11 @@
 package com.greybox.projectmesh.viewModel
 
-import android.content.SharedPreferences
 import android.os.Build
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.greybox.projectmesh.arch.StateViewModel
+import com.greybox.projectmesh.data.SettingsRepository
 import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
 import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
 import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
@@ -12,144 +13,129 @@ import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectConfig
 import com.ustadmobile.meshrabiya.vnet.wifi.state.MeshrabiyaWifiState
 import com.ustadmobile.meshrabiya.vnet.wifi.state.WifiStationState
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import org.kodein.di.DI
+import org.kodein.di.DIAware
 import org.kodein.di.instance
 import timber.log.Timber
 
-
-data class HomeScreenModel(
+@Immutable
+data class HomeUiState(
+    // mirrored from node.state (Flow — not seedable, defaults show until first emission)
     val wifiState: MeshrabiyaWifiState? = null,
     val connectUri: String? = null,
     val localAddress: Int = 0,
+    val hotspotStatus: Boolean = false,
+    val nodesOnMesh: Set<Int> = emptySet(),
+    // set once in init from the synchronous 5GHz capability check
     val bandMenu: List<ConnectBand> = listOf(ConnectBand.BAND_2GHZ),
     val band: ConnectBand = bandMenu.first(),
-    val hotspotTypeMenu: List<HotspotType> = listOf(HotspotType.AUTO,
+    val hotspotTypeMenu: List<HotspotType> = listOf(
+        HotspotType.AUTO,
         HotspotType.WIFIDIRECT_GROUP,
-        HotspotType.LOCALONLY_HOTSPOT),
+        HotspotType.LOCALONLY_HOTSPOT,
+    ),
     val hotspotTypeToCreate: HotspotType = hotspotTypeMenu.first(),
-    val hotspotStatus: Boolean = false,
-    val isWifiConnected: Boolean = false,
-    val nodesOnMesh: Set<Int> = emptySet(),
-){
+    // mirrored from SettingsRepository (was: SharedPreferences listener + screen param)
+    val deviceName: String = "",
+    val concurrencyKnown: Boolean = false,
+    val concurrencySupported: Boolean = true,
+    // VM-owned dialog visibility (was: two loose StateFlows)
+    val showNoConcurrencyWarning: Boolean = false,
+    val showConcurrencyWarning: Boolean = false,
+) {
     val wifiConnectionEnabled: Boolean
         get() = wifiState?.connectConfig != null
     val connectBandVisible: Boolean
         get() = Build.VERSION.SDK_INT >= 29 && wifiState?.connectConfig == null
 }
 
-class HomeScreenViewModel(di: DI,
-                          savedStateHandle: SavedStateHandle): ViewModel(){
-    // inject SharedPreferences
-    private val settingPrefs: SharedPreferences by di.instance(tag = "settings")
-    // _uiState will be updated whenever there is a change in the UI state
-    private val _uiState = MutableStateFlow(HomeScreenModel())
-    // uiState is a read-only property that shows the current UI state
-    val uiState: Flow<HomeScreenModel> = _uiState.asStateFlow()
-    // di is used to get the AndroidVirtualNode instance
-    private val node: AndroidVirtualNode by di.instance()
-    // Concurrency Known State
-    private val _concurrencyKnown = MutableStateFlow(loadConcurrencyKnown())
-    val concurrencyKnown: StateFlow<Boolean> = _concurrencyKnown
-    // Concurrency Supported State
-    private val _concurrencySupported = MutableStateFlow(loadConcurrencySupported())
-    val concurrencySupported: StateFlow<Boolean> = _concurrencySupported
+class HomeScreenViewModel(
+    di: DI,
+    savedStateHandle: SavedStateHandle,
+) : StateViewModel<HomeUiState>(HomeUiState()), DIAware {
 
-    private val sharedPrefsListener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
-        if (key == CONCURRENCY_KNOWN_KEY || key == CONCURRENCY_SUPPORTED_KEY) {
-            _concurrencyKnown.value = loadConcurrencyKnown()
-            _concurrencySupported.value = loadConcurrencySupported()
-        }
-    }
+    override val di = di
+    private val settings: SettingsRepository by instance()
+    private val node: AndroidVirtualNode by instance()
 
-    // control the visibility of the STA/AP concurrency doesn't support warning popup
-    private val _showNoConcurrencyWarning = MutableStateFlow(false)
-    val showNoConcurrencyWarning: StateFlow<Boolean> = _showNoConcurrencyWarning.asStateFlow()
-
-    // control the visibility of the STA/AP concurrency support warning popup
-    private val _showConcurrencyWarning = MutableStateFlow(false)
-    val showConcurrencyWarning: StateFlow<Boolean> = _showConcurrencyWarning.asStateFlow()
+    /** Carrier for the repo-mirrored fields (see SettingsScreenViewModel). */
+    private data class HomeSettings(
+        val deviceName: String,
+        val concurrencyKnown: Boolean,
+        val concurrencySupported: Boolean,
+    )
 
     init {
-        // launch a coroutine
-        viewModelScope.launch {
-            // collect the state flow of the AndroidVirtualNode
-            node.state.collect {
-                // update the UI state with the new state
-                _uiState.update { prev ->
-                    // Creates a new instance of the state,
-                    // copying the existing properties and updating only the ones specified.
-                    prev.copy(
-                        wifiState = it.wifiState,
-                        connectUri = it.connectUri,
-                        localAddress = it.address,
-                        hotspotStatus = it.wifiState.hotspotIsStarted,
-                        nodesOnMesh = it.originatorMessages.keys
-                    )
-                }
-            }
-        }
-        if (node.meshrabiyaWifiManager.is5GhzSupported){
-            _uiState.update { prev ->
-                prev.copy(
+        // seed synchronously before the mirrors launch. The 5GHz
+        // capability check is also synchronous, so it belongs to the seed too.
+        setState { withHomeSettings(currentHomeSettings()) }
+        if (node.meshrabiyaWifiManager.is5GhzSupported) {
+            setState {
+                copy(
                     bandMenu = listOf(ConnectBand.BAND_5GHZ, ConnectBand.BAND_2GHZ),
-                    band = ConnectBand.BAND_5GHZ
+                    band = ConnectBand.BAND_5GHZ,
                 )
             }
         }
-        settingPrefs.registerOnSharedPreferenceChangeListener(sharedPrefsListener)
+
+        combine(
+            settings.deviceName, settings.concurrencyKnown, settings.concurrencySupported,
+        ) { name, known, supported ->
+            HomeSettings(name, known, supported)
+        }.onEach { s -> setState { withHomeSettings(s) } }
+            .launchIn(viewModelScope)
+
+        node.state.onEach { nodeState ->
+            setState {
+                copy(
+                    wifiState = nodeState.wifiState,
+                    connectUri = nodeState.connectUri,
+                    localAddress = nodeState.address,
+                    hotspotStatus = nodeState.wifiState.hotspotIsStarted,
+                    nodesOnMesh = nodeState.originatorMessages.keys,
+                )
+            }
+        }.launchIn(viewModelScope)
     }
 
-    private fun loadConcurrencyKnown(): Boolean {
-        return settingPrefs.getBoolean(CONCURRENCY_KNOWN_KEY, false)
-    }
+    private fun currentHomeSettings() = HomeSettings(
+        deviceName = settings.deviceName.value,
+        concurrencyKnown = settings.concurrencyKnown.value,
+        concurrencySupported = settings.concurrencySupported.value,
+    )
 
-    fun saveConcurrencyKnown(concurrencyKnown: Boolean) {
-        _concurrencyKnown.value = concurrencyKnown
-        settingPrefs.edit().putBoolean(CONCURRENCY_KNOWN_KEY, concurrencyKnown).apply()
-    }
+    /** The ONE carrier→state mapping, shared by seed and mirror. */
+    private fun HomeUiState.withHomeSettings(s: HomeSettings) = copy(
+        deviceName = s.deviceName,
+        concurrencyKnown = s.concurrencyKnown,
+        concurrencySupported = s.concurrencySupported,
+    )
 
-    private fun loadConcurrencySupported(): Boolean {
-        return settingPrefs.getBoolean(CONCURRENCY_SUPPORTED_KEY, true)
-    }
+    // --- pure UI state ---
+    fun setBand(band: ConnectBand) = setState { copy(band = band) }
+    fun setHotspotType(hotspotType: HotspotType) = setState { copy(hotspotTypeToCreate = hotspotType) }
+    fun dismissNoConcurrencyWarning() = setState { copy(showNoConcurrencyWarning = false) }
+    fun dismissConcurrencyWarning() = setState { copy(showConcurrencyWarning = false) }
 
-    fun saveConcurrencySupported(concurrencySupported: Boolean) {
-        _concurrencySupported.value = concurrencySupported
-        settingPrefs.edit().putBoolean(CONCURRENCY_SUPPORTED_KEY, concurrencySupported).apply()
-    }
+    /** Android 11+ official-API detection result (HomeScreen calls this once); no dialog. */
+    fun onConcurrencyDetected(supported: Boolean) =
+        settings.setConcurrency(known = true, supported = supported)
 
-    fun onConnectBandChanged(band: ConnectBand) {
-        _uiState.update { prev ->
-            prev.copy(
-                band = band
-            )
-        }
-    }
-
-    fun onSetHotspotTypeToCreate(hotspotType: HotspotType) {
-        _uiState.update { prev ->
-            prev.copy(
-                hotspotTypeToCreate = hotspotType
-            )
-        }
-    }
-
-    fun onSetIncomingConnectionsEnabled(enable: Boolean) {
+    fun setIncomingConnectionsEnabled(enable: Boolean) {
         viewModelScope.launch {
-            val wasWifiConnected = _uiState.value.wifiState?.wifiStationState?.status
+            val wasWifiConnected = currentState.wifiState?.wifiStationState?.status
             try {
                 Timber.tag("HotspotDebug").d("Attempt 1: Setting Hotspot to $enable")
                 val response = withTimeoutOrNull(1500) {
                     node.setWifiHotspotEnabled(
                         enabled = enable,
-                        preferredBand = _uiState.value.band,
-                        hotspotType = _uiState.value.hotspotTypeToCreate
+                        preferredBand = currentState.band,
+                        hotspotType = currentState.hotspotTypeToCreate,
                     )
                 }
                 if (response == null) {
@@ -157,24 +143,21 @@ class HomeScreenViewModel(di: DI,
                     // Retry once
                     val retryResponse = node.setWifiHotspotEnabled(
                         enabled = enable,
-                        preferredBand = _uiState.value.band,
-                        hotspotType = _uiState.value.hotspotTypeToCreate
+                        preferredBand = currentState.band,
+                        hotspotType = currentState.hotspotTypeToCreate,
                     )
                     Timber.tag("HotspotDebug").d("Retry successful: $retryResponse")
-                }
-                else {
+                } else {
                     Timber.tag("HotspotDebug").d("Hotspot set successfully: $response")
                 }
-                if (!_concurrencyKnown.value && Build.VERSION.SDK_INT < Build.VERSION_CODES.R){
+                if (!currentState.concurrencyKnown && Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                     delay(500)
-                    val isWifiStillConnected = _uiState.value.wifiState?.wifiStationState?.status
-                    if (wasWifiConnected == WifiStationState.Status.AVAILABLE)
-                    {
-                        if(isWifiStillConnected == WifiStationState.Status.INACTIVE || isWifiStillConnected == null){
+                    val isWifiStillConnected = currentState.wifiState?.wifiStationState?.status
+                    if (wasWifiConnected == WifiStationState.Status.AVAILABLE) {
+                        if (isWifiStillConnected == WifiStationState.Status.INACTIVE || isWifiStillConnected == null) {
                             markStaApConcurrencyUnsupported()
                             Timber.tag("HotspotDebug").d("Wi-Fi disconnected after enabling hotspot. STA/AP concurrency NOT supported.")
-                        }
-                        else{
+                        } else {
                             markStaApConcurrencySupported()
                             Timber.tag("HotspotDebug").d("Wi-Fi still connected after enabling " +
                                     "hotspot. STA/AP concurrency supported.")
@@ -187,68 +170,42 @@ class HomeScreenViewModel(di: DI,
         }
     }
 
-    // This function is responsible for connecting to a wifi network as a station (Client Mode)
-    fun onConnectWifi(
-        hotSpotConfig: WifiConnectConfig
-    ){
+    /** Connect to a wifi network as a station (client mode). */
+    fun connectWifi(hotSpotConfig: WifiConnectConfig) {
         viewModelScope.launch {
-            try{
-                val wasHotspotOnline = _uiState.value.hotspotStatus
+            try {
+                val wasHotspotOnline = currentState.hotspotStatus
                 node.connectAsStation(hotSpotConfig)
-                if(!_concurrencyKnown.value && Build.VERSION.SDK_INT < Build.VERSION_CODES.R){
+                if (!currentState.concurrencyKnown && Build.VERSION.SDK_INT < Build.VERSION_CODES.R) {
                     delay(500)
-                    val isHotspotStillOnline = _uiState.value.hotspotStatus
-                    if(wasHotspotOnline){
-                        if(!isHotspotStillOnline){
+                    val isHotspotStillOnline = currentState.hotspotStatus
+                    if (wasHotspotOnline) {
+                        if (!isHotspotStillOnline) {
                             markStaApConcurrencyUnsupported()
-                        }
-                        else{
+                        } else {
                             markStaApConcurrencySupported()
                         }
                     }
                 }
-            }
-            catch (e: Exception){
+            } catch (e: Exception) {
                 Timber.tag("HomeScreenViewModel").e("onConnectWifi: ${e.message}")
             }
         }
     }
 
-    // disconnect the wifi station
-    fun onClickDisconnectStation(){
+    fun disconnectStation() {
         viewModelScope.launch {
             node.disconnectWifiStation()
         }
     }
 
-    private fun markStaApConcurrencyUnsupported(){
-        saveConcurrencyKnown(true)
-        saveConcurrencySupported(false)
-        _showNoConcurrencyWarning.value = true
+    private fun markStaApConcurrencyUnsupported() {
+        settings.setConcurrency(known = true, supported = false)
+        setState { copy(showNoConcurrencyWarning = true) }
     }
 
-    private fun markStaApConcurrencySupported(){
-        saveConcurrencyKnown(true)
-        saveConcurrencySupported(true)
-        _showConcurrencyWarning.value = true
-    }
-
-    fun dismissNoConcurrencyWarning() {
-        _showNoConcurrencyWarning.value = false
-    }
-
-    fun dismissConcurrencyWarning() {
-        _showConcurrencyWarning.value = false
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        // Unregister the listener when ViewModel is cleared
-        settingPrefs.unregisterOnSharedPreferenceChangeListener(sharedPrefsListener)
-    }
-
-    companion object{
-        private const val CONCURRENCY_KNOWN_KEY = "concurrency_known"
-        private const val CONCURRENCY_SUPPORTED_KEY = "concurrency_supported"
+    private fun markStaApConcurrencySupported() {
+        settings.setConcurrency(known = true, supported = true)
+        setState { copy(showConcurrencyWarning = true) }
     }
 }
