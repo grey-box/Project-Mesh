@@ -73,3 +73,37 @@ val DarkColorScheme = darkColorScheme(
     surfaceContainer = SurfaceContainerDark,
     surfaceContainerHigh = SurfaceContainerHighDark,
 )
+
+// The light and dark MeshColors instances. Kept next to the schemes they pair with so a
+// new role can't be added to one scheme and forgotten in the other.
+//
+// bubbleReceived/bubbleSent alias existing role values rather than duplicating hexes:
+// received is surfaceVariant (which is what the old code already did, correctly) and sent
+// is tertiaryContainer. Only the three status colors are genuinely new.
+//
+// Measured contrast, both schemes (WCAG 2.1, sRGB):
+//   statusOnline/onStatusOnline       light  5.00:1   dark 5.59:1
+//   bubbleSent/onBubbleSent           light 13.27:1   dark 7.26:1
+//   bubbleReceived/onBubbleReceived   light  7.22:1   dark 5.48:1
+// All clear 4.5:1. Changing a value here means re-measuring its partner.
+val LightMeshColors = MeshColors(
+    statusOnline = StatusOnlineLight,
+    onStatusOnline = OnStatusOnlineLight,
+    statusOffline = StatusOfflineLight,
+    statusConnecting = StatusConnectingLight,
+    bubbleSent = Tertiary90,
+    onBubbleSent = Tertiary10,
+    bubbleReceived = SurfaceVariantLight,
+    onBubbleReceived = OnSurfaceVariantLight,
+)
+
+val DarkMeshColors = MeshColors(
+    statusOnline = StatusOnlineDark,
+    onStatusOnline = OnStatusOnlineDark,
+    statusOffline = StatusOfflineDark,
+    statusConnecting = StatusConnectingDark,
+    bubbleSent = Tertiary30,
+    onBubbleSent = Tertiary90,
+    bubbleReceived = SurfaceVariantDark,
+    onBubbleReceived = OnSurfaceVariantDark,
+)

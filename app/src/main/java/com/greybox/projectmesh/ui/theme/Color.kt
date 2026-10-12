@@ -89,3 +89,31 @@ val InversePrimaryDark = Color(0xFF006E1C)
 
 // Same in both schemes
 val Scrim = Color(0xFF000000)
+
+// ---- Mesh-specific tones (feed MeshColors, not the ColorScheme) ----
+// Material 3 has no role for "peer is online" or "this message is mine".
+//
+// Status green is NOT primary green. An interactive control and an online indicator have
+// to stay tellable apart when they sit in the same row, so these are held about 1.87:1
+// away from primary in both schemes (1.88 light, 1.86 dark). That constraint is why the
+// light pair carries a dark on-color instead of white: white needs a green dark enough to
+// land within 1.4:1 of Primary40, at which point the two greens collapse into one.
+// Treating statusOnline as a container with dark content is the same trick M3 uses for
+// primaryContainer/onPrimaryContainer.
+val StatusOnlineLight = Color(0xFF2E9E4B)
+val StatusOnlineDark = Color(0xFF2EA84F)
+val OnStatusOnlineLight = Color(0xFF00210B)
+val OnStatusOnlineDark = Color(0xFF00210B)
+
+// Offline and connecting carry no on* partner: nothing is ever drawn on them. They clear
+// 3:1 against their surface (the floor for a non-text indicator) but not 4.5:1, so they
+// are dot colors only. A label reading "Offline" uses onSurfaceVariant.
+val StatusOfflineLight = Color(0xFF8A8F87)
+val StatusOfflineDark = Color(0xFF6E736C)
+
+val StatusConnectingLight = Color(0xFFB86E00)
+val StatusConnectingDark = Color(0xFFFFB95C)
+
+// Sent bubbles declare no new values: they are the tertiary container, which is already
+// the mesh/network accent. Deliberately not primary, so a bubble never reads as tappable.
+// This also kills the old Color.Cyan bubble that measured ~1.9:1 in dark.
