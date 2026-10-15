@@ -17,6 +17,10 @@ import androidx.navigation.compose.rememberNavController
 import com.greybox.projectmesh.R
 import org.kodein.di.android.BuildConfig
 
+import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.MeshTheme
+import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
+
 data class NavigationItem(
     val route: String,
     val label: String,
@@ -24,11 +28,20 @@ data class NavigationItem(
 )
 
 //Preview is to show the bottom navigation bar in the preview and notice what it looks like
-@Preview(showBackground = true)
+@Preview(showBackground = true, name = "Light")
 @Composable
 fun BottomNavigationBarPreview() {
-    val navController = rememberNavController()
-    BottomNavigationBar(navController = navController)
+    ProjectMeshTheme(appTheme = AppTheme.LIGHT) {
+        BottomNavigationBar(navController = rememberNavController())
+    }
+}
+
+@Preview(showBackground = true, name = "Dark")
+@Composable
+fun BottomNavigationBarDarkPreview() {
+    ProjectMeshTheme(appTheme = AppTheme.DARK) {
+        BottomNavigationBar(navController = rememberNavController())
+    }
 }
 
 @Composable
@@ -60,7 +73,7 @@ fun BottomNavigationBar(navController: NavHostController) {
                 label = {
                     Text(
                         item.label,
-                        fontSize = 10.5.sp,
+                        style = MeshTheme.typography.labelSmall,
                         maxLines = 1,
                         softWrap = false,
                         overflow = TextOverflow.Clip

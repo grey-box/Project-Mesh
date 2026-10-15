@@ -28,6 +28,7 @@ data class MeshSize(
     // Interactive
     val touchTargetMin: Dp = 48.dp,  // accessibility floor for anything tappable
     val buttonHeight: Dp = 48.dp,    // replaces 50.dp; also satisfies the touch target
+    val buttonMinWidth: Dp = 120.dp,
 
     // Messaging
     val bubbleMaxWidth: Dp = 280.dp, // fixed cap, not a fraction (phones only, minSdk 26)

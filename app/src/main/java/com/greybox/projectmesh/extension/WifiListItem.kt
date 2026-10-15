@@ -24,6 +24,8 @@ import com.ustadmobile.meshrabiya.ext.addressToDotNotation
 import com.ustadmobile.meshrabiya.vnet.VirtualNode
 import kotlinx.coroutines.runBlocking
 import com.greybox.projectmesh.user.UserRepository
+import com.greybox.projectmesh.ui.theme.MeshTheme
+import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 @Composable
 // Display a single connected wifi station
 fun WifiListItem(
@@ -49,7 +51,7 @@ fun WifiListItem(
                 // replace this image with a custom icon or image
                 imageVector = Icons.Default.Image,
                 contentDescription = "Profile Picture",
-                modifier = Modifier.size(28.dp)
+                modifier = Modifier.size(MeshTheme.size.iconMd)
             )
         },
         headlineContent = {
@@ -76,12 +78,12 @@ fun WifiListItem(
                 Icon(
                     imageVector = Icons.Default.SignalCellular4Bar,
                     contentDescription = "Mesh Signal Strength",
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(MeshTheme.size.iconMd)
                 )
-                Spacer(modifier = Modifier.width(4.dp))
+                Spacer(modifier = Modifier.width(MeshTheme.spacing.xs))
                 Column{
                     Text(text = "Mesh status")
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(MeshTheme.spacing.xs))
                     Text("Ping: ${wifiEntry.originatorMessage.pingTimeSum}ms "
                             + "Hops: ${wifiEntry.hopCount} ")
                 }

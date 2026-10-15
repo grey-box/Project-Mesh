@@ -26,6 +26,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
+import androidx.compose.material3.OutlinedButton
+import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.MeshTheme
+import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 
 // This is a pre-defined button with white background and black text
 @Composable
@@ -35,14 +39,13 @@ fun TransparentButton(
     text: String,
     enabled: Boolean = false
 ) {
-    Button(
+    OutlinedButton(
         onClick = onClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color.White, // Background color
-            contentColor = Color.Black    // Text color
+        colors = ButtonDefaults.outlinedButtonColors(
+            contentColor = MeshTheme.colors.primary
         ),
-        border = BorderStroke(1.dp, Color.Black), // Black border
-        shape = RoundedCornerShape(8.dp), // Optional: Rounded corners
+        border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, Color.Black), // Black border
+        //shape = RoundedCornerShape(8.dp), // Optional: Rounded corners
         modifier = modifier.fillMaxWidth(),
         enabled = enabled
     ) {
@@ -54,11 +57,12 @@ fun TransparentButton(
 fun GradientButton(
     text: String,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color> = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient colors
-    textColor: Color = Color.White,
-    maxWidth: Dp = 120.dp,
+    gradientColors: List<Color>? = null, // null = solid primary; pass two or more colors for a gradient
+    textColor: Color = MeshTheme.colors.onPrimary,
+    maxWidth: Dp = MeshTheme.size.buttonMinWidth,
     onClick: () -> Unit
 ) {
+    val brushColors = gradientColors ?: List(2) { MeshTheme.colors.primary }
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down when pressed
     LaunchedEffect(isPressed) {
@@ -70,14 +74,14 @@ fun GradientButton(
     Box(
         modifier = modifier
             .scale(scale)
-            .shadow(8.dp, RoundedCornerShape(12.dp)) // Shadow effect
+            .shadow(MeshTheme.elevation.level2, MeshTheme.shapes.medium) // Shadow effect
             .background(
-                brush = Brush.horizontalGradient(gradientColors),
-                shape = RoundedCornerShape(12.dp)
+                brush = Brush.horizontalGradient(brushColors),
+                shape = MeshTheme.shapes.medium
             )
-            .height(50.dp) // Height of the button
-            .widthIn(min = 120.dp, max = maxWidth) // Width of the button
-            .padding(horizontal = 16.dp)
+            .height(MeshTheme.size.buttonHeight) // Height of the button
+            .widthIn(min = MeshTheme.size.buttonMinWidth, max = maxWidth) // Width of the button
+            .padding(horizontal = MeshTheme.spacing.md)
             .clickable {
                 isPressed = true
                 onClick()
@@ -87,7 +91,7 @@ fun GradientButton(
         Text(
             text = text,
             color = textColor,
-            fontSize = 14.sp,
+            style = MeshTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // Truncate text if it overflows
@@ -99,10 +103,11 @@ fun GradientButton(
 fun GradientLongButton(
     text: String,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color> = listOf(Color(0xFF4CAF50), Color(0xFF81C784)), // Default gradient colors
-    textColor: Color = Color.White,
+    gradientColors: List<Color>? = null, // null = solid primary; pass two or more colors for a gradient
+    textColor: Color = MeshTheme.colors.onPrimary,
     onClick: () -> Unit
 ) {
+    val brushColors = gradientColors ?: List(2) { MeshTheme.colors.primary }
     var isPressed by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down when pressed
     LaunchedEffect(isPressed) {
@@ -115,12 +120,12 @@ fun GradientLongButton(
         modifier = modifier
             .fillMaxWidth()
             .scale(scale)
-            .shadow(8.dp, RoundedCornerShape(12.dp)) // Shadow effect
+            .shadow(MeshTheme.elevation.level2, MeshTheme.shapes.medium) // Shadow effect
             .background(
-                brush = Brush.horizontalGradient(gradientColors),
-                shape = RoundedCornerShape(12.dp)
+                brush = Brush.horizontalGradient(brushColors),
+                shape = MeshTheme.shapes.medium
             )
-            .height(50.dp) // Height of the button
+            .height(MeshTheme.size.buttonHeight) // Height of the button
             .clickable {
                 isPressed = true
                 onClick()
@@ -130,7 +135,7 @@ fun GradientLongButton(
         Text(
             text = text,
             color = textColor,
-            fontSize = 14.sp,
+            style = MeshTheme.typography.labelLarge,
             fontWeight = FontWeight.Bold,
             maxLines = 1,
             overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // Truncate text if it overflows
