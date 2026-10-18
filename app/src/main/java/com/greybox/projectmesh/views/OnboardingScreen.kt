@@ -1,17 +1,43 @@
 package com.greybox.projectmesh.views
 
+import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Hub
+import androidx.compose.material.icons.outlined.WifiTethering
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -19,18 +45,38 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.extension.getLocalIpFromDI
 import com.greybox.projectmesh.viewModel.OnboardingViewModel
+import kotlinx.coroutines.launch
 import org.kodein.di.compose.localDI
 
+private const val PAGE_COUNT = 3
+
+private data class InfoPage(
+    val illustration: ImageVector,
+    val headline: String,
+    val body: String,
+)
+
+private val infoPages = listOf(
+    InfoPage(
+        illustration = Icons.Outlined.Hub,
+        headline = "Stay connected — even without Wi-Fi or signal.",
+        body = "Project Mesh lets nearby phones talk to each other directly, like a walkie-talkie for your phone — no internet needed."
+    ),
+    InfoPage(
+        illustration = Icons.Outlined.WifiTethering,
+        headline = "Your phone may also help pass along messages for nearby devices.",
+        body = "This keeps everyone connected. It uses a small amount of battery and data."
+    ),
+)
+
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
     onComplete: () -> Unit
 ) {
-    // Retrieve DI instance
     val di = localDI()
-    // Get the local IP from DI using our helper function
     val localIp = getLocalIpFromDI(di)
 
-    // Create a custom ViewModelProvider.Factory that passes the local IP to OnboardingViewModel
     val factory = remember {
         object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -47,35 +93,194 @@ fun OnboardingScreen(
         }
     }
 
-    // Obtain the OnboardingViewModel using the custom factory
     val onboardingViewModel: OnboardingViewModel = viewModel(factory = factory)
     val uiState by onboardingViewModel.uiState.collectAsState()
 
-    // Build your UI
-    Column(modifier = Modifier.padding(16.dp)) {
-        Text("Welcome to Project Mesh!")
-        Spacer(modifier = Modifier.height(16.dp))
-        Text("Please set your username:")
-        TextField(
-            value = uiState.username,
-            onValueChange = { newValue -> onboardingViewModel.onUsernameChange(newValue) }
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Button(onClick = {
-            // Check if the username is null or blank
-            if (uiState.username.isNullOrBlank()) {
-                onboardingViewModel.blankUsernameGenerator{ generatedName ->
-                    onboardingViewModel.onUsernameChange(generatedName)
+    val pagerState = rememberPagerState(initialPage = 0) { PAGE_COUNT }
+    val scope = rememberCoroutineScope()
+    val isLastPage = pagerState.currentPage == PAGE_COUNT - 1
 
-                    onboardingViewModel.handleFirstTimeSetup { onComplete() }
-                }
-            } else {
+    BackHandler(enabled = pagerState.currentPage > 0) {
+        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
+    }
+
+    val finishOnboarding: () -> Unit = {
+        if (uiState.username.isNullOrBlank()) {
+            onboardingViewModel.blankUsernameGenerator{ generatedName ->
+                onboardingViewModel.onUsernameChange(generatedName)
+
                 onboardingViewModel.handleFirstTimeSetup { onComplete() }
             }
-
+        } else {
             onboardingViewModel.handleFirstTimeSetup { onComplete() }
-        }) {
-            Text("Next")
+        }
+
+        onboardingViewModel.handleFirstTimeSetup { onComplete() }
+    }
+
+    val skipOnboarding: () -> Unit = {
+        onboardingViewModel.blankUsernameGenerator { generatedName ->
+            onboardingViewModel.onUsernameChange(generatedName)
+            onboardingViewModel.handleFirstTimeSetup { onComplete() }
+        }
+    }
+
+    Surface(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding()
+                .padding(horizontal = 24.dp, vertical = 16.dp)
+        ) {
+            // Skip — top-right, same position on every screen
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.End
+            ) {
+                TextButton(onClick = skipOnboarding) {
+                    Text(
+                        text = "Skip",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                }
+            }
+
+            HorizontalPager(
+                state = pagerState,
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth()
+            ) { page ->
+                if (page < infoPages.size) {
+                    InfoPageContent(infoPages[page])
+                } else {
+                    UsernamePageContent(
+                        username = uiState.username,
+                        onUsernameChange = { newValue -> onboardingViewModel.onUsernameChange(newValue) }
+                    )
+                }
+            }
+
+            PageIndicator(
+                currentPage = pagerState.currentPage,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(top = 14.dp, bottom = 10.dp)
+            )
+
+            Button(
+                onClick = {
+                    if (isLastPage) {
+                        finishOnboarding()
+                    } else {
+                        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                    }
+                },
+                shape = RoundedCornerShape(12.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(48.dp)
+            ) {
+                Text(
+                    text = "Next",
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun InfoPageContent(page: InfoPage) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        // Illustration placeholder block
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 8.dp, bottom = 20.dp)
+                .height(120.dp)
+                .background(
+                    color = MaterialTheme.colorScheme.primaryContainer,
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = page.illustration,
+                contentDescription = null, // decorative
+                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.size(56.dp)
+            )
+        }
+        Headline(page.headline)
+        Spacer(modifier = Modifier.height(10.dp))
+        BodyText(page.body)
+    }
+}
+
+@Composable
+private fun UsernamePageContent(
+    username: String,
+    onUsernameChange: (String) -> Unit,
+) {
+    Column(modifier = Modifier.fillMaxSize()) {
+        Headline("Welcome to Project Mesh!")
+        Spacer(modifier = Modifier.height(10.dp))
+        BodyText("Please set your username:")
+        Spacer(modifier = Modifier.height(16.dp))
+        OutlinedTextField(
+            value = username,
+            onValueChange = onUsernameChange,
+            label = { Text("Username") },
+            singleLine = true,
+            shape = RoundedCornerShape(10.dp),
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Composable
+private fun Headline(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.titleLarge,
+        fontWeight = FontWeight.Bold,
+        color = MaterialTheme.colorScheme.onSurface
+    )
+}
+
+@Composable
+private fun BodyText(text: String) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+}
+
+@Composable
+private fun PageIndicator(
+    currentPage: Int,
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        repeat(PAGE_COUNT) { index ->
+            val active = index == currentPage
+            Box(
+                modifier = Modifier
+                    .width(if (active) 16.dp else 6.dp)
+                    .height(6.dp)
+                    .background(
+                        color = if (active) MaterialTheme.colorScheme.primary
+                        else MaterialTheme.colorScheme.outlineVariant,
+                        shape = if (active) RoundedCornerShape(3.dp) else CircleShape
+                    )
+            )
         }
     }
 }
