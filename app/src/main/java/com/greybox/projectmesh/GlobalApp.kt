@@ -49,6 +49,8 @@ import com.greybox.projectmesh.user.UserEntity
 import com.ustadmobile.meshrabiya.log.MNetLogger
 import java.text.SimpleDateFormat
 import java.util.Date
+import com.greybox.projectmesh.data.SettingsRepository
+import com.greybox.projectmesh.data.SharedPrefsSettingsRepository
 
 /*
 initialize global variables and DI(dependency injection) container
@@ -371,6 +373,13 @@ class GlobalApp : Application(), DIAware {
 
         bind<SharedPreferences>(tag = "settings") with singleton {
             applicationContext.getSharedPreferences("settings", Context.MODE_PRIVATE)
+        }
+        bind<SharedPreferences>(tag = "mesh_prefs") with singleton {
+            applicationContext.getSharedPreferences("project_mesh_prefs", Context.MODE_PRIVATE)
+        }
+
+        bind<SettingsRepository>() with singleton {
+            SharedPrefsSettingsRepository(instance(tag = "settings"), instance(tag = "mesh_prefs"))
         }
         bind<UserRepository>() with singleton {
             UserRepository(instance<MeshDatabase>().userDao())
