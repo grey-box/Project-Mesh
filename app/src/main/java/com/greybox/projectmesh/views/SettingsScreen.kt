@@ -31,6 +31,7 @@ import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
+import androidx.compose.material3.Typography
 import androidx.compose.runtime.Composable
 
 import androidx.compose.runtime.getValue
@@ -59,6 +60,8 @@ import com.greybox.projectmesh.ui.theme.GradientLongButton
 import com.greybox.projectmesh.viewModel.SettingsScreenViewModel
 import org.kodein.di.compose.localDI
 
+import com.greybox.projectmesh.ui.theme.MeshTheme
+import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 
 
 @Composable
@@ -86,14 +89,14 @@ fun SettingsScreen(
 
     Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState()))
     {
-        Spacer(modifier = Modifier.height(36.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.xl))
         // Title "Settings"
         Text(
             text = stringResource(id = R.string.settings),
-            style = TextStyle(fontSize = 24.sp, fontWeight = FontWeight.Bold),
+            style = TextStyle(fontSize = MeshTheme.typography.headlineSmall.fontSize, fontWeight = FontWeight.Bold),
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
-        Column(modifier = Modifier.padding(36.dp)) {
+        Column(modifier = Modifier.padding(MeshTheme.spacing.xl)) {
             // General Setting Section (Language, Theme)
             SectionHeader(title = R.string.general)
             SettingItem(
@@ -153,15 +156,10 @@ fun SettingsScreen(
                     {
                         Switch(
                             checked = ui.autoFinish,
-                            onCheckedChange = { 
+                            onCheckedChange = {
                                 viewModel.setAutoFinish(it)
                             },
-                            colors = SwitchDefaults.colors(
-                                checkedThumbColor = Color.White,
-                                uncheckedThumbColor = Color.White,
-                                checkedTrackColor = Color(0xFF4CAF50),
-                                uncheckedTrackColor = Color.LightGray,
-                            ),
+                            colors = SwitchDefaults.colors(),
                             modifier = Modifier.scale(1.3f).align(Alignment.Center)
                         )
                     }
@@ -215,18 +213,18 @@ fun SettingsScreen(
 }
 @Composable
 fun SectionHeader(title: Int) {
-    Spacer(modifier = Modifier.height(20.dp))
+    Spacer(modifier = Modifier.height(MeshTheme.spacing.lg))
     Text(
         text = stringResource(id = title),
-        style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Bold)
+        style = TextStyle(fontSize = MeshTheme.typography.titleLarge.fontSize, fontWeight = FontWeight.Bold)
     )
-    HorizontalDivider(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(0.dp, 10.dp),
-        thickness = 2.dp,
-        color = Color.Red
-    )
+//    HorizontalDivider(
+//        modifier = Modifier
+//            .fillMaxWidth()
+//            .padding(0.dp, 10.dp),
+//        thickness = 2.dp,
+//        color = Color.Red
+//    )
 }
 
 @Composable
@@ -234,10 +232,10 @@ fun SettingItem(label: String, trailingContent: @Composable () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 16.dp),
+            .padding(vertical = MeshTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = TextStyle(fontSize = 18.sp))
+        Text(text = label, style = TextStyle(fontSize = MeshTheme.typography.bodyLarge.fontSize))
         Spacer(modifier = Modifier.weight(1f))
         trailingContent()
     }
@@ -317,9 +315,9 @@ fun ChangeDeviceNameDialog(
         ) {
             Column(
                 modifier = Modifier
-                    .padding(16.dp)
+                    .padding(MeshTheme.spacing.md)
                     .fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
+                verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.md)
             ) {
                 Text("Enter New Device Name", style = MaterialTheme.typography.titleMedium)
                 var inputText by remember { mutableStateOf("") }
