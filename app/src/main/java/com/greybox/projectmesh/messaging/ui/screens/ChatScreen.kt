@@ -7,7 +7,6 @@ import android.os.Bundle
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,26 +17,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.border
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachFile
 import androidx.compose.material.icons.filled.SignalWifiOff
 import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -47,7 +39,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,10 +46,14 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.DeviceStatusManager
 import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.ViewModelFactory
+import com.greybox.projectmesh.components.MeshAvatar
+import com.greybox.projectmesh.components.MeshAvatarSize
+import com.greybox.projectmesh.components.MeshScreenScaffold
 import com.greybox.projectmesh.messaging.data.entities.Message
 import com.greybox.projectmesh.messaging.ui.models.ChatScreenModel
 import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
 import com.greybox.projectmesh.server.AppServer
+import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.views.LongPressCopyableText
 import com.greybox.projectmesh.testing.TestDeviceService
 import kotlinx.coroutines.runBlocking
@@ -128,7 +123,7 @@ fun ChatScreen(
             if (deviceStatus != newStatus) {
                 Timber.tag(
                     "ChatScreen")
-                    .d("Device status changed: ${virtualAddress.hostAddress} is now ${if 
+                    .d("Device status changed: ${virtualAddress.hostAddress} is now ${if
                             (newStatus) "online" else "offline"}"
                 )
                 deviceStatus = newStatus
@@ -175,14 +170,76 @@ fun ChatScreen(
     val uiState: ChatScreenModel by viewModel.uiState.collectAsState(initial = ChatScreenModel())
     var textMessage by rememberSaveable { mutableStateOf("") }
 
-    val context = LocalContext.current
-
     val scrollState = rememberScrollState()
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .padding(bottom = 72.dp)) {
+    // The input row is the Scaffold's bottomBar rather than a Box overlay with a
+    // bottom-padding spacer underneath the message list. That 72dp was never
+    // nav-bar clearance — it was reserving room for this row, and it was a guess: the
+    // TextField grows to five lines, so a tall input used to ride up over the last
+    // message. As a bottomBar the Scaffold measures the row and insets the content by
+    // its real height, whatever that turns out to be.
+    MeshScreenScaffold(
+        bottomBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(MeshTheme.spacing.xs),
+                verticalAlignment = Alignment.Bottom //Change the Alignment So that it does not
+                // increase the height together with the TextField and be floating in the middle of the
+                // screen
+            ) {
+
+                //File Picker Button
+                // OutlinedIconButton instead of a hand-rolled clip + border + size: the
+                // outline comes from Material 3, so neither the 2dp width nor the grey
+                // needs a literal, and no border token has to be invented for one call site.
+                OutlinedIconButton(
+                    modifier = Modifier.size(MeshTheme.size.iconXl),
+                    onClick = { pickFileLauncher.launch("*/*") }
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AttachFile,
+                        contentDescription = "Select a file to send"
+                    )
+                }
+                TextField(
+                    // min is the accessibility touch-target floor; the old 40dp sat under
+                    // it. The previous 120dp max is dropped because `maxLines = 5`
+                    // already bounds the growth, and five lines is what 120dp encoded.
+                    modifier = Modifier
+                        .weight(3f)
+                        .heightIn(min = MeshTheme.size.touchTargetMin)
+                        .verticalScroll(scrollState),
+                    value = textMessage,
+                    onValueChange = {
+                        textMessage = it
+                    },
+                    maxLines = 5,
+                    enabled = deviceStatus // disable text input when user is offline
+                )
+                Button(modifier = Modifier.weight(1f), onClick = {
+                    val message = textMessage.trimEnd()
+                    //val imgpath = "sdcard/padorubastard.jpg"//test image path
+                    //future implementation should implement file picker
+                    //val filepath = Uri.parse(imgpath)
+                    if(message.isNotEmpty()) {
+                        viewModel.sendChatMessage(virtualAddress,message, null)
+                        // resets the text field
+                        textMessage = ""
+                    }
+                },
+                    enabled = deviceStatus //disable button when user is offline
+                ) {
+                    Text(text = "Send")
+                }
+            }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
 
             //add a status bar at the top of the chat
             UserStatusBar(
@@ -196,83 +253,36 @@ fun ChatScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(8.dp),
+                        .padding(MeshTheme.spacing.sm),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.errorContainer
+                        containerColor = MeshTheme.colors.errorContainer,
+                        // onErrorContainer, not error: `error` is the colour for content on
+                        // a neutral surface, and on errorContainer it is the washed-out
+                        // pairing the on* rule exists to stop.
+                        contentColor = MeshTheme.colors.onErrorContainer
                     )
                 ){
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
+                            .padding(MeshTheme.spacing.md),
                         verticalAlignment = Alignment.CenterVertically
                     ){
                         Icon(
                             imageVector = Icons.Default.SignalWifiOff,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.error
+                            tint = MeshTheme.colors.onErrorContainer
                         )
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
                         Text(
                             text = "User is offline. Messages cannot be sent.",
-                            color = MaterialTheme.colorScheme.error
+                            color = MeshTheme.colors.onErrorContainer
                         )
                     }
                 }
             }
 
             DisplayAllMessages(uiState, onClickButton)
-        }
-        Row(modifier = Modifier
-            .fillMaxWidth()
-            .align(Alignment.BottomCenter)
-            .padding(4.dp),
-            verticalAlignment = Alignment.Bottom //Change the Alignment So that it does not
-        // increase the height together with the TextField and be floating in the middle of the
-        // screen
-        ) {
-
-            //File Picker Button
-            IconButton(
-                modifier = Modifier
-                    .clip(CircleShape)
-                    .border(2.dp, Color.Gray, CircleShape)
-                    .size(40.dp),
-                onClick = { pickFileLauncher.launch("*/*") }
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Select a file to send"
-                )
-            }
-            TextField(
-                modifier = Modifier
-                    .weight(3f)
-                    .heightIn(min = 40.dp, max = 120.dp) // Added Min and Max Height to the
-                    // TextField
-                    .verticalScroll(scrollState),
-                value = textMessage,
-                onValueChange = {
-                    textMessage = it
-                },
-                maxLines = 5,
-                enabled = deviceStatus // disable text input when user is offline
-            )
-            Button(modifier = Modifier.weight(1f), onClick = {
-                val message = textMessage.trimEnd()
-                //val imgpath = "sdcard/padorubastard.jpg"//test image path
-                //future implementation should implement file picker
-                //val filepath = Uri.parse(imgpath)
-                if(message.isNotEmpty()) {
-                    viewModel.sendChatMessage(virtualAddress,message, null)
-                    // resets the text field
-                    textMessage = ""
-                }
-            },
-                enabled = deviceStatus //disable button when user is offline
-            ) {
-                Text(text = "Send")
-            }
         }
     }
 }
@@ -286,80 +296,67 @@ fun UserStatusBar(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(8.dp),
+            .padding(MeshTheme.spacing.sm),
         colors = CardDefaults.cardColors(
             containerColor = if (isOnline)
-                MaterialTheme.colorScheme.primaryContainer
+                MeshTheme.colors.primaryContainer
             else
-                MaterialTheme.colorScheme.surfaceVariant
+                MeshTheme.colors.surfaceVariant,
+            contentColor = if (isOnline)
+                MeshTheme.colors.onPrimaryContainer
+            else
+                MeshTheme.colors.onSurfaceVariant
         )
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(MeshTheme.spacing.md),
             verticalAlignment = Alignment.CenterVertically
         ) {
             //User avatar/icon
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .clip(CircleShape)
-                    .background(
-                        if (isOnline)
-                            MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.outline
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = userName.first().toString(),
-                    color = Color.White,
-                    fontSize = 20.sp
-                )
-            }
+            // MeshAvatar also removes a latent crash: the old code called
+            // userName.first(), which throws on an empty name. The component falls back
+            // to "?" instead.
+            MeshAvatar(
+                name = userName,
+                size = MeshAvatarSize.Sm,
+                isOnline = isOnline,
+                showStatusDot = true
+            )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(MeshTheme.spacing.md))
 
             //User name and status
             Column {
                 Text(
                     text = userName,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MeshTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    //Status indicator dot
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .clip(CircleShape)
-                            .background(
-                                if (isOnline) Color.Green else Color.Gray
-                            )
-                    )
-
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    // Status text
+                    // The separate inline status dot that used to sit here is gone: the
+                    // avatar above now carries the status dot, and two dots 20dp apart
+                    // driven by one boolean is the same duplicate-indicator bug as the
+                    // twice-drawn unread badge in ConversationsHomeScreen. The word
+                    // "Online"/"Offline" still carries the state, and carries it to
+                    // screen readers too, which a coloured circle never did.
                     Text(
                         text = if (isOnline) "Online" else "Offline",
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        style = MeshTheme.typography.bodySmall,
+                        color = MeshTheme.colors.onSurfaceVariant
                     )
 
-                    Spacer(modifier = Modifier.width(12.dp))
+                    Spacer(modifier = Modifier.width(MeshTheme.spacing.md))
 
                     // IP address
                     Text(
                         text = userAddress,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontSize = 10.sp
+                        style = MeshTheme.typography.labelSmall,
+                        color = MeshTheme.colors.onSurfaceVariant
                     )
                 }
             }
@@ -385,20 +382,20 @@ fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(MeshTheme.spacing.md),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = "No messages yet. Start a conversation!",
-                        modifier = Modifier.padding(16.dp),
-                        style = MaterialTheme.typography.bodyLarge
+                        modifier = Modifier.padding(MeshTheme.spacing.md),
+                        style = MeshTheme.typography.bodyLarge
                     )
                     if (uiState.offlineWarning != null) {
                         Text(
                             text = "You're currently offline. Any messages you send will be delivered when connection is restored.",
-                            modifier = Modifier.padding(horizontal = 16.dp),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.error
+                            modifier = Modifier.padding(horizontal = MeshTheme.spacing.md),
+                            style = MeshTheme.typography.bodyMedium,
+                            color = MeshTheme.colors.error
                         )
                     }
                 }
@@ -432,7 +429,10 @@ fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
                             context = context,
                             text = "",
                             textCopyable = chatMessage.content,
-                            textSize = 15
+                            // was textSize = 15, which sat between bodyMedium (14) and
+                            // bodyLarge (16). Message content is body text at the reading
+                            // size, so bodyLarge.
+                            style = MeshTheme.typography.bodyLarge
                         )
                     },
                     sender = sender,
@@ -451,49 +451,56 @@ fun MessageBubble(
     sender: String,
     modifier: Modifier
 ){
-    val context = LocalContext.current
-
     ElevatedCard(
+        // The old hardcoded cyan, with no content colour, measured about 1.9:1 in dark. Both
+        // sides now use a paired container/content token, so the text colour can no
+        // longer drift away from whatever the bubble is sitting on.
         colors = CardDefaults.cardColors(
-            containerColor = if(sentBySelf){
-                Color.Cyan
-            }else{
-                MaterialTheme.colorScheme.surfaceVariant
-            }
+            containerColor = if (sentBySelf) MeshTheme.mesh.bubbleSent
+            else MeshTheme.mesh.bubbleReceived,
+            contentColor = if (sentBySelf) MeshTheme.mesh.onBubbleSent
+            else MeshTheme.mesh.onBubbleReceived
+        ),
+        shape = MeshTheme.shapes.medium,
+        elevation = CardDefaults.elevatedCardElevation(
+            defaultElevation = MeshTheme.elevation.level1
         ),
         modifier = modifier
-            .padding(10.dp)
-            .widthIn(max = 280.dp)
+            .padding(MeshTheme.spacing.sm)
+            .widthIn(max = MeshTheme.size.bubbleMaxWidth)
     ) {
-        Column(modifier = Modifier.padding(4.dp)) {
+        Column(modifier = Modifier.padding(MeshTheme.spacing.xs)) {
             Text(
                 text = sender,
-                style = MaterialTheme.typography.labelMedium
+                style = MeshTheme.typography.labelMedium
             )
 
             messageContent()
             //ONLY SHOW FILE ATTACHMENT IF PRESENT
             if (chatMessage.file != null) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(MeshTheme.spacing.xs))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(
-                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                            RoundedCornerShape(4.dp)
+                            MeshTheme.colors.surfaceVariant.copy(alpha = 0.3f),
+                            MeshTheme.shapes.extraSmall
                         )
-                        .padding(4.dp),
+                        .padding(MeshTheme.spacing.xs),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
                         imageVector = Icons.Default.AttachFile,
                         contentDescription = "File",
-                        modifier = Modifier.size(16.dp)
+                        // iconXs, not iconLg. The checklist says "the 32dp attachment
+                        // icon" but the literal in this file was 16dp, and page 05 defines
+                        // iconXs as exactly "attachment icon inside a message bubble".
+                        modifier = Modifier.size(MeshTheme.size.iconXs)
                     )
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(MeshTheme.spacing.xs))
                     Text(
                         text = chatMessage.file.toString(),
-                        style = MaterialTheme.typography.bodySmall,
+                        style = MeshTheme.typography.bodySmall,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
                     )
@@ -506,10 +513,9 @@ fun MessageBubble(
             ) {
                 Text(
                     text = SimpleDateFormat("HH:mm").format(Date(chatMessage.dateReceived)),
-                    style = MaterialTheme.typography.labelSmall
+                    style = MeshTheme.typography.labelSmall
                 )
             }
         }
     }
 }
-

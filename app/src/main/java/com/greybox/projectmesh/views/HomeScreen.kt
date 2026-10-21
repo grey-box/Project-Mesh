@@ -2,8 +2,8 @@ package com.greybox.projectmesh.views
 
 import android.app.AlertDialog
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
+import android.content.Intent
 import android.net.wifi.WifiManager
 import android.os.Build
 import android.util.Log
@@ -37,7 +37,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -49,7 +48,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
@@ -60,14 +58,15 @@ import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.zxing.BarcodeFormat
 import com.greybox.projectmesh.extension.NEARBY_WIFI_PERMISSION_NAME
 import com.greybox.projectmesh.R
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.extension.hasNearbyWifiDevicesOrLocationPermission
+import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.viewModel.HomeScreenViewModel
 import com.journeyapps.barcodescanner.BarcodeEncoder
 import com.journeyapps.barcodescanner.ScanContract
@@ -262,37 +261,40 @@ fun StartHomeScreen(
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.spacedBy(8.dp),
+        verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.sm),
     ) {
         item (key = "device_info") {
             LongPressCopyableText(
                 context,
                 text = stringResource(id = R.string.device_name) + ": ",
                 textCopyable = uiState.deviceName,
-                textSize = 14,
-                padding = 6
+                style = MeshTheme.typography.bodyMedium,
+                padding = MeshTheme.spacing.sm
             )
             LongPressCopyableText(
                 context,
                 text = stringResource(id = R.string.ip_address) + ": ",
                 textCopyable = uiState.localAddress.addressToDotNotation(),
-                textSize = 14,
-                padding = 6
+                style = MeshTheme.typography.bodyMedium,
+                padding = MeshTheme.spacing.sm
             )
         }
 
         item (key = "band_option"){
             if (uiState.connectBandVisible) {
                 Text(
-                    modifier = Modifier.padding(horizontal = 6.dp),
+                    modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm),
                     text = stringResource(id = R.string.band),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MeshTheme.typography.bodySmall,
                 )
-                Row (modifier = Modifier.padding(horizontal = 6.dp)){
+                Row (modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm)){
                     uiState.bandMenu.forEach { band ->
                         FilterChip(
                             selected = uiState.band == band,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 6.dp),
+                            modifier = Modifier.padding(
+                                horizontal = MeshTheme.spacing.sm,
+                                vertical = MeshTheme.spacing.sm
+                            ),
                             onClick = {
                                 onSetBand(band)
                             },
@@ -309,17 +311,20 @@ fun StartHomeScreen(
             if(!uiState.wifiConnectionEnabled) {
                 val wifiDirectSupported = isWifiDirectSupported(context)
                 Text(
-                    modifier = Modifier.padding(horizontal = 6.dp),
+                    modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm),
                     text = stringResource(id = R.string.hotspot_type),
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MeshTheme.typography.bodySmall,
                 )
-                Row(modifier = Modifier.padding(horizontal = 6.dp)){
+                Row(modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm)){
                     uiState.hotspotTypeMenu.forEach { hotspotType ->
                         val isDisabled = (hotspotType == HotspotType.WIFIDIRECT_GROUP && !wifiDirectSupported)
                         FilterChip(
                             enabled = !isDisabled,
                             selected = hotspotType == uiState.hotspotTypeToCreate,
-                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp),
+                            modifier = Modifier.padding(
+                                horizontal = MeshTheme.spacing.sm,
+                                vertical = MeshTheme.spacing.sm
+                            ),
                             onClick = { onSetHotspotTypeToCreate(hotspotType) },
                             label = { Text(hotspotType.toString()) }
                         )
@@ -335,7 +340,7 @@ fun StartHomeScreen(
                 Row{
                     TransparentButton(
                         onClick = { onSetIncomingConnectionsEnabled(true) },
-                        modifier = Modifier.padding(4.dp),
+                        modifier = Modifier.padding(MeshTheme.spacing.xs),
                         text = stringResource(id = R.string.start_hotspot),
                         // If not connected to a WiFi, enable the button
                         // Else, check if the device supports WiFi STA/AP Concurrency
@@ -358,7 +363,7 @@ fun StartHomeScreen(
                                 }
                             }
                         },
-                        modifier = Modifier.padding(4.dp),
+                        modifier = Modifier.padding(MeshTheme.spacing.xs),
                         text = stringResource(id = R.string.stop_hotspot),
                         enabled = true
                     )
@@ -379,7 +384,7 @@ fun StartHomeScreen(
                     uiState.wifiState?.connectConfig?.port.toString()
                 )
                 // Display connectUri
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(MeshTheme.spacing.md))
                 Text(text = stringResource(id = R.string.instruction_start_hotspot))
                 Button(onClick = {
                     val sendIntent: Intent = Intent().apply {
@@ -389,7 +394,7 @@ fun StartHomeScreen(
                     }
                     val shareIntent = Intent.createChooser(sendIntent, null)
                     context.startActivity(shareIntent)
-                }, modifier = Modifier.padding(4.dp), enabled = true) {
+                }, modifier = Modifier.padding(MeshTheme.spacing.xs), enabled = true) {
                     Text(stringResource(id = R.string.share_connect_uri))
                 }
             }
@@ -402,15 +407,19 @@ fun StartHomeScreen(
             // It will display the option to connect via a QR code scan.
             if (stationState != null){
                 if (stationState.status == WifiStationState.Status.INACTIVE){
-                    Text(modifier = Modifier.padding(6.dp), text = stringResource(id = R.string.wifi_station_connection), style = TextStyle(fontSize = 16.sp))
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        modifier = Modifier.padding(MeshTheme.spacing.sm),
+                        text = stringResource(id = R.string.wifi_station_connection),
+                        style = MeshTheme.typography.bodyLarge
+                    )
+                    Spacer(modifier = Modifier.height(MeshTheme.spacing.md))
                     Row{
                         TransparentButton(onClick = {
                             qrScannerLauncher.launch(ScanOptions().setOrientationLocked(false)
                                 .setPrompt("Scan another device to join the Mesh")
                                 .setBeepEnabled(true)
                             )},
-                            modifier = Modifier.padding(4.dp),
+                            modifier = Modifier.padding(MeshTheme.spacing.xs),
                             text = stringResource(id = R.string.connect_via_qr_code_scan),
                             // If the hotspot isn't started, enable the button
                             // Else, check if the device supports WiFi STA/AP Concurrency
@@ -421,7 +430,10 @@ fun StartHomeScreen(
                                 uiState.concurrencySupported
                         )
                     }
-                    Text(modifier = Modifier.padding(6.dp), text = stringResource(id = R.string.instruction))
+                    Text(
+                        modifier = Modifier.padding(MeshTheme.spacing.sm),
+                        text = stringResource(id = R.string.instruction)
+                    )
                     TextField(
                         value = userEnteredConnectUri,
                         onValueChange = {
@@ -433,7 +445,7 @@ fun StartHomeScreen(
                         onClick = {
                             connect(userEnteredConnectUri, logger)
                         },
-                        modifier = Modifier.padding(4.dp),
+                        modifier = Modifier.padding(MeshTheme.spacing.xs),
                         text = stringResource(id = R.string.connect_via_entering_connect_uri),
                         // If the hotspot isn't started, enable the button
                         // Else, check if the device supports WiFi STA/AP Concurrency
@@ -460,7 +472,7 @@ fun StartHomeScreen(
                         leadingContent = {
                             if(stationState.status == WifiStationState.Status.CONNECTING) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.padding(8.dp)
+                                    modifier = Modifier.padding(MeshTheme.spacing.sm)
                                 )
                             }else {
                                 Icon(
@@ -489,16 +501,23 @@ fun StartHomeScreen(
         // add a Hotspot status indicator
         item(key = "hotspot_status_indicator"){
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(modifier = Modifier.padding(6.dp),
+                Text(modifier = Modifier.padding(MeshTheme.spacing.sm),
                     text = stringResource(id = R.string.hotspot_status) + ": " +
                             if (uiState.hotspotStatus) stringResource(
                                 id = R.string.hotspot_status_online)
                             else stringResource(id = R.string.hotspot_status_offline))
+                // statusOffline, not error, for the off state. The checklist asked for this
+                // to be confirmed: a hotspot being off is a state the user chose, not a
+                // fault, and `error` is reserved for things that went wrong. This is a
+                // visible change — the dot goes from red to grey when the hotspot is off.
                 Box(
-                    modifier = Modifier.size(8.dp).background(
-                        color = if (uiState.hotspotStatus) Color.Green else Color.Red,
-                        shape = CircleShape
-                    )
+                    modifier = Modifier
+                        .size(MeshTheme.size.statusDotInline)
+                        .background(
+                            color = if (uiState.hotspotStatus) MeshTheme.mesh.statusOnline
+                            else MeshTheme.mesh.statusOffline,
+                            shape = CircleShape
+                        )
                 )
             }
         }
@@ -518,18 +537,23 @@ fun stopHotspotConfirmationDialog(context: Context, onConfirm: (Boolean) -> Unit
 }
 
 // Enable users to copy text by holding down the text for a long press
+//
+// `textSize: Int` and `padding: Int` became a TextStyle and a Dp. The Int parameters were
+// a literal smuggled across a function boundary: every call site passed a bare number
+// that this function turned into `.sp` and `.dp`, so no caller could pass a token and the
+// gate could never see the violation.
 @Composable
 fun LongPressCopyableText(context: Context,
                           text: String,
                           textCopyable: String,
-                          textSize: Int,
-                          padding: Int = 0){
+                          style: TextStyle = MeshTheme.typography.bodyMedium,
+                          padding: Dp = MeshTheme.spacing.none){
     val clipboardManager = LocalClipboardManager.current
     BasicText(
         text = text + textCopyable,
-        style = TextStyle(
-            fontSize = textSize.sp,
-            color = MaterialTheme.colorScheme.onBackground),
+        // BasicText draws no colour of its own, so the role has to be applied here or the
+        // text renders black on a dark background.
+        style = style.copy(color = MeshTheme.colors.onBackground),
         modifier = Modifier
             .pointerInput(textCopyable) {
                 detectTapGestures(
@@ -540,7 +564,7 @@ fun LongPressCopyableText(context: Context,
                             .show()
                     })
             }
-            .padding(padding.dp)
+            .padding(padding)
     )
 }
 
@@ -549,6 +573,8 @@ fun LongPressCopyableText(context: Context,
 fun QRCodeView(qrcodeUri: String, barcodeEncoder: BarcodeEncoder, ssid: String?, password: String?,
                mac: String?, port: String?) {
     val configuration = LocalConfiguration.current
+    // Not a design value: this converts a system-reported screen width, so it stays a
+    // raw .dp conversion rather than becoming a token.
     val screenWidthDp = configuration.screenWidthDp.dp
     val density = LocalDensity.current
     // Convert dp to int once and remember the value
@@ -566,17 +592,16 @@ fun QRCodeView(qrcodeUri: String, barcodeEncoder: BarcodeEncoder, ssid: String?,
             bitmap = qrCodeBitMap,
             contentDescription = "QR Code"
         )
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
         Column(
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
+            // Four identical Spacers became one spacedBy, per page 05's rule to prefer
+            // Arrangement.spacedBy over Spacer chains.
+            verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.sm)
         ) {
-            Spacer(modifier = Modifier.height(10.dp))
             Text(text = "SSID: $ssid")
-            Spacer(modifier = Modifier.height(10.dp))
             Text(text = "Password: $password")
-            Spacer(modifier = Modifier.height(10.dp))
             Text(text = "MAC: $mac")
-            Spacer(modifier = Modifier.height(10.dp))
             Text(text = "Port: $port")
         }
     }

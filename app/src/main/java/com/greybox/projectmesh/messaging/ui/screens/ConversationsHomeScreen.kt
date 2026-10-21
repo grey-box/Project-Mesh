@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.border
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Chat
@@ -18,18 +17,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.ViewModelFactory
+import com.greybox.projectmesh.components.MeshAvatar
+import com.greybox.projectmesh.components.MeshAvatarSize
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.ui.models.ConversationsHomeScreenModel
 import com.greybox.projectmesh.messaging.ui.viewmodels.ConversationsHomeScreenViewModel
 import com.greybox.projectmesh.messaging.utils.MessageUtils
+import com.greybox.projectmesh.ui.theme.MeshTheme
 import org.kodein.di.compose.localDI
 
 @Composable
@@ -93,9 +92,14 @@ fun ConversationsList(
     conversations: List<Conversation>,
     onConversationClick: (Conversation) -> Unit
 ) {
+    // The divider indent is derived, not guessed: row gutter + avatar + the gap after it,
+    // which is exactly where the text column starts. The old hardcoded 72dp sat 8dp left
+    // of the text it was supposed to align with.
+    val dividerIndent = MeshTheme.spacing.md + MeshTheme.size.avatarMd + MeshTheme.spacing.md
+
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
-        contentPadding = PaddingValues(vertical = 8.dp)
+        contentPadding = PaddingValues(vertical = MeshTheme.spacing.sm)
     ) {
         items(conversations) { conversation ->
             ConversationItem(
@@ -103,8 +107,8 @@ fun ConversationsList(
                 onClick = { onConversationClick(conversation) }
             )
             Divider(
-                modifier = Modifier.padding(start = 72.dp, end = 16.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant
+                modifier = Modifier.padding(start = dividerIndent, end = MeshTheme.spacing.md),
+                color = MeshTheme.colors.surfaceVariant
             )
         }
     }
@@ -119,47 +123,18 @@ fun ConversationItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(16.dp),
+            .padding(MeshTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically
     ) {
         //avatar/profile picture with online status indicator
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .clip(CircleShape)
-                .background(
-                    color = if (conversation.isOnline)
-                        MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.surfaceVariant
-                )
-                .border(
-                    width = 2.dp,
-                    color = if (conversation.isOnline) Color.Green else Color.Transparent,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = conversation.userName.firstOrNull()?.toString() ?: "?",
-                color = Color.White,
-                fontSize = 20.sp
-            )
+        MeshAvatar(
+            name = conversation.userName,
+            size = MeshAvatarSize.Md,
+            isOnline = conversation.isOnline,
+            showStatusDot = conversation.isOnline
+        )
 
-            //online status indicator
-            if (conversation.isOnline) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .clip(CircleShape)
-                        .background(Color.Green)
-                        .border(1.dp, Color.White, CircleShape)
-                        .align(Alignment.BottomEnd)
-                )
-            }
-        }
-
-        Spacer(modifier = Modifier.width(16.dp))
+        Spacer(modifier = Modifier.width(MeshTheme.spacing.md))
 
         Column(
             modifier = Modifier.weight(1f)
@@ -174,19 +149,18 @@ fun ConversationItem(
                 ){
                     Text(
                         text = conversation.userName,
-                        style = MaterialTheme.typography.titleMedium,
+                        style = MeshTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
 
-                    Spacer (modifier = Modifier.width(8.dp))
+                    Spacer (modifier = Modifier.width(MeshTheme.spacing.sm))
 
                     //status indicator text
                     if (conversation.isOnline) {
                         Text (
                             text = "Online",
-                            style = MaterialTheme.typography.labelSmall,
-                            color = Color.Green,
-                            fontSize = 10.sp
+                            style = MeshTheme.typography.labelSmall,
+                            color = MeshTheme.mesh.statusOnline
                         )
                     }
                 }
@@ -198,29 +172,12 @@ fun ConversationItem(
                     } else {
                         ""
                     },
-                    style = MaterialTheme.typography.labelSmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = MeshTheme.typography.labelSmall,
+                    color = MeshTheme.colors.onSurfaceVariant
                 )
-
-                // Unread count badge
-                if (conversation.unreadCount > 0) {
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = conversation.unreadCount.toString(),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            style = MaterialTheme.typography.labelSmall
-                        )
-                    }
-                }
             }
 
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(MeshTheme.spacing.xs))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -235,40 +192,37 @@ fun ConversationItem(
                     //online/offline indicator
                     Box(
                         modifier = Modifier
-                            .size(8.dp)
+                            .size(MeshTheme.size.statusDotInline)
                             .clip(CircleShape)
                             .background(
-                                if (conversation.isOnline) Color.Green else Color.Gray
+                                if (conversation.isOnline) MeshTheme.mesh.statusOnline
+                                else MeshTheme.mesh.statusOffline
                             )
                     )
 
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
 
                     // Last message content
                     Text(
                         text = conversation.lastMessage ?: "No messages yet",
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MeshTheme.typography.bodyMedium,
+                        color = MeshTheme.colors.onSurfaceVariant,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
                 }
 
-                //unread count badge
+                // Unread count badge. There used to be a second copy of this in the row
+                // above, bound to the same unreadCount, so an unread conversation drew the
+                // number twice at two different sizes. Material 3's Badge is used rather
+                // than a hand-rolled Box so the size comes from the spec, not a literal.
                 if (conversation.unreadCount > 0) {
-                    Box(
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.primary),
-                        contentAlignment = Alignment.Center
+                    Badge(
+                        containerColor = MeshTheme.colors.primary,
+                        contentColor = MeshTheme.colors.onPrimary
                     ) {
-                        Text(
-                            text = conversation.unreadCount.toString(),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            style = MaterialTheme.typography.labelSmall
-                        )
+                        Text(text = conversation.unreadCount.toString())
                     }
                 }
             }
@@ -281,31 +235,31 @@ fun EmptyConversationsView() {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(MeshTheme.spacing.md),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = Icons.Default.Chat,
             contentDescription = null,
-            modifier = Modifier.size(72.dp),
-            tint = MaterialTheme.colorScheme.primary
+            modifier = Modifier.size(MeshTheme.size.iconEmptyState),
+            tint = MeshTheme.colors.primary
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.md))
 
         Text(
             text = "No Conversations Yet",
-            style = MaterialTheme.typography.headlineSmall
+            style = MeshTheme.typography.headlineSmall
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
 
         Text(
             text = "Connect with users on the network to start chatting",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 32.dp)
+            style = MeshTheme.typography.bodyMedium,
+            color = MeshTheme.colors.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = MeshTheme.spacing.xl)
         )
     }
 }
@@ -318,44 +272,44 @@ fun ErrorView(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(MeshTheme.spacing.md),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
         Icon(
             imageVector = Icons.Default.Error,
             contentDescription = null,
-            modifier = Modifier.size(72.dp),
-            tint = MaterialTheme.colorScheme.error
+            modifier = Modifier.size(MeshTheme.size.iconEmptyState),
+            tint = MeshTheme.colors.error
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.md))
 
         Text(
             text = "Error Loading Conversations",
-            style = MaterialTheme.typography.headlineSmall
+            style = MeshTheme.typography.headlineSmall
         )
 
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
 
         Text(
             text = errorMessage,
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(horizontal = 32.dp)
+            style = MeshTheme.typography.bodyMedium,
+            color = MeshTheme.colors.onSurfaceVariant,
+            modifier = Modifier.padding(horizontal = MeshTheme.spacing.xl)
         )
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.md))
 
         Button(
             onClick = onRetry,
-            contentPadding = PaddingValues(horizontal = 16.dp)
+            contentPadding = PaddingValues(horizontal = MeshTheme.spacing.md)
         ) {
             Icon(
                 imageVector = Icons.Default.Refresh,
                 contentDescription = null
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
             Text("Retry")
         }
     }
