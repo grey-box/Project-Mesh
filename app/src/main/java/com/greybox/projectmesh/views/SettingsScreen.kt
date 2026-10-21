@@ -59,7 +59,7 @@ import com.greybox.projectmesh.ui.theme.GradientButton
 import com.greybox.projectmesh.ui.theme.GradientLongButton
 import com.greybox.projectmesh.viewModel.SettingsScreenViewModel
 import org.kodein.di.compose.localDI
-
+import androidx.compose.foundation.layout.sizeIn
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 
@@ -152,17 +152,28 @@ fun SettingsScreen(
             SectionHeader(title = R.string.receive)
             SettingItem(label = stringResource(id = R.string.auto_finish),
                 trailingContent = {
-                    Box(modifier = Modifier.width(130.dp).height(70.dp))
-                    {
-                        Switch(
-                            checked = ui.autoFinish,
-                            onCheckedChange = {
-                                viewModel.setAutoFinish(it)
-                            },
-                            colors = SwitchDefaults.colors(),
-                            modifier = Modifier.scale(1.3f).align(Alignment.Center)
+//                    Box(modifier = Modifier.width(130.dp).height(70.dp))
+//                    {
+//                        Switch(
+//                            checked = ui.autoFinish,
+//                            onCheckedChange = {
+//                                viewModel.setAutoFinish(it)
+//                            },
+//                            colors = SwitchDefaults.colors(),
+//                            modifier = Modifier.scale(1.3f).align(Alignment.Center)
+//                        )
+//                    }
+                    Switch(
+                        checked = ui.autoFinish,
+                        onCheckedChange = {
+                            viewModel.setAutoFinish(it)
+                        },
+                        colors = SwitchDefaults.colors(),
+                        modifier = Modifier.sizeIn(
+                            minWidth = MeshTheme.size.touchTargetMin,
+                            minHeight = MeshTheme.size.touchTargetMin
                         )
-                    }
+                    )
                 }
             )
             val directoryLauncher = rememberLauncherForActivityResult(
