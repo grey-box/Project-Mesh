@@ -23,6 +23,7 @@ import com.ustadmobile.meshrabiya.ext.addressToDotNotation
 import com.ustadmobile.meshrabiya.mmcp.MmcpOriginatorMessage
 import org.kodein.di.compose.localDI
 import java.net.InetAddress
+import com.greybox.projectmesh.ui.theme.MeshTheme
 
 @Composable
 fun PingScreen(
@@ -50,7 +51,7 @@ fun PingScreen(
             items = uiState.allOriginatorMessages
         ){ originatorMessage ->
             val mmcpMessage: MmcpOriginatorMessage = originatorMessage.originatorMessage
-            Spacer(modifier = Modifier.width(4.dp))
+            Spacer(modifier = Modifier.width(MeshTheme.spacing.xs))
             Row(modifier = Modifier.fillMaxWidth()){
                 Text(text = "Ping: ${mmcpMessage.pingTimeSum}ms, hops: ${originatorMessage.hopCount}, last hop: ${originatorMessage.lastHopAddr.addressToDotNotation()}, id: ${mmcpMessage.messageId}")
             }

@@ -23,6 +23,7 @@ import com.greybox.projectmesh.viewModel.SelectDestNodeScreenModel
 import com.greybox.projectmesh.viewModel.SelectDestNodeScreenViewModel
 import org.kodein.di.compose.localDI
 import com.greybox.projectmesh.extension.WifiListItem
+import com.greybox.projectmesh.ui.theme.MeshTheme
 @Composable
 fun SelectDestNodeScreen(
     uris: List<Uri>,
@@ -59,10 +60,10 @@ fun DisplayAllNodesToSelect(
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     CircularProgressIndicator(
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        modifier = Modifier.padding(MeshTheme.spacing.sm),
                     )
                     Text(
-                        modifier = Modifier.padding(vertical = 8.dp),
+                        modifier = Modifier.padding(MeshTheme.spacing.sm),
                         text = "Contacting $inProgressDevice\nThis might take a few seconds.",
                     )
                 }

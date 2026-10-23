@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsCompat
 import com.greybox.projectmesh.R
 import java.io.PrintWriter
 import java.io.StringWriter
+import com.greybox.projectmesh.ui.theme.MeshTheme
 
 class CrashScreenActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,12 +47,12 @@ class CrashScreenActivity : AppCompatActivity() {
     @Composable
     fun Crash()
     {
-        Surface(modifier = Modifier.background(color = Color.White).fillMaxSize()) {
+        Surface(modifier = Modifier.background(MeshTheme.colors.background).fillMaxSize()) {
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-                Text(text="Crash! Please screenshot and send to george.varvaris@grey-box.ca",Modifier.background(Color.White), color = Color.Red)
+                Text(text="Crash! Please screenshot and send to george.varvaris@grey-box.ca",Modifier.background(MeshTheme.colors.background), color = MeshTheme.colors.error)
                 Button(content = {Text("Exit app")}, onClick = { finish() } )
                 CrashHandler.getThrowableFromIntent(intent).let {
-                    Text("Message: " + it?.message + "\nStack trace:\n" + it?.stackTraceToString(),Modifier.background(Color.White), color = Color.Red)
+                    Text("Message: " + it?.message + "\nStack trace:\n" + it?.stackTraceToString(),Modifier.background(MeshTheme.colors.background), color = MeshTheme.colors.error)
                 }
             }
         }

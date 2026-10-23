@@ -9,7 +9,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -51,6 +50,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.R
 import com.greybox.projectmesh.ViewModelFactory
+import com.greybox.projectmesh.components.MeshScreenScaffold
 import com.greybox.projectmesh.ui.theme.TransparentButton
 import com.greybox.projectmesh.viewModel.SendScreenModel
 import com.greybox.projectmesh.viewModel.SendScreenViewModel
@@ -58,6 +58,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.kodein.di.compose.localDI
+import com.greybox.projectmesh.ui.theme.MeshTheme
+import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 
 @Composable
 fun SendScreen(
@@ -81,19 +83,35 @@ fun SendScreen(
             viewModel.onFileChosen(uris)
         }
     }
-    Box(modifier = Modifier.fillMaxSize()){
+//    Box(modifier = Modifier.fillMaxSize()){
+//        Column(modifier = Modifier
+//            .fillMaxSize()
+//            .padding(bottom = 72.dp)) {
+//            DisplayAllPendingTransfers(viewModel, uiState)
+//        }
+//        TransparentButton(onClick = { openDocumentLauncher.launch(arrayOf("*/*")) },
+//            modifier = Modifier
+//                .align(Alignment.BottomCenter)
+//                .padding(16.dp),
+//            text = stringResource(id = R.string.send_file),
+//            enabled = true
+//        )
+//    }
+
+    MeshScreenScaffold(
+        bottomBar = {
+            TransparentButton(onClick = { openDocumentLauncher.launch(arrayOf("*/*")) },
+                modifier = Modifier.padding(MeshTheme.spacing.md),
+                text = stringResource(id = R.string.send_file),
+                enabled = true
+            )
+        }
+    ) { innerPadding ->
         Column(modifier = Modifier
             .fillMaxSize()
-            .padding(bottom = 72.dp)) {
+            .padding(innerPadding)) {
             DisplayAllPendingTransfers(viewModel, uiState)
         }
-        TransparentButton(onClick = { openDocumentLauncher.launch(arrayOf("*/*")) },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(16.dp),
-            text = stringResource(id = R.string.send_file),
-            enabled = true
-        )
     }
 }
 
@@ -137,18 +155,16 @@ fun DisplayAllPendingTransfers(
                     backgroundContent = {
                         Box(
                             modifier = Modifier
-                                .fillMaxSize()
-                                .height(64.dp) // Controls the red background size
-                                .padding(vertical = 8.dp) // Prevents red from touching top & bottom
-                                .background(Color.Red, shape = RoundedCornerShape(12.dp))
-                                .border(width = 0.dp, color = Color.Transparent, shape = RoundedCornerShape(12.dp)),
+                                .fillMaxSize() // Matches the height of the item being swiped
+                                .padding(vertical = MeshTheme.spacing.sm) // Prevents the background from touching top & bottom
+                                .background(MeshTheme.colors.error, shape = MeshTheme.shapes.medium),
                             contentAlignment = Alignment.CenterEnd
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = "Delete",
-                                tint = Color.White,
-                                modifier = Modifier.size(32.dp).padding(end = 6.dp)
+                                tint = MeshTheme.colors.onError,
+                                modifier = Modifier.size(MeshTheme.size.iconLg).padding(end = MeshTheme.spacing.sm)
                             )
                         }
                     },
@@ -177,7 +193,7 @@ fun DisplayAllPendingTransfers(
                                     Text(stringResource(id = R.string.send) + ": ${autoConvertByte(byteTransferred)} / ${autoConvertByte(byteSize)}")
                                 }
                             },
-                            modifier = Modifier.padding(vertical = 4.dp)
+                            modifier = Modifier.padding(vertical = MeshTheme.spacing.xs)
                         )
                     },
                 )

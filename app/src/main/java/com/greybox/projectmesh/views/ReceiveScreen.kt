@@ -53,6 +53,7 @@ import java.io.File
 import androidx.compose.material3.HorizontalDivider
 import com.greybox.projectmesh.viewModel.ReceiveScreenModel
 import com.greybox.projectmesh.BuildConfig
+import com.greybox.projectmesh.ui.theme.MeshTheme
 
 @Composable
 fun ReceiveScreen(
@@ -164,12 +165,12 @@ fun HandleIncomingTransfers(
                         if(transfer.status == AppServer.Status.PENDING){
                             Row{
                                 IconButton(onClick = {onAccept(transfer)},
-                                    modifier = Modifier.width(100.dp)) {
+                                    modifier = Modifier.width(MeshTheme.size.buttonMinWidth)) {
                                     Icon(Icons.Default.CheckCircle, contentDescription = "Accept")
                                 }
-                                Spacer(modifier = Modifier.width(8.dp))
+                                Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
                                 IconButton(onClick = {onDecline(transfer)},
-                                    modifier = Modifier.width(100.dp)) {
+                                    modifier = Modifier.width(MeshTheme.size.buttonMinWidth)) {
                                     Icon(Icons.Default.Cancel, contentDescription = "Decline")
                                 }
                             }
@@ -180,7 +181,7 @@ fun HandleIncomingTransfers(
                     if(transfer.status == AppServer.Status.COMPLETED){
                         Row (
                             verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp) // Space between buttons
+                            horizontalArrangement = Arrangement.spacedBy(MeshTheme.spacing.sm) // Space between buttons
                         ){
                             IconButton(onClick = {onDelete(transfer)}) {
                                 Icon(Icons.Default.Delete, contentDescription = "Delete")
