@@ -63,4 +63,14 @@
     <string name="server_restart_complete">Server restart complete</string>
     <string name="concurrency_reset">Reset STA/AP Concurrency Status -&gt; Unknown</string>
 
+    <!-- Onboarding -->
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_s1_title">Stay connected — even without Wi-Fi or signal.</string>
+    <string name="onboarding_s1_body">Project Mesh lets nearby phones talk to each other directly, like a walkie-talkie for your phone — no internet needed.</string>
+    <string name="onboarding_s2_title">Your phone may also help pass along messages for nearby devices.</string>
+    <string name="onboarding_s2_body">This keeps everyone connected. It uses a small amount of battery and data.</string>
+    <string name="onboarding_s3_title">Welcome to Project Mesh!</string>
+    <string name="onboarding_s3_body">Please set your username:</string>
+    <string name="onboarding_username_label">Username</string>
 </resources>

@@ -37,12 +37,14 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.GlobalApp
+import com.greybox.projectmesh.R
 import com.greybox.projectmesh.extension.getLocalIpFromDI
 import com.greybox.projectmesh.viewModel.OnboardingViewModel
 import kotlinx.coroutines.launch
@@ -52,20 +54,20 @@ private const val PAGE_COUNT = 3
 
 private data class InfoPage(
     val illustration: ImageVector,
-    val headline: String,
-    val body: String,
+    val headline: Int,
+    val body: Int,
 )
 
 private val infoPages = listOf(
     InfoPage(
         illustration = Icons.Outlined.Hub,
-        headline = "Stay connected — even without Wi-Fi or signal.",
-        body = "Project Mesh lets nearby phones talk to each other directly, like a walkie-talkie for your phone — no internet needed."
+        headline = R.string.onboarding_s1_title,
+        body = R.string.onboarding_s1_body
     ),
     InfoPage(
         illustration = Icons.Outlined.WifiTethering,
-        headline = "Your phone may also help pass along messages for nearby devices.",
-        body = "This keeps everyone connected. It uses a small amount of battery and data."
+        headline = R.string.onboarding_s2_title,
+        body = R.string.onboarding_s2_body
     ),
 )
 
@@ -85,7 +87,7 @@ fun OnboardingScreen(
                     return OnboardingViewModel(
                         userRepository = GlobalApp.GlobalUserRepo.userRepository,
                         prefs = GlobalApp.GlobalUserRepo.prefs,
-                        localIp = localIp  // pass the local IP here
+                        localIp = localIp
                     ) as T
                 }
                 throw IllegalArgumentException("Unknown ViewModel class")
@@ -132,14 +134,13 @@ fun OnboardingScreen(
                 .imePadding()
                 .padding(horizontal = 24.dp, vertical = 16.dp)
         ) {
-            // Skip — top-right, same position on every screen
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
                 TextButton(onClick = skipOnboarding) {
                     Text(
-                        text = "Skip",
+                        text = stringResource(R.string.onboarding_skip),
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -183,7 +184,7 @@ fun OnboardingScreen(
                     .height(48.dp)
             ) {
                 Text(
-                    text = "Next",
+                    text = stringResource(R.string.onboarding_next),
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -194,7 +195,6 @@ fun OnboardingScreen(
 @Composable
 private fun InfoPageContent(page: InfoPage) {
     Column(modifier = Modifier.fillMaxSize()) {
-        // Illustration placeholder block
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -208,14 +208,14 @@ private fun InfoPageContent(page: InfoPage) {
         ) {
             Icon(
                 imageVector = page.illustration,
-                contentDescription = null, // decorative
+                contentDescription = null,
                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.size(56.dp)
             )
         }
-        Headline(page.headline)
+        Headline(stringResource(page.headline))
         Spacer(modifier = Modifier.height(10.dp))
-        BodyText(page.body)
+        BodyText(stringResource(page.body))
     }
 }
 
@@ -225,14 +225,14 @@ private fun UsernamePageContent(
     onUsernameChange: (String) -> Unit,
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
-        Headline("Welcome to Project Mesh!")
+        Headline(stringResource(R.string.onboarding_s3_title))
         Spacer(modifier = Modifier.height(10.dp))
-        BodyText("Please set your username:")
+        BodyText(stringResource(R.string.onboarding_s3_body))
         Spacer(modifier = Modifier.height(16.dp))
         OutlinedTextField(
             value = username,
             onValueChange = onUsernameChange,
-            label = { Text("Username") },
+            label = { Text(stringResource(R.string.onboarding_username_label)) },
             singleLine = true,
             shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
