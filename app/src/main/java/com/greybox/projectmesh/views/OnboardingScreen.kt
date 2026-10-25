@@ -45,10 +45,12 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.R
+import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.extension.getLocalIpFromDI
 import com.greybox.projectmesh.viewModel.OnboardingViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.localDI
+import org.kodein.di.instance
 
 private const val PAGE_COUNT = 3
 
@@ -78,6 +80,7 @@ fun OnboardingScreen(
 ) {
     val di = localDI()
     val localIp = getLocalIpFromDI(di)
+    val settingsRepository: SettingsRepository by di.instance()
 
     val factory = remember {
         object : ViewModelProvider.Factory {
@@ -87,6 +90,7 @@ fun OnboardingScreen(
                     return OnboardingViewModel(
                         userRepository = GlobalApp.GlobalUserRepo.userRepository,
                         prefs = GlobalApp.GlobalUserRepo.prefs,
+                        settingsRepository = settingsRepository,
                         localIp = localIp
                     ) as T
                 }
@@ -116,8 +120,6 @@ fun OnboardingScreen(
         } else {
             onboardingViewModel.handleFirstTimeSetup { onComplete() }
         }
-
-        onboardingViewModel.handleFirstTimeSetup { onComplete() }
     }
 
     val skipOnboarding: () -> Unit = {

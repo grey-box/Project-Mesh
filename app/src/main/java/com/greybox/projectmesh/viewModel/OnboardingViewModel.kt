@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.util.UUID
 import com.greybox.projectmesh.user.UserRepository
+import com.greybox.projectmesh.data.SettingsRepository
 import android.content.SharedPreferences
 import timber.log.Timber
 
@@ -18,6 +19,7 @@ data class OnboardingUiState(
 class OnboardingViewModel(
     private val userRepository: UserRepository,
     private val prefs: SharedPreferences,
+    private val settingsRepository: SettingsRepository,
     private val localIp: String // Use the local IP here
 ) : ViewModel() {
 
@@ -42,8 +44,7 @@ class OnboardingViewModel(
                 name = _uiState.value.username,
                 address = localIp
             )
-            prefs.edit().putString("device_name", _uiState.value.username).apply()
-            prefs.edit().putBoolean("hasRunBefore", true).apply()
+            settingsRepository.setDeviceName(_uiState.value.username)
             onComplete()
         }
     }
