@@ -24,7 +24,6 @@ import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.WifiTethering
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -38,7 +37,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -47,6 +45,7 @@ import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.R
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.extension.getLocalIpFromDI
+import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.viewModel.OnboardingViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.localDI
@@ -134,7 +133,7 @@ fun OnboardingScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .imePadding()
-                .padding(horizontal = 24.dp, vertical = 16.dp)
+                .padding(horizontal = MeshTheme.spacing.md, vertical = MeshTheme.spacing.md)
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -143,8 +142,7 @@ fun OnboardingScreen(
                 TextButton(onClick = skipOnboarding) {
                     Text(
                         text = stringResource(R.string.onboarding_skip),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontWeight = FontWeight.SemiBold
+                        color = MeshTheme.colors.onSurfaceVariant
                     )
                 }
             }
@@ -169,7 +167,7 @@ fun OnboardingScreen(
                 currentPage = pagerState.currentPage,
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)
-                    .padding(top = 14.dp, bottom = 10.dp)
+                    .padding(top = MeshTheme.spacing.md, bottom = MeshTheme.spacing.sm)
             )
 
             Button(
@@ -180,15 +178,11 @@ fun OnboardingScreen(
                         scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
                     }
                 },
-                shape = RoundedCornerShape(12.dp),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(48.dp)
+                    .height(MeshTheme.size.buttonHeight)
             ) {
-                Text(
-                    text = stringResource(R.string.onboarding_next),
-                    fontWeight = FontWeight.Bold
-                )
+                Text(text = stringResource(R.string.onboarding_next))
             }
         }
     }
@@ -200,23 +194,23 @@ private fun InfoPageContent(page: InfoPage) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp, bottom = 20.dp)
+                .padding(top = MeshTheme.spacing.sm, bottom = MeshTheme.spacing.lg)
                 .height(120.dp)
                 .background(
-                    color = MaterialTheme.colorScheme.primaryContainer,
-                    shape = RoundedCornerShape(16.dp)
+                    color = MeshTheme.colors.primaryContainer,
+                    shape = MeshTheme.shapes.large
                 ),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 imageVector = page.illustration,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                modifier = Modifier.size(56.dp)
+                tint = MeshTheme.colors.onPrimaryContainer,
+                modifier = Modifier.size(MeshTheme.size.iconEmptyState)
             )
         }
         Headline(stringResource(page.headline))
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
         BodyText(stringResource(page.body))
     }
 }
@@ -228,15 +222,14 @@ private fun UsernamePageContent(
 ) {
     Column(modifier = Modifier.fillMaxSize()) {
         Headline(stringResource(R.string.onboarding_s3_title))
-        Spacer(modifier = Modifier.height(10.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
         BodyText(stringResource(R.string.onboarding_s3_body))
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(MeshTheme.spacing.md))
         OutlinedTextField(
             value = username,
             onValueChange = onUsernameChange,
             label = { Text(stringResource(R.string.onboarding_username_label)) },
             singleLine = true,
-            shape = RoundedCornerShape(10.dp),
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -246,9 +239,8 @@ private fun UsernamePageContent(
 private fun Headline(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.titleLarge,
-        fontWeight = FontWeight.Bold,
-        color = MaterialTheme.colorScheme.onSurface
+        style = MeshTheme.typography.headlineSmall,
+        color = MeshTheme.colors.onSurface
     )
 }
 
@@ -256,8 +248,8 @@ private fun Headline(text: String) {
 private fun BodyText(text: String) {
     Text(
         text = text,
-        style = MaterialTheme.typography.bodyMedium,
-        color = MaterialTheme.colorScheme.onSurfaceVariant
+        style = MeshTheme.typography.bodyMedium,
+        color = MeshTheme.colors.onSurfaceVariant
     )
 }
 
@@ -268,7 +260,7 @@ private fun PageIndicator(
 ) {
     Row(
         modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalArrangement = Arrangement.spacedBy(MeshTheme.spacing.xs),
         verticalAlignment = Alignment.CenterVertically
     ) {
         repeat(PAGE_COUNT) { index ->
@@ -278,8 +270,8 @@ private fun PageIndicator(
                     .width(if (active) 16.dp else 6.dp)
                     .height(6.dp)
                     .background(
-                        color = if (active) MaterialTheme.colorScheme.primary
-                        else MaterialTheme.colorScheme.outlineVariant,
+                        color = if (active) MeshTheme.colors.primary
+                        else MeshTheme.colors.outlineVariant,
                         shape = if (active) RoundedCornerShape(3.dp) else CircleShape
                     )
             )
