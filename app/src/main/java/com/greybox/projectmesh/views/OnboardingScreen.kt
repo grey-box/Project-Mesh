@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.WifiTethering
@@ -37,7 +36,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -195,7 +193,7 @@ private fun InfoPageContent(page: InfoPage) {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = MeshTheme.spacing.sm, bottom = MeshTheme.spacing.lg)
-                .height(120.dp)
+                .height(MeshTheme.size.illustrationPanel)
                 .background(
                     color = MeshTheme.colors.primaryContainer,
                     shape = MeshTheme.shapes.large
@@ -267,12 +265,14 @@ private fun PageIndicator(
             val active = index == currentPage
             Box(
                 modifier = Modifier
-                    .width(if (active) 16.dp else 6.dp)
-                    .height(6.dp)
+                    .width(if (active) MeshTheme.size.pageIndicatorDotActive else MeshTheme.size.pageIndicatorDot)
+                    .height(MeshTheme.size.pageIndicatorDot)
                     .background(
                         color = if (active) MeshTheme.colors.primary
                         else MeshTheme.colors.outlineVariant,
-                        shape = if (active) RoundedCornerShape(3.dp) else CircleShape
+                        // A 3dp radius on a 6dp-tall box is just a stadium, which is what
+                        // CircleShape already gives at any size, so both states use it.
+                        shape = CircleShape
                     )
             )
         }

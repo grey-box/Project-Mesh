@@ -12,10 +12,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ListItem
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -32,10 +31,10 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.MNetLoggerAndroid
 import com.greybox.projectmesh.ViewModelFactory
+import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.viewModel.LogScreenModel
 import com.greybox.projectmesh.viewModel.LogScreenViewModel
 import com.ustadmobile.meshrabiya.log.MNetLogger
@@ -80,7 +79,7 @@ fun ShowLogScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(8.dp),
+                    .padding(MeshTheme.spacing.sm),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -125,18 +124,22 @@ fun ShowLogScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = MeshTheme.spacing.sm, vertical = MeshTheme.spacing.xs)
                         .background(
-                            color = if (isSelected) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                            else MaterialTheme.colorScheme.surfaceVariant,
-                            shape = RoundedCornerShape(8.dp)
+                            color = if (isSelected) MeshTheme.colors.primary.copy(alpha = 0.2f)
+                            else MeshTheme.colors.surfaceVariant,
+                            shape = MeshTheme.shapes.small
                         )
                         .border(
-                            width = 1.dp,
-                            color = MaterialTheme.colorScheme.outline,
-                            shape = RoundedCornerShape(8.dp)
+                            // No border-width token exists: 05 defines spacing, size,
+                            // shape and elevation only. DividerDefaults.Thickness is the
+                            // M3 hairline that pairs with the outline role, so the width
+                            // comes from the library rather than from a literal here.
+                            width = DividerDefaults.Thickness,
+                            color = MeshTheme.colors.outline,
+                            shape = MeshTheme.shapes.small
                         )
-                        .clip(RoundedCornerShape(8.dp))
+                        .clip(MeshTheme.shapes.small)
                         .pointerInput(Unit) {
                             detectTapGestures(
                                 onTap = {

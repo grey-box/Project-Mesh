@@ -33,14 +33,10 @@ data class MeshSize(
     // Messaging
     val bubbleMaxWidth: Dp = 280.dp, // fixed cap, not a fraction (phones only, minSdk 26)
 
-    // Transitional
-    @Deprecated(
-        message = "Migration crutch for hardcoded 72.dp bottom insets. " +
-                "Temporary value for old hardcoded bottom padding. Use the " +
-                "padding that MeshScreenScaffold passes in instead. " +
-                "This will be removed when all hard coded values are gone.",
-    )
-    val navBarHeight: Dp = 72.dp,
+    // Onboarding
+    val illustrationPanel: Dp = 120.dp,       // hero illustration panel behind the page icon
+    val pageIndicatorDot: Dp = 6.dp,          // inactive page dot, and the height of both
+    val pageIndicatorDotActive: Dp = 16.dp,   // active dot stretches into a pill
 )
 
 // static: sizes never change after theme setup.

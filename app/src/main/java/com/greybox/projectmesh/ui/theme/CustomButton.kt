@@ -5,7 +5,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
@@ -44,8 +43,9 @@ fun TransparentButton(
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = MeshTheme.colors.primary
         ),
-        border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, Color.Black), // Black border
-        //shape = RoundedCornerShape(8.dp), // Optional: Rounded corners
+        // Was a hardcoded Color.Black, which ignored the theme and sat wrong in dark.
+        // outline is the M3 role for exactly this.
+        border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, MeshTheme.colors.outline),
         modifier = modifier.fillMaxWidth(),
         enabled = enabled
     ) {
