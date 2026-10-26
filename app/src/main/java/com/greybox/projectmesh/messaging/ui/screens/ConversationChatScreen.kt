@@ -2,9 +2,11 @@ package com.greybox.projectmesh.messaging.ui.screens
 
 import android.os.Bundle
 import android.widget.Toast
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
@@ -18,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.DeviceStatusManager
@@ -26,6 +29,7 @@ import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.repository.ConversationRepository
 import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
 import com.greybox.projectmesh.testing.TestDeviceService
+import com.greybox.projectmesh.ui.theme.MeshTheme
 import java.net.InetAddress
 import org.kodein.di.compose.localDI
 import org.kodein.di.instance
@@ -100,8 +104,20 @@ fun ConversationChatScreen (
     //show error if loading failed
     if (errorMessage.value != null) {
         Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Error: ${errorMessage.value}")
+            // This state had no padding at all, so a long error string ran into both
+            // screen edges. The gutter and the gap between the message and the button
+            // both come from the spacing scale rather than from literals.
+            Column(
+                modifier = Modifier.padding(MeshTheme.spacing.lg),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.md)
+            ) {
+                Text(
+                    text = "Error: ${errorMessage.value}",
+                    style = MeshTheme.typography.bodyLarge,
+                    color = MeshTheme.colors.error,
+                    textAlign = TextAlign.Center
+                )
                 Button(onClick = onBackClick) {
                     Text("Go Back")
                 }

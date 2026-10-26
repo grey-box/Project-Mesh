@@ -1,6 +1,7 @@
 package com.greybox.projectmesh.extension
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -18,14 +19,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.greybox.projectmesh.GlobalApp
 import com.ustadmobile.meshrabiya.ext.addressToDotNotation
 import com.ustadmobile.meshrabiya.vnet.VirtualNode
 import kotlinx.coroutines.runBlocking
-import com.greybox.projectmesh.user.UserRepository
 import com.greybox.projectmesh.ui.theme.MeshTheme
-import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 @Composable
 // Display a single connected wifi station
 fun WifiListItem(
@@ -59,13 +57,10 @@ fun WifiListItem(
             val user = runBlocking {
                 GlobalApp.GlobalUserRepo.userRepository.getUserByIp(wifiAddressDotNotation)
             }
-            val device = user?.name ?: "Unknown"
-            if(device != null){
-                Text(text= device, fontWeight = FontWeight.Bold)
-            }
-            else{
-                Text(text = "Loading...", fontWeight = FontWeight.Bold)
-            }
+            // getUserByIp already returns null for an unknown node, so the fallback is the
+            // only "not found" state there is. The previous `if (device != null)` could never
+            // be false once the elvis had run, so the "Loading..." branch was unreachable.
+            Text(text = user?.name ?: "Unknown", fontWeight = FontWeight.Bold)
         },
         supportingContent = {
             Text(text = wifiAddressDotNotation)
@@ -81,9 +76,14 @@ fun WifiListItem(
                     modifier = Modifier.size(MeshTheme.size.iconMd)
                 )
                 Spacer(modifier = Modifier.width(MeshTheme.spacing.xs))
-                Column{
+                // The gap between these two lines used to be a Spacer with a *width*, which
+                // contributes nothing inside a Column, so the two labels sat flush against
+                // each other. Expressing it as the Column's own vertical arrangement makes
+                // the spacing real and removes the stray Spacer.
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.xs)
+                ){
                     Text(text = "Mesh status")
-                    Spacer(modifier = Modifier.width(MeshTheme.spacing.xs))
                     Text("Ping: ${wifiEntry.originatorMessage.pingTimeSum}ms "
                             + "Hops: ${wifiEntry.hopCount} ")
                 }
