@@ -133,7 +133,7 @@ class ConversationsHomeScreenViewModel(
                 _uiState.update {
                     it.copy (
                         isLoading = false,
-                        error = "Failed to load conversations: ${e.message}"
+                        error = "Failed to load conversations"
                     )
                 }
             }

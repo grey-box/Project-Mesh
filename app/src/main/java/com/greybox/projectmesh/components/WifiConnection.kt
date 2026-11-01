@@ -24,6 +24,7 @@ import com.ustadmobile.meshrabiya.log.MNetLogger
 import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
 import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
 import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
+import com.greybox.projectmesh.R
 import com.ustadmobile.meshrabiya.vnet.wifi.WifiConnectException
 import java.util.regex.Pattern
 import android.util.Log
@@ -102,7 +103,7 @@ fun meshrabiyaConnectLauncher(
             onResult(
                 ConnectWifiLauncherResult(
                     hotspotConfig = null,
-                    exception = WifiConnectException("CompanionDeviceManager: device not found / not selected"),
+                    exception = WifiConnectException(context.getString(R.string.error_wifi_no_device)),
                     isWifiConnected = false,
                 )
             )
@@ -120,7 +121,7 @@ fun meshrabiyaConnectLauncher(
             onResult(
                 ConnectWifiLauncherResult(
                     hotspotConfig = null,
-                    exception = WifiConnectException("Permission denied: permission not granted"),
+                    exception = WifiConnectException(context.getString(R.string.error_wifi_permission)),
                     isWifiConnected = false,
                 )
             )
@@ -183,7 +184,7 @@ fun meshrabiyaConnectLauncher(
                         onResult(
                             ConnectWifiLauncherResult(
                                 hotspotConfig = null,
-                                exception = WifiConnectException("CompanionDeviceManager: onFailure: $reason"),
+                                exception = WifiConnectException(context.getString(R.string.error_wifi_pair_failed)),
                                 isWifiConnected = false,
                             )
                         )

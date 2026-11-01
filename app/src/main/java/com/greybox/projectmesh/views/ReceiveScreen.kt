@@ -129,12 +129,12 @@ fun HandleIncomingTransfers(
                     context.startActivity(intent)
                 }
                 catch (e: Exception){
-                    Toast.makeText(context, "Error opening file: ${e.message}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(context, context.getString(R.string.error_file_open_failed), Toast.LENGTH_SHORT).show()
                 }
 
             }
             else{
-                Toast.makeText(context, "File cannot be opened", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.error_file_open_unsupported), Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -234,7 +234,7 @@ private fun saveFileToMediaStore(context: Context, transfer: AppServer.IncomingT
 
     val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
     if (uri == null) {
-        Toast.makeText(context, "Failed to save file", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_file_save_failed), Toast.LENGTH_LONG).show()
         return
     }
 
@@ -251,7 +251,7 @@ private fun saveFileToMediaStore(context: Context, transfer: AppServer.IncomingT
     } catch (e: Exception) {
         e.printStackTrace()
         Toast.makeText(context,
-            "Error saving file: ${e.localizedMessage}",
+            context.getString(R.string.error_file_verify_failed),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -269,14 +269,14 @@ private fun saveFileToDefaultPath(context: Context, transfer: AppServer.Incoming
 
     // Ensure the directory exists
     if (!directoryFile.exists() && !directoryFile.mkdirs()) {
-        Toast.makeText(context, "Failed to create directory: $folderPath", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_folder_create_failed), Toast.LENGTH_LONG).show()
         return
     }
 
     // Check if the file in `transfer` is valid
     val sourceFile = transfer.file
     if (sourceFile == null || !sourceFile.exists()) {
-        Toast.makeText(context, "File not available for download", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_file_unavailable), Toast.LENGTH_LONG).show()
         return
     }
 
@@ -287,7 +287,7 @@ private fun saveFileToDefaultPath(context: Context, transfer: AppServer.Incoming
         Toast.makeText(context, "File saved to: ${targetFile.absolutePath}", Toast.LENGTH_LONG).show()
     } catch (e: Exception) {
         e.printStackTrace()
-        Toast.makeText(context, "Error saving file: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_file_verify_failed), Toast.LENGTH_LONG).show()
     }
 }
 
@@ -302,7 +302,7 @@ private fun saveFileToContentUri(context: Context, transfer: AppServer.IncomingT
     // Check if the file in `transfer` is valid
     val sourceFile = transfer.file
     if (sourceFile == null || !sourceFile.exists()) {
-        Toast.makeText(context, "File not available for download", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_file_unavailable), Toast.LENGTH_LONG).show()
         return
     }
 
@@ -324,10 +324,10 @@ private fun saveFileToContentUri(context: Context, transfer: AppServer.IncomingT
             // Notify the user of the successful download
             Toast.makeText(context, "File saved to: " + targetUri.path, Toast.LENGTH_LONG).show()
         } else {
-            Toast.makeText(context, "Error creating file in the selected directory", Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.error_save_folder_failed), Toast.LENGTH_LONG).show()
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        Toast.makeText(context, "Error saving file: ${e.localizedMessage}", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_file_verify_failed), Toast.LENGTH_LONG).show()
     }
 }

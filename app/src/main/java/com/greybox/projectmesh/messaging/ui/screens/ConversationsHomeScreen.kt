@@ -18,9 +18,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.greybox.projectmesh.R
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.components.MeshAvatar
 import com.greybox.projectmesh.components.MeshAvatarSize
@@ -58,7 +60,7 @@ fun ConversationsHomeScreen(
             }
             uiState.error != null -> {
                 ErrorView(
-                    errorMessage = uiState.error!!,
+                    errorMessage = stringResource(R.string.error_conversations_load_failed),
                     onRetry = { viewModel.refreshConversations() }
                 )
             }

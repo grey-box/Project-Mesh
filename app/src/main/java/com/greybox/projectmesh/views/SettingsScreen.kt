@@ -188,7 +188,7 @@ fun SettingsScreen(
                     Toast.makeText(context, "Directory selected: $uri", Toast.LENGTH_LONG).show()
                     viewModel.setSaveToFolder(uri.toString())
                 } else {
-                    Toast.makeText(context, "No directory selected", Toast.LENGTH_LONG).show()
+                    Toast.makeText(context, context.getString(R.string.error_no_save_folder), Toast.LENGTH_LONG).show()
                 }
             }
             val folderNameToShow = if (ui.saveToFolder.startsWith("content://")) {

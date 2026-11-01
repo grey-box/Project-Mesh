@@ -73,4 +73,28 @@
     <string name="onboarding_s3_title">Welcome to Project Mesh!</string>
     <string name="onboarding_s3_body">Please set your username:</string>
     <string name="onboarding_username_label">Username</string>
+    <!-- Error messages -->
+    <string name="error_wifi_off">Wifi is Turned Off. Please Start or Join a Mesh Network</string>
+    <string name="error_link_no_config">Invalid Mesh Connect Link. Retry New Link or Use QR Code</string>
+    <string name="error_link_unreadable">Unreadable Link. Ensure Whole Link is Copied or Try QR Code</string>
+    <string name="error_qr_unrelated">Unrelated QR Code. Scan QR Code from Other Device’s Screen</string>
+
+    <string name="error_file_open_failed">Unable to Open File either Moved or Deleted</string>
+    <string name="error_file_open_unsupported">Cannot Open File Type on Device. Try Downloading &amp; Opening with Another App</string>
+    <string name="error_file_save_failed">Unable to Save File. Check for Sufficient Storage</string>
+    <string name="error_file_verify_failed">Couldn’t Verify File. Check for Sufficient Storage</string>
+    <string name="error_folder_create_failed">Unable to Save Folder. Check Permissions in Settings, then Try Again</string>
+    <string name="error_file_unavailable">File No Longer Available. Sender Offline or File was Removed</string>
+    <string name="error_save_folder_failed">Unable to Save in Selected Folder. Switch to a Different Folder in Settings &amp; Try Again</string>
+
+    <string name="error_no_save_folder">No Directory Selected. Any Files you Receive Won’t Be Saved Until a Save Folder is Selected</string>
+
+    <string name="error_conversation_load_failed">Conversation Unable to Load. Chat may have been Deleted or Connection Lost</string>
+    <string name="error_conversation_generic">Error Occurred Loading Conversation. Refresh &amp; Try Again</string>
+    <string name="error_offline_user">Unable to Message an Offline User</string>
+    <string name="error_conversations_load_failed">Conversations Unable to Load. Tap Retry to Try Again</string>
+
+    <string name="error_wifi_no_device">No Device Selected for Communication. Choose a User or Nearby Device</string>
+    <string name="error_wifi_permission">Project Mesh requires Permission to Locate Nearby Devices. Navigate on Your Device: Settings &gt; Apps &gt; Project Mesh &amp; Grant Permission</string>
+    <string name="error_wifi_pair_failed">Unable to Pair Devices. Ensure Device is Nearby &amp; Try Again</string>
 </resources>

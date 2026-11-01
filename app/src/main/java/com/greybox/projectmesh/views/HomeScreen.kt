@@ -136,7 +136,7 @@ fun HomeScreen(
                 if (uiState.hotspotTypeToCreate == HotspotType.WIFIDIRECT_GROUP) {
                     val wifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
                     if (!wifiManager.isWifiEnabled) {
-                        Toast.makeText(context, "Please Turn on Wifi", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(context, context.getString(R.string.error_wifi_off), Toast.LENGTH_LONG).show()
                         return@StartHomeScreen
                     }
                 }
@@ -223,11 +223,11 @@ fun StartHomeScreen(
                     logger(Log.INFO,"Already connected to this device")
                 }
             } else {
-                Toast.makeText(context, "Link doesn't have a connect config", Toast.LENGTH_SHORT).show()
+                Toast.makeText(context, context.getString(R.string.error_link_no_config), Toast.LENGTH_LONG).show()
                 logger(Log.WARN, "HomeScreen: Link doesn't have a connect config")
             }
         } catch (e: Exception) {
-            Toast.makeText(context, "Invalid Link", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.error_link_unreadable), Toast.LENGTH_LONG).show()
             logger(Log.WARN, "HomeScreen: Invalid Link", e)
         }
     }
@@ -239,7 +239,7 @@ fun StartHomeScreen(
         if (link != null) {
             connect(link, logger)
         }else{
-            Toast.makeText(context, "QR Code scan doesn't return a link", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.error_qr_unrelated), Toast.LENGTH_LONG).show()
             logger(Log.INFO,"QR Code scan doesn't return a link")
         }
     }

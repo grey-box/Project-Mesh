@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.DeviceStatusManager
+import com.greybox.projectmesh.R
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.repository.ConversationRepository
@@ -60,7 +61,7 @@ fun ConversationChatScreen (
                 //conversationState.value = result
 
                 if (result == null) {
-                    errorMessage.value = "Conversation not found"
+                    errorMessage.value = context.getString(R.string.error_conversation_load_failed)
                     isLoading.value = false
                     /*
                     Timber.tag("ConversationChatScreen").e("Conversation not found:
@@ -79,7 +80,7 @@ fun ConversationChatScreen (
                 }
             } catch (e: Exception) {
                 Timber.tag("ConversationChatScreen").e(e, "Error loading conversation")
-                errorMessage.value = e.message
+                errorMessage.value = context.getString(R.string.error_conversation_generic)
                 isLoading.value = false
                 /*
                 Toast.makeText(
@@ -113,7 +114,7 @@ fun ConversationChatScreen (
                 verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.md)
             ) {
                 Text(
-                    text = "Error: ${errorMessage.value}",
+                    text = errorMessage.value ?: "",
                     style = MeshTheme.typography.bodyLarge,
                     color = MeshTheme.colors.error,
                     textAlign = TextAlign.Center
@@ -129,7 +130,7 @@ fun ConversationChatScreen (
     //get the conversation from state
     val conversation = conversationState.value
     if (conversation == null) {
-        Toast.makeText(context, "Conversation not found", Toast.LENGTH_SHORT).show()
+        Toast.makeText(context, context.getString(R.string.error_conversation_load_failed), Toast.LENGTH_SHORT).show()
         onBackClick()
         return
     }
@@ -188,7 +189,7 @@ fun ConversationChatScreen (
             // Disable ping for offline users
             Toast.makeText(
                 context,
-                "Cannot ping offline users",
+                context.getString(R.string.error_offline_user),
                 Toast.LENGTH_SHORT
             ).show()
         },
