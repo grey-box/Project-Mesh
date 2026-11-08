@@ -73,6 +73,7 @@ fun SettingsScreen(
             vmFactory = { di, savedStateHandle -> SettingsScreenViewModel(di, savedStateHandle)},
             defaultArgs = null,
         )),
+    onOpenHowMeshWorks: () -> Unit = {},
 ) {
 
     val context = LocalContext.current
@@ -202,6 +203,17 @@ fun SettingsScreen(
                 trailingContent = {
                     GradientButton(text = folderNameToShow,
                         onClick = { directoryLauncher.launch(null) }
+                    )
+                }
+            )
+            // Help Section (User Education)
+            SectionHeader(title = R.string.help)
+            SettingItem(
+                label = stringResource(id = R.string.how_mesh_works_title),
+                trailingContent = {
+                    GradientButton(
+                        text = stringResource(id = R.string.open),
+                        onClick = onOpenHowMeshWorks
                     )
                 }
             )

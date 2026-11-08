@@ -23,6 +23,7 @@ import com.greybox.projectmesh.messaging.ui.screens.ConversationsHomeScreen
 import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.viewModel.SharedUriViewModel
 import com.greybox.projectmesh.views.HomeScreen
+import com.greybox.projectmesh.views.HowMeshWorksScreen
 import com.greybox.projectmesh.views.LogScreen
 import com.greybox.projectmesh.views.NetworkScreen
 import com.greybox.projectmesh.views.PingScreen
@@ -36,6 +37,8 @@ import org.kodein.di.DI
 import timber.log.Timber
 import com.greybox.projectmesh.util.isIpv4
 
+
+const val HOW_MESH_WORKS_ROUTE = "how_mesh_works"
 
 @Composable
 fun AppNavHost(
@@ -112,7 +115,14 @@ fun AppNavHost(
             }
             
             composable(BottomNavItem.Settings.route) {
-                     SettingsScreen()
+                SettingsScreen(
+                    onOpenHowMeshWorks = { navController.navigate(HOW_MESH_WORKS_ROUTE) }
+                )
+            }
+
+            // User-education page: reachable from Settings, not listed in the bottom nav
+            composable(HOW_MESH_WORKS_ROUTE) {
+                HowMeshWorksScreen(onBackClick = { navController.popBackStack() })
             }
 
             
