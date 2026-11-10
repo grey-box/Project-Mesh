@@ -29,116 +29,53 @@ import androidx.compose.material3.OutlinedButton
 import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
+import androidx.compose.ui.text.style.TextOverflow
 
 // This is a pre-defined button with white background and black text
 @Composable
-fun TransparentButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    text: String,
-    enabled: Boolean = false
-) {
+fun TransparentButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
     OutlinedButton(
         onClick = onClick,
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MeshTheme.colors.primary
-        ),
-        // Was a hardcoded Color.Black, which ignored the theme and sat wrong in dark.
-        // outline is the M3 role for exactly this.
-        border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, MeshTheme.colors.outline),
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled
-    ) {
-        Text(text = text)
-    }
+        enabled = enabled,
+        shape = MeshTheme.shapes.medium, // only if the old one wasn't M3's default shape
+    ) { Text(text) }
 }
 
 @Composable
 fun GradientButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color>? = null, // null = solid primary; pass two or more colors for a gradient
-    textColor: Color = MeshTheme.colors.onPrimary,
-    maxWidth: Dp = MeshTheme.size.buttonMinWidth,
-    onClick: () -> Unit
+    enabled: Boolean = true,
 ) {
-    val brushColors = gradientColors ?: List(2) { MeshTheme.colors.primary }
-    var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down when pressed
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            delay(100) // Wait for 100 ms
-            isPressed = false
-        }
-    }
-    Box(
+    Button(
+        onClick = onClick,
         modifier = modifier
-            .scale(scale)
-            .shadow(MeshTheme.elevation.level2, MeshTheme.shapes.medium) // Shadow effect
-            .background(
-                brush = Brush.horizontalGradient(brushColors),
-                shape = MeshTheme.shapes.medium
-            )
-            .height(MeshTheme.size.buttonHeight) // Height of the button
-            .widthIn(min = MeshTheme.size.buttonMinWidth, max = maxWidth) // Width of the button
-            .padding(horizontal = MeshTheme.spacing.md)
-            .clickable {
-                isPressed = true
-                onClick()
-            },
-        contentAlignment = Alignment.Center // Center content in the box
+            .heightIn(min = MeshTheme.size.buttonHeight)
+            .widthIn(min = MeshTheme.size.buttonMinWidth),
+        enabled = enabled,
+        shape = MeshTheme.shapes.medium,
     ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = MeshTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // Truncate text if it overflows
-        )
+        Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 fun GradientLongButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color>? = null, // null = solid primary; pass two or more colors for a gradient
-    textColor: Color = MeshTheme.colors.onPrimary,
-    onClick: () -> Unit
+    enabled: Boolean = true,
 ) {
-    val brushColors = gradientColors ?: List(2) { MeshTheme.colors.primary }
-    var isPressed by remember { mutableStateOf(false) }
-    val scale by animateFloatAsState(if (isPressed) 0.85f else 1f) // Scale down when pressed
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            delay(100) // Wait for 100 ms
-            isPressed = false
-        }
-    }
-    Box(
+    Button(
+        onClick = onClick,
         modifier = modifier
-            .fillMaxWidth()
-            .scale(scale)
-            .shadow(MeshTheme.elevation.level2, MeshTheme.shapes.medium) // Shadow effect
-            .background(
-                brush = Brush.horizontalGradient(brushColors),
-                shape = MeshTheme.shapes.medium
-            )
-            .height(MeshTheme.size.buttonHeight) // Height of the button
-            .clickable {
-                isPressed = true
-                onClick()
-            },
-        contentAlignment = Alignment.Center // Center content in the box
+            .heightIn(min = MeshTheme.size.buttonHeight)
+            .fillMaxWidth(),
+        enabled = enabled,
+        shape = MeshTheme.shapes.medium,
     ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = MeshTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            maxLines = 1,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis, // Truncate text if it overflows
-        )
+        Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis)
     }
 }

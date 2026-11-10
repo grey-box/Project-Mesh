@@ -18,6 +18,7 @@ import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 import androidx.compose.runtime.remember
+import androidx.compose.material3.MaterialTheme
 
 enum class MeshAvatarSize { Sm, Md }
 
@@ -39,8 +40,8 @@ fun MeshAvatar(
         MeshAvatarSize.Sm -> MeshTheme.typography.titleMedium
         MeshAvatarSize.Md -> MeshTheme.typography.titleLarge
     }
-    val containerColor = if (isOnline) MeshTheme.colors.primary else MeshTheme.colors.secondaryContainer
-    val contentColor = if (isOnline) MeshTheme.colors.onPrimary else MeshTheme.colors.onSecondaryContainer
+    val container = MaterialTheme.colorScheme.secondaryContainer
+    val content = MaterialTheme.colorScheme.onSecondaryContainer
 
     val initial = remember(name) {
         val trimmed = name.trim()
@@ -52,13 +53,13 @@ fun MeshAvatar(
             modifier = Modifier
                 .matchParentSize()
                 .clip(CircleShape)
-                .background(containerColor),
+                .background(container),
             contentAlignment = Alignment.Center
         ) {
             Text(
                 text = initial,
                 style = initialStyle,
-                color = contentColor
+                color = content
             )
         }
 

@@ -133,7 +133,7 @@ fun ConversationItem(
             name = conversation.userName,
             size = MeshAvatarSize.Md,
             isOnline = conversation.isOnline,
-            showStatusDot = conversation.isOnline
+            showStatusDot = true
         )
 
         Spacer(modifier = Modifier.width(MeshTheme.spacing.md))
@@ -154,17 +154,6 @@ fun ConversationItem(
                         style = MeshTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-
-                    Spacer (modifier = Modifier.width(MeshTheme.spacing.sm))
-
-                    //status indicator text
-                    if (conversation.isOnline) {
-                        Text (
-                            text = "Online",
-                            style = MeshTheme.typography.labelSmall,
-                            color = MeshTheme.mesh.statusOnline
-                        )
-                    }
                 }
 
                 //show the timestamp of the last message
@@ -191,19 +180,6 @@ fun ConversationItem(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    //online/offline indicator
-                    Box(
-                        modifier = Modifier
-                            .size(MeshTheme.size.statusDotInline)
-                            .clip(CircleShape)
-                            .background(
-                                if (conversation.isOnline) MeshTheme.mesh.statusOnline
-                                else MeshTheme.mesh.statusOffline
-                            )
-                    )
-
-                    Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
-
                     // Last message content
                     Text(
                         text = conversation.lastMessage ?: "No messages yet",
