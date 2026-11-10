@@ -37,6 +37,11 @@
     <string name="general">Général</string>
     <string name="language">Langue</string>
     <string name="theme">Thème</string>
+    <string name="text_size">Taille du texte</string>
+    <string name="text_size_small">Petit</string>
+    <string name="text_size_default">Par défaut</string>
+    <string name="text_size_large">Grand</string>
+    <string name="text_size_extra_large">Très grand</string>
     <string name="network">Réseau</string>
     <string name="server">Serveur</string>
     <string name="restart">Redémarrer</string>

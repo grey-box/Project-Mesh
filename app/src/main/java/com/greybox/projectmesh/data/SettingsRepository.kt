@@ -4,6 +4,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import android.os.Environment
 import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.TextSizeOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,6 +20,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
  interface SettingsRepository {
     val theme: StateFlow<AppTheme>
+    val textSize: StateFlow<TextSizeOption>
     val languageCode: StateFlow<String>
     val deviceName: StateFlow<String>
     val autoFinish: StateFlow<Boolean>
@@ -31,6 +33,7 @@ import kotlinx.coroutines.flow.asStateFlow
     val localUuid: String?
 
     fun setTheme(theme: AppTheme)
+    fun setTextSize(option: TextSizeOption)
     fun setLanguage(languageCode: String)
     fun setDeviceName(deviceName: String)
     fun setAutoFinish(autoFinish: Boolean)
@@ -46,6 +49,9 @@ import kotlinx.coroutines.flow.asStateFlow
 
        private val _theme = MutableStateFlow(loadTheme())
     override val theme: StateFlow<AppTheme> = _theme.asStateFlow()
+
+    private val _textSize = MutableStateFlow(loadTextSize())
+    override val textSize: StateFlow<TextSizeOption> = _textSize.asStateFlow()
 
     private val _languageCode =
         MutableStateFlow(settingsPrefs.getString(KEY_LANGUAGE, DEFAULT_LANGUAGE) ?: DEFAULT_LANGUAGE)
@@ -79,6 +85,11 @@ import kotlinx.coroutines.flow.asStateFlow
     override fun setTheme(theme: AppTheme) {
         settingsPrefs.edit().putString(KEY_THEME, theme.name).apply()
         _theme.value = theme
+    }
+
+    override fun setTextSize(option: TextSizeOption) {
+        settingsPrefs.edit().putString(KEY_TEXT_SIZE, option.name).apply()
+        _textSize.value = option
     }
 
     override fun setLanguage(languageCode: String) {
@@ -121,6 +132,11 @@ import kotlinx.coroutines.flow.asStateFlow
         return AppTheme.valueOf(name)
     }
 
+    // Unknown stored value falls back to DEFAULT
+    private fun loadTextSize(): TextSizeOption = runCatching {
+        TextSizeOption.valueOf(settingsPrefs.getString(KEY_TEXT_SIZE, null) ?: TextSizeOption.DEFAULT.name)
+    }.getOrDefault(TextSizeOption.DEFAULT)
+
     private fun loadSaveToFolder(): String {
         val default = "${Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)}/Project Mesh"
         return settingsPrefs.getString(KEY_SAVE_TO_FOLDER, default) ?: default
@@ -128,6 +144,7 @@ import kotlinx.coroutines.flow.asStateFlow
 
     companion object {
         private const val KEY_THEME = "app_theme"
+        private const val KEY_TEXT_SIZE = "text_size"
         private const val KEY_LANGUAGE = "language"
         private const val KEY_DEVICE_NAME = "device_name"
         private const val KEY_AUTO_FINISH = "auto_finish"

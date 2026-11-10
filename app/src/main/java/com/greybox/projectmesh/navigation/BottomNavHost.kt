@@ -9,15 +9,14 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.greybox.projectmesh.R
-import org.kodein.di.android.BuildConfig
 
 import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.CappedFontScale
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 
@@ -44,6 +43,14 @@ fun BottomNavigationBarDarkPreview() {
     }
 }
 
+@Preview(showBackground = true, name = "Large font", fontScale = 2f)
+@Composable
+fun BottomNavigationBarLargeFontPreview() {
+    ProjectMeshTheme(appTheme = AppTheme.LIGHT) {
+        BottomNavigationBar(navController = rememberNavController())
+    }
+}
+
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val context = LocalContext.current
@@ -64,36 +71,37 @@ fun BottomNavigationBar(navController: NavHostController) {
 
         add(NavigationItem(BottomNavItem.Settings.route, stringResource(id = R.string.settings), BottomNavItem.Settings.icon))
     }
-    NavigationBar {
-        val currentRoute = navController.currentDestination?.route
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                //Modify label Sizes to fit the screen of multiple devices
-                label = {
-                    Text(
-                        item.label,
-                        style = MeshTheme.typography.labelSmall,
-                        maxLines = 1,
-                        softWrap = false,
-                        overflow = TextOverflow.Clip
-                    )
-                },
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        // Avoid multiple copies of the same destination when reselecting the same item
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+    // Labels get fixed slots, so the bar only scales up to a cap
+    CappedFontScale {
+        NavigationBar {
+            val currentRoute = navController.currentDestination?.route
+            items.forEach { item ->
+                NavigationBarItem(
+                    icon = { Icon(item.icon, contentDescription = item.label) },
+                    // No softWrap = false, or the ellipsis becomes a hard clip
+                    label = {
+                        Text(
+                            item.label,
+                            style = MeshTheme.typography.labelSmall.copy(letterSpacing = 0.sp),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    },
+                    selected = currentRoute == item.route,
+                    onClick = {
+                        navController.navigate(item.route) {
+                            // Avoid multiple copies of the same destination when reselecting the same item
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
+                            // Avoid multiple copies of the same destination when reselecting the same item
+                            launchSingleTop = true
                         }
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                        // Avoid multiple copies of the same destination when reselecting the same item
-                        launchSingleTop = true
-                    }
-                },
-
-            )
+                    },
+                )
+            }
         }
     }
 }

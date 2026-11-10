@@ -45,10 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -62,6 +59,7 @@ import org.kodein.di.compose.localDI
 import androidx.compose.foundation.layout.sizeIn
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
+import com.greybox.projectmesh.ui.theme.TextSizeOption
 
 
 @Composable
@@ -94,7 +92,7 @@ fun SettingsScreen(
         // Title "Settings"
         Text(
             text = stringResource(id = R.string.settings),
-            style = TextStyle(fontSize = MeshTheme.typography.headlineSmall.fontSize, fontWeight = FontWeight.Bold),
+            style = MeshTheme.typography.headlineSmall,
             modifier = Modifier.align(Alignment.CenterHorizontally)
         )
         Column(modifier = Modifier.padding(MeshTheme.spacing.xl)) {
@@ -119,6 +117,15 @@ fun SettingsScreen(
                         onThemeSelected = {
                             viewModel.setTheme(it)
                         }
+                    )
+                }
+            )
+            SettingItem(
+                label = stringResource(id = R.string.text_size),
+                trailingContent = {
+                    TextSizeSetting(
+                        current = ui.textSize,
+                        onSelected = { viewModel.setTextSize(it) }
                     )
                 }
             )
@@ -239,7 +246,7 @@ fun SectionHeader(title: Int) {
     Spacer(modifier = Modifier.height(MeshTheme.spacing.lg))
     Text(
         text = stringResource(id = title),
-        style = TextStyle(fontSize = MeshTheme.typography.titleLarge.fontSize, fontWeight = FontWeight.Bold)
+        style = MeshTheme.typography.titleLarge
     )
 //    HorizontalDivider(
 //        modifier = Modifier
@@ -258,8 +265,14 @@ fun SettingItem(label: String, trailingContent: @Composable () -> Unit) {
             .padding(vertical = MeshTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Text(text = label, style = TextStyle(fontSize = MeshTheme.typography.bodyLarge.fontSize))
-        Spacer(modifier = Modifier.weight(1f))
+        // weight(1f) lets a long label wrap instead of pushing the control off
+        Text(
+            text = label,
+            style = MeshTheme.typography.bodyLarge,
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = MeshTheme.spacing.sm)
+        )
         trailingContent()
     }
 }
@@ -290,6 +303,32 @@ fun LanguageSetting(
                     onClick = {
                         onLanguageSelected(item.first)
                         langExpanded = false
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TextSizeSetting(
+    current: TextSizeOption,
+    onSelected: (TextSizeOption) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        GradientButton(text = stringResource(current.labelRes), onClick = { expanded = true })
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false },
+            properties = PopupProperties(true)
+        ) {
+            TextSizeOption.entries.forEach { option ->
+                DropdownMenuItem(
+                    text = { Text(stringResource(option.labelRes)) },
+                    onClick = {
+                        onSelected(option)
+                        expanded = false
                     }
                 )
             }

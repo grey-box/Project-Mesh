@@ -57,7 +57,7 @@ fun GradientButton(
         enabled = enabled,
         shape = MeshTheme.shapes.medium,
     ) {
-        Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
@@ -76,6 +76,6 @@ fun GradientLongButton(
         enabled = enabled,
         shape = MeshTheme.shapes.medium,
     ) {
-        Text(text, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        Text(text, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }

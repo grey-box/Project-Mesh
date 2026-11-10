@@ -7,6 +7,7 @@ import com.greybox.projectmesh.arch.StateViewModel
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.navigation.BottomNavItem
 import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.TextSizeOption
 import com.greybox.projectmesh.util.isIpv4
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -19,6 +20,7 @@ import org.kodein.di.instance
 data class AppUiState(
     val hasRunBefore: Boolean = false,
     val theme: AppTheme = AppTheme.SYSTEM,
+    val textSize: TextSizeOption = TextSizeOption.DEFAULT,
     val languageCode: String = "en",
     val deviceName: String = "",
     val startDestination: String = BottomNavItem.Home.route,
@@ -49,6 +51,7 @@ class AppViewModel(
     private data class ShellSettings(
         val theme: AppTheme, val languageCode: String,
         val deviceName: String, val hasRunBefore: Boolean,
+        val textSize: TextSizeOption,
     )
         init {
         // seed synchronously from the repo's CURRENT values before the
@@ -60,7 +63,8 @@ class AppViewModel(
         // Mirror: every LATER repo change flows into state.
         combine(
             settings.theme, settings.languageCode, settings.deviceName, settings.hasRunBefore,
-        ) { theme, lang, name, hasRun -> ShellSettings(theme, lang, name, hasRun) }
+            settings.textSize,
+        ) { theme, lang, name, hasRun, textSize -> ShellSettings(theme, lang, name, hasRun, textSize) }
             .onEach { s -> setState { withShellSettings(s) } }
             .launchIn(viewModelScope)
 
@@ -76,6 +80,7 @@ class AppViewModel(
         languageCode = settings.languageCode.value,
         deviceName = settings.deviceName.value,
         hasRunBefore = settings.hasRunBefore.value,
+        textSize = settings.textSize.value,
     )
 
     /** The ONE carrier→state mapping, shared by seed and mirror. Repo-owned fields
@@ -86,6 +91,7 @@ class AppViewModel(
         languageCode = s.languageCode,
         deviceName = s.deviceName,
         hasRunBefore = s.hasRunBefore,
+        textSize = s.textSize,
     )
     /** Mark onboarding complete; the repo flow propagates the new value into state. */
     fun completeOnboarding() { settings.setHasRunBefore(true) }
