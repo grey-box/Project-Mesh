@@ -21,13 +21,14 @@ import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.greybox.projectmesh.R
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.components.MeshAvatar
 import com.greybox.projectmesh.components.MeshAvatarSize
-import com.greybox.projectmesh.components.MeshStatusDot
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.ui.models.ConversationsHomeScreenModel
 import com.greybox.projectmesh.messaging.ui.viewmodels.ConversationsHomeScreenViewModel
@@ -62,7 +63,7 @@ fun ConversationsHomeScreen(
             }
             uiState.error != null -> {
                 ErrorView(
-                    errorMessage = uiState.error!!,
+                    errorMessage = stringResource(R.string.error_conversations_load_failed),
                     onRetry = { viewModel.refreshConversations() }
                 )
             }
@@ -144,7 +145,7 @@ fun ConversationItem(
             name = conversation.userName,
             size = MeshAvatarSize.Md,
             isOnline = conversation.isOnline,
-            showStatusDot = conversation.isOnline
+            showStatusDot = true
         )
 
         Spacer(modifier = Modifier.width(MeshTheme.spacing.md))
@@ -165,26 +166,6 @@ fun ConversationItem(
                         style = MeshTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-
-                    Spacer (modifier = Modifier.width(MeshTheme.spacing.sm))
-
-                    //status indicator text
-                    if (conversation.isOnline) {
-                        Text (
-                            text = "Online",
-                            style = MeshTheme.typography.labelSmall,
-                            // Was MeshTheme.mesh.statusOnline, which measures 3.36:1 on
-                            // surface in the light scheme and so failed the 4.5:1 text
-                            // floor (SC 1.4.3). The 5.00:1 figure documented in
-                            // ColorScheme.kt is for statusOnline as a *fill* with
-                            // onStatusOnline text on top; it says nothing about using the
-                            // same colour as text on a plain surface, which is exactly
-                            // what Meshcolors.kt warns against. onSurfaceVariant measures
-                            // 9.08:1 light / 10.12:1 dark, and the word itself plus the
-                            // dot beside it already carry the state without needing hue.
-                            color = MeshTheme.colors.onSurfaceVariant
-                        )
-                    }
                 }
 
                 //show the timestamp of the last message
@@ -211,18 +192,6 @@ fun ConversationItem(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    // Filled dot when online, hollow ring when offline. This row showed
-                    // an "Online" label only in the online case, so offline was conveyed
-                    // by a grey circle and nothing else — and grey vs green measures
-                    // 1.04:1, meaning the two states were the same dot once hue was gone.
-                    // Shape is now the second channel. SC 1.4.1.
-                    MeshStatusDot(
-                        isOnline = conversation.isOnline,
-                        size = MeshTheme.size.statusDotInline
-                    )
-
-                    Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
-
                     // Last message content
                     Text(
                         text = conversation.lastMessage ?: "No messages yet",

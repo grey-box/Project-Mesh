@@ -9,7 +9,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.platform.LocalDensity
@@ -20,9 +19,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.sp
 import androidx.navigation.compose.rememberNavController
 import com.greybox.projectmesh.R
-import org.kodein.di.android.BuildConfig
 
 import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.CappedFontScale
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
 
@@ -49,6 +48,14 @@ fun BottomNavigationBarDarkPreview() {
     }
 }
 
+@Preview(showBackground = true, name = "Large font", fontScale = 2f)
+@Composable
+fun BottomNavigationBarLargeFontPreview() {
+    ProjectMeshTheme(appTheme = AppTheme.LIGHT) {
+        BottomNavigationBar(navController = rememberNavController())
+    }
+}
+
 @Composable
 fun BottomNavigationBar(navController: NavHostController) {
     val context = LocalContext.current
@@ -69,27 +76,31 @@ fun BottomNavigationBar(navController: NavHostController) {
 
         add(NavigationItem(BottomNavItem.Settings.route, stringResource(id = R.string.settings), BottomNavItem.Settings.icon))
     }
-    NavigationBar {
-        val currentRoute = navController.currentDestination?.route
-        items.forEach { item ->
-            NavigationBarItem(
-                icon = { Icon(item.icon, contentDescription = item.label) },
-                label = { NavLabel(item.label) },
-                selected = currentRoute == item.route,
-                onClick = {
-                    navController.navigate(item.route) {
-                        // Avoid multiple copies of the same destination when reselecting the same item
-                        popUpTo(navController.graph.findStartDestination().id) {
-                            saveState = true
+    // Labels get fixed slots, so the bar only scales up to a cap
+    CappedFontScale {
+        NavigationBar {
+            val currentRoute = navController.currentDestination?.route
+            items.forEach { item ->
+                NavigationBarItem(
+                    icon = { Icon(item.icon, contentDescription = item.label) },
+                    // Inside the 115% cap, a long label still shrinks to fit its tab
+                    // rather than ellipsizing ("Settin…"). See NavLabel.
+                    label = { NavLabel(item.label) },
+                    selected = currentRoute == item.route,
+                    onClick = {
+                        navController.navigate(item.route) {
+                            // Avoid multiple copies of the same destination when reselecting the same item
+                            popUpTo(navController.graph.findStartDestination().id) {
+                                saveState = true
+                            }
+                            // Restore state when reselecting a previously selected item
+                            restoreState = true
+                            // Avoid multiple copies of the same destination when reselecting the same item
+                            launchSingleTop = true
                         }
-                        // Restore state when reselecting a previously selected item
-                        restoreState = true
-                        // Avoid multiple copies of the same destination when reselecting the same item
-                        launchSingleTop = true
-                    }
-                },
-
-            )
+                    },
+                )
+            }
         }
     }
 }
@@ -107,11 +118,17 @@ fun BottomNavigationBar(navController: NavHostController) {
  * full enlarged size; only the long ones shrink. This means nav labels do not reach
  * the full 200% that SC 1.4.4 asks for. That was a deliberate trade-off, made with the
  * team on 2026-11-08: a readable label beats a split one. The real fix is fewer tabs.
+ *
+ * The whole bar also sits inside CappedFontScale (115%), so the bar's height stays
+ * bounded; this label then shrinks within that cap. The floor below is still "normal
+ * size", because the fontScale read here is the capped one.
  * TalkBack is unaffected, because the label is also the icon's contentDescription.
  */
 @Composable
 private fun NavLabel(text: String) {
-    val style = MeshTheme.typography.labelSmall
+    // Zero tracking (from Tomas, 2026-11-10): labelSmall's default letter spacing costs a
+    // few dp per label, which on seven tabs is the difference between fitting and shrinking.
+    val style = MeshTheme.typography.labelSmall.copy(letterSpacing = 0.sp)
     val measurer = rememberTextMeasurer()
     val fontScale = LocalDensity.current.fontScale
     BoxWithConstraints(contentAlignment = Alignment.Center) {

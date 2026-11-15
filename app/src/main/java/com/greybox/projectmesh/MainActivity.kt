@@ -82,7 +82,7 @@ class MainActivity : ComponentActivity(), DIAware {
 
             val locale = LocaleUtil.applyLocale(context, ui.languageCode)
             key(locale) {
-                ProjectMeshTheme(appTheme = ui.theme) {
+                ProjectMeshTheme(appTheme = ui.theme, textSize = ui.textSize) {
                     if (!ui.hasRunBefore) {
                         OnboardingScreen(onComplete = appViewModel::completeOnboarding)
                     } else {

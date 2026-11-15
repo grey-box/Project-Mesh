@@ -34,148 +34,54 @@ import androidx.compose.material3.OutlinedButton
 import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
+import androidx.compose.ui.text.style.TextOverflow
 
 // This is a pre-defined button with white background and black text
 @Composable
-fun TransparentButton(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    text: String,
-    enabled: Boolean = false
-) {
+fun TransparentButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, enabled: Boolean = true) {
     OutlinedButton(
         onClick = onClick,
-        colors = ButtonDefaults.outlinedButtonColors(
-            contentColor = MeshTheme.colors.primary
-        ),
-        // Was a hardcoded Color.Black, which ignored the theme and sat wrong in dark.
-        // outline is the M3 role for exactly this.
-        border = BorderStroke(ButtonDefaults.outlinedButtonBorder.width, MeshTheme.colors.outline),
         modifier = modifier.fillMaxWidth(),
-        enabled = enabled
-    ) {
-        Text(text = text)
-    }
+        enabled = enabled,
+        shape = MeshTheme.shapes.medium, // only if the old one wasn't M3's default shape
+    ) { Text(text) }
 }
 
 @Composable
 fun GradientButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color>? = null, // null = solid primary; pass two or more colors for a gradient
-    textColor: Color = MeshTheme.colors.onPrimary,
-    maxWidth: Dp = MeshTheme.size.buttonMinWidth,
-    onClick: () -> Unit
+    enabled: Boolean = true,
 ) {
-    val brushColors = gradientColors ?: List(2) { MeshTheme.colors.primary }
-    val fontScale = LocalDensity.current.fontScale.coerceAtLeast(1f)
-    var isPressed by remember { mutableStateOf(false) }
-    val reduceMotion = rememberReduceMotion()
-    // The press animation punches the whole button down to 85% and back. For someone with
-    // a vestibular disorder that is six lurches per visit to Settings, where these
-    // buttons live. If they have switched animations off system-wide they have already
-    // said motion is a problem, so the button stays still. WCAG 2.1 SC 2.3.3.
-    val scale by animateFloatAsState(if (isPressed && !reduceMotion) 0.85f else 1f)
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            delay(100) // Wait for 100 ms
-            isPressed = false
-        }
-    }
-    Box(
+    Button(
+        onClick = onClick,
         modifier = modifier
-            .scale(scale)
-            .shadow(MeshTheme.elevation.level2, MeshTheme.shapes.medium) // Shadow effect
-            .background(
-                brush = Brush.horizontalGradient(brushColors),
-                shape = MeshTheme.shapes.medium
-            )
-            // heightIn, not height: a fixed 48dp with a single-line label clipped the text
-            // outright at the 200% font scale Android allows, which is a straight SC 1.4.4
-            // failure. The minimum still holds the 48dp touch target.
             .heightIn(min = MeshTheme.size.buttonHeight)
-            // The cap grows with the system font scale. With min and max both at 120dp the
-            // button was a fixed width, so at 200% text even "System" split mid-word
-            // ("Syste / m"). Scaling the cap keeps the button's proportions to its text.
-            .widthIn(min = MeshTheme.size.buttonMinWidth, max = maxWidth * fontScale)
-            // clickable sits above padding so the padded area is tappable too. Underneath
-            // it, the touch target was the text box alone rather than the button you see.
-            .clickable(
-                // Without an explicit Role this is a Box that happens to react to taps:
-                // TalkBack read the label as static text, with no "button" and no
-                // "double-tap to activate". SC 4.1.2 Name, Role, Value. Six of these
-                // render in SettingsScreen, so most of that screen was unannounced.
-                role = Role.Button,
-                onClickLabel = text
-            ) {
-                isPressed = true
-                onClick()
-            }
-            .padding(horizontal = MeshTheme.spacing.md, vertical = MeshTheme.spacing.xs),
-        contentAlignment = Alignment.Center // Center content in the box
+            .widthIn(min = MeshTheme.size.buttonMinWidth),
+        enabled = enabled,
+        shape = MeshTheme.shapes.medium,
     ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = MeshTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            // maxLines = 1 + Ellipsis is deliberately gone. These labels are live values —
-            // a device name, a folder name, a language — so truncating them loses content
-            // rather than trimming decoration. The width cap above still bounds the shape.
-        )
+        Text(text, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 
 @Composable
 fun GradientLongButton(
     text: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    gradientColors: List<Color>? = null, // null = solid primary; pass two or more colors for a gradient
-    textColor: Color = MeshTheme.colors.onPrimary,
-    onClick: () -> Unit
+    enabled: Boolean = true,
 ) {
-    val brushColors = gradientColors ?: List(2) { MeshTheme.colors.primary }
-    var isPressed by remember { mutableStateOf(false) }
-    val reduceMotion = rememberReduceMotion()
-    // See GradientButton: honours the system "Remove animations" setting. SC 2.3.3.
-    val scale by animateFloatAsState(if (isPressed && !reduceMotion) 0.85f else 1f)
-    LaunchedEffect(isPressed) {
-        if (isPressed) {
-            delay(100) // Wait for 100 ms
-            isPressed = false
-        }
-    }
-    Box(
+    Button(
+        onClick = onClick,
         modifier = modifier
-            .fillMaxWidth()
-            .scale(scale)
-            .shadow(MeshTheme.elevation.level2, MeshTheme.shapes.medium) // Shadow effect
-            .background(
-                brush = Brush.horizontalGradient(brushColors),
-                shape = MeshTheme.shapes.medium
-            )
-            // heightIn, not height: see GradientButton. SC 1.4.4 at 200% font scale.
             .heightIn(min = MeshTheme.size.buttonHeight)
-            .clickable(
-                // SC 4.1.2: announce as a button, not as text that happens to be tappable.
-                role = Role.Button,
-                onClickLabel = text
-            ) {
-                isPressed = true
-                onClick()
-            }
-            .padding(horizontal = MeshTheme.spacing.md, vertical = MeshTheme.spacing.xs),
-        contentAlignment = Alignment.Center // Center content in the box
+            .fillMaxWidth(),
+        enabled = enabled,
+        shape = MeshTheme.shapes.medium,
     ) {
-        Text(
-            text = text,
-            color = textColor,
-            style = MeshTheme.typography.labelLarge,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            // maxLines = 1 + Ellipsis removed: see GradientButton.
-        )
+        Text(text, maxLines = 2, overflow = TextOverflow.Ellipsis)
     }
 }
 

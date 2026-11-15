@@ -6,6 +6,7 @@ import com.greybox.projectmesh.navigation.BottomNavItem
 import com.greybox.projectmesh.testutil.FakeSettingsRepository
 import com.greybox.projectmesh.testutil.MainDispatcherRule
 import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.TextSizeOption
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -46,6 +47,17 @@ fun `state reflects repository values immediately, without advancing the dispatc
     assertEquals("Kara's phone", s.deviceName)
     assertTrue(s.hasRunBefore)
 }
+
+@Test
+fun `text size seeds from repository and follows later changes`() =
+    runTest(mainDispatcherRule.dispatcher) {
+        val fake = FakeSettingsRepository(initialTextSize = TextSizeOption.LARGE)
+        val vm = buildVm(fake)
+        assertEquals(TextSizeOption.LARGE, vm.state.value.textSize)   // seeded, no dispatcher advance
+        fake.setTextSize(TextSizeOption.SMALL)
+        advanceUntilIdle()                                            // drain the mirror's launchIn
+        assertEquals(TextSizeOption.SMALL, vm.state.value.textSize)
+    }
 
 @Test
 fun `hostile conversation id falls back to Home and never reaches saved state`() {

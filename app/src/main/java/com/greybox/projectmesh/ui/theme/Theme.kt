@@ -5,6 +5,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.material3.*
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 
 enum class AppTheme {
     SYSTEM, LIGHT, DARK
@@ -19,6 +21,7 @@ enum class AppTheme {
 @Composable
 fun ProjectMeshTheme(
     appTheme: AppTheme,
+    textSize: TextSizeOption = TextSizeOption.DEFAULT,
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (appTheme) {
@@ -32,7 +35,14 @@ fun ProjectMeshTheme(
     // sensible default and throws on read. Spacing, size and elevation are scheme-
     // independent, so they get their defaults; they are still provided explicitly so
     // there is one obvious place to swap them (a test, or a future density setting).
+    // In-app text size multiplies the system font scale; only sp scales, not dp
+    val base = LocalDensity.current
+    val density = Density(
+        density = base.density,
+        fontScale = (base.fontScale * textSize.multiplier).coerceIn(0.8f, 2.0f)
+    )
     CompositionLocalProvider(
+        LocalDensity provides density,
         LocalMeshColors provides if (darkTheme) DarkMeshColors else LightMeshColors,
         LocalMeshSpacing provides MeshSpacing(),
         LocalMeshSize provides MeshSize(),
