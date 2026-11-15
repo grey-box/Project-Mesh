@@ -133,7 +133,12 @@ class ConversationsHomeScreenViewModel(
                 _uiState.update {
                     it.copy (
                         isLoading = false,
-                        error = "Failed to load conversations: ${e.message}"
+                        // This string is rendered verbatim on screen by ErrorState in
+                        // ConversationsHomeScreen, so interpolating e.message put a raw
+                        // Java exception in front of the user. The exception is already
+                        // on the Timber line above. SC 3.3.1 / SC 3.3.3 — describe the
+                        // problem, and name the next step.
+                        error = "Conversations could not be loaded. Tap Retry to try again."
                     )
                 }
             }

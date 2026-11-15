@@ -81,11 +81,37 @@ val DarkColorScheme = darkColorScheme(
 // received is surfaceVariant (which is what the old code already did, correctly) and sent
 // is tertiaryContainer. Only the three status colors are genuinely new.
 //
-// Measured contrast, both schemes (WCAG 2.1, sRGB):
+// Measured contrast, both schemes (WCAG 2.1, sRGB).
+//
+// TEXT pairs, against the 4.5:1 floor of SC 1.4.3. These are fill/content pairs: the
+// first colour is the background, the second is text drawn on top of it.
 //   statusOnline/onStatusOnline       light  5.00:1   dark 5.59:1
 //   bubbleSent/onBubbleSent           light 13.27:1   dark 7.26:1
 //   bubbleReceived/onBubbleReceived   light  7.22:1   dark 5.48:1
 // All clear 4.5:1. Changing a value here means re-measuring its partner.
+//
+// NON-TEXT contrast, against the 3:1 floor of SC 1.4.11. These were missing, and the
+// absence mattered: the three figures above say nothing about a status colour used as an
+// 8dp dot, because a dot has no text on it. Measured against the surface behind them:
+//   statusOnline  / surface           light  3.36:1   dark 5.58:1
+//   statusOffline / surface           light  3.23:1   dark 3.54:1
+//   outline / surfaceContainer        light  3.95:1   dark 4.89:1   (log row border)
+//   outline / surfaceVariant          light  3.49:1   dark 2.94:1   <-- FAILS, do not use
+//
+// AND THE PAIR THAT ACTUALLY FAILED: online vs offline measured against EACH OTHER.
+//   statusOnline vs statusOffline     light  1.04:1   dark 1.58:1
+// Near-identical luminance. Every one of the figures above passes while the two states
+// remain indistinguishable the moment hue is removed — greyscale, bright sunlight,
+// monochromacy. Contrast against a background is not the same question as whether two
+// states can be told apart, and only the second one matters for a status indicator.
+// This is why MeshStatusDot distinguishes the states by SHAPE (filled vs hollow) and
+// treats colour as reinforcement. If you change a status colour, re-measure that pair.
+//
+// Finally: statusOnline is a FILL. Used as a text colour on `surface` it measures 3.36:1
+// and fails SC 1.4.3 outright — which is what ConversationsHomeScreen was doing with its
+// "Online" label. Meshcolors.kt already says these mean state only; this is the number
+// behind that rule. Text that needs to read as status uses onSurfaceVariant (9.08:1
+// light, 10.12:1 dark) and lets the word carry the meaning.
 val LightMeshColors = MeshColors(
     statusOnline = StatusOnlineLight,
     onStatusOnline = OnStatusOnlineLight,

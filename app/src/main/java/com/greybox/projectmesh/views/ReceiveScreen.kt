@@ -129,7 +129,14 @@ fun HandleIncomingTransfers(
                     context.startActivity(intent)
                 }
                 catch (e: Exception){
-                    Toast.makeText(context, "Error opening file: ${e.message}", Toast.LENGTH_SHORT).show()
+                    // Was "Error opening file: ${e.message}", which showed the user a raw
+                    // exception string in a Toast that vanishes in two seconds and cannot
+                    // be re-read. SC 3.3.1.
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.error_file_open),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
             }

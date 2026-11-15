@@ -320,7 +320,15 @@ class ChatScreenViewModel(
                 } catch (e: Exception) {
                     Timber.tag("ChatScreenViewModel").e(e, "Error sending message: ${e.message}")
                     _uiState.update { prev ->
-                        prev.copy(offlineWarning = "Error sending message: ${e.message}")
+                        // Was "Error sending message: ${e.message}". The exception text is
+                        // already on the Timber line above; what reaches the user needs to
+                        // say what happened and what becomes of their message. The three
+                        // sibling warnings in this file were already written this way, so
+                        // this one was the odd one out. SC 3.3.1.
+                        prev.copy(
+                            offlineWarning = "Message could not be sent. It is saved and " +
+                                    "will be delivered when the device is back in range."
+                        )
                     }
                 }
             } else {
