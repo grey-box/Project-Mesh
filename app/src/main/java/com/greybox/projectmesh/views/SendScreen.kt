@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeOut
@@ -60,6 +61,7 @@ import kotlinx.coroutines.runBlocking
 import org.kodein.di.compose.localDI
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.ProjectMeshTheme
+import com.greybox.projectmesh.ui.theme.rememberReduceMotion
 
 @Composable
 fun SendScreen(
@@ -123,6 +125,9 @@ fun DisplayAllPendingTransfers(
     uiState: SendScreenModel,
 ){
     val coroutineScope = rememberCoroutineScope()
+    // With "Remove animations" on, a swiped-away transfer disappears at once instead of
+    // fading for 300ms and then sliding the rest of the list up to fill the gap. SC 2.3.3.
+    val reduceMotion = rememberReduceMotion()
     LazyColumn {
         items(
             items = uiState.outgoingTransfers,
@@ -134,7 +139,7 @@ fun DisplayAllPendingTransfers(
                     if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
                         coroutineScope.launch {
                             isVisible = false // Start fade-out animation
-                            delay(300)
+                            if (!reduceMotion) delay(300) // Let the fade finish first
                             viewModel.onDelete(transfer) // Remove item on swipe
                         }
                         true
@@ -145,8 +150,9 @@ fun DisplayAllPendingTransfers(
             )
             AnimatedVisibility(
                 visible = isVisible,
-                exit = fadeOut(animationSpec = tween(300)),
-                modifier = Modifier.animateItemPlacement()
+                exit = if (reduceMotion) ExitTransition.None
+                else fadeOut(animationSpec = tween(300)),
+                modifier = if (reduceMotion) Modifier else Modifier.animateItemPlacement()
             ){
                 SwipeToDismissBox(
                     state = swipeState,

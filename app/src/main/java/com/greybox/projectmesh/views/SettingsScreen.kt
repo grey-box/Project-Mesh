@@ -45,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -227,7 +229,13 @@ fun SectionHeader(title: Int) {
     Spacer(modifier = Modifier.height(MeshTheme.spacing.lg))
     Text(
         text = stringResource(id = title),
-        style = TextStyle(fontSize = MeshTheme.typography.titleLarge.fontSize, fontWeight = FontWeight.Bold)
+        style = TextStyle(fontSize = MeshTheme.typography.titleLarge.fontSize, fontWeight = FontWeight.Bold),
+        // These were headings in appearance only — bold and larger, but structurally just
+        // text. TalkBack's "navigate by heading" gesture had nothing to land on anywhere
+        // in the app, so the only way through this long settings list was to swipe past
+        // every single control in order. Declaring the heading is what makes the visual
+        // hierarchy a real one. SC 1.3.1 (Info and Relationships).
+        modifier = Modifier.semantics { heading() }
     )
 //    HorizontalDivider(
 //        modifier = Modifier

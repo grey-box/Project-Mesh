@@ -73,4 +73,37 @@
     <string name="onboarding_s3_title">Welcome to Project Mesh!</string>
     <string name="onboarding_s3_body">Please set your username:</string>
     <string name="onboarding_username_label">Username</string>
+
+    <!--
+      Accessibility action labels. These name what an action DOES, because that is what a
+      screen reader reads out from the actions menu: "Copy IP address", not "Copy".
+    -->
+    <string name="copy_device_name">Copy device name</string>
+    <string name="copy_ip_address">Copy IP address</string>
+    <!-- Chat bubbles: the visible menu item and the TalkBack action share copy_message. -->
+    <string name="copy_message">Copy message</string>
+    <!-- Read by TalkBack as "Double-tap to open message options". -->
+    <string name="message_options">Open message options</string>
+
+    <!--
+      User-facing error copy.
+
+      These replace four places that interpolated a raw exception message straight into
+      the UI, producing text like "java.net.SocketTimeoutException: failed to connect to
+      /192.168.49.1 (port 9614) after 10000ms". That is a log line, not a sentence: it
+      tells a non-technical user nothing about what happened or what to do, and for
+      someone with a reading or processing disability it is an unreadable wall. WCAG 2.1
+      SC 3.3.1 (Error Identification) asks that the error be described to the user in
+      text; SC 3.3.3 (Error Suggestion) asks that a next step be offered where one exists.
+      The exception still goes to Timber, where it belongs.
+    -->
+    <!--
+      Only the two sites that render inside a composable are here. The other two are set
+      in a ViewModel, which has no Context and so cannot resolve a resource; those carry
+      readable English inline instead. Routing them through a resource provider is a
+      localisation follow-up, not an accessibility one — the copy is already
+      understandable, it just is not yet translatable.
+    -->
+    <string name="error_conversation_load">This conversation could not be opened. It may have been deleted.</string>
+    <string name="error_file_open">This file could not be opened. No app on this device can display this file type.</string>
 </resources>

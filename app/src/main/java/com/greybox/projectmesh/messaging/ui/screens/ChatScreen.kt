@@ -41,6 +41,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.DeviceStatusManager
@@ -54,7 +58,17 @@ import com.greybox.projectmesh.messaging.ui.models.ChatScreenModel
 import com.greybox.projectmesh.messaging.ui.viewmodels.ChatScreenViewModel
 import com.greybox.projectmesh.server.AppServer
 import com.greybox.projectmesh.ui.theme.MeshTheme
-import com.greybox.projectmesh.views.LongPressCopyableText
+import android.widget.Toast
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.ui.platform.LocalClipboardManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.text.AnnotatedString
+import com.greybox.projectmesh.R
 import com.greybox.projectmesh.testing.TestDeviceService
 import kotlinx.coroutines.runBlocking
 import org.kodein.di.compose.localDI
@@ -194,7 +208,13 @@ fun ChatScreen(
                 // outline comes from Material 3, so neither the 2dp width nor the grey
                 // needs a literal, and no border token has to be invented for one call site.
                 OutlinedIconButton(
-                    modifier = Modifier.size(MeshTheme.size.iconXl),
+                    // touchTargetMin, not iconXl. iconXl (40dp) is the size of icon
+                    // *content*; using it for the button itself left the tap target 8dp
+                    // under the 48dp floor, which is hard to hit with a tremor, a
+                    // prosthetic, or one thumb on a moving bus. The TextField directly
+                    // below was already corrected for this exact reason — see its
+                    // comment — and this control was missed in the same pass.
+                    modifier = Modifier.size(MeshTheme.size.touchTargetMin),
                     onClick = { pickFileLauncher.launch("*/*") }
                 ) {
                     Icon(
@@ -207,7 +227,7 @@ fun ChatScreen(
                     // it. The previous 120dp max is dropped because `maxLines = 5`
                     // already bounds the growth, and five lines is what 120dp encoded.
                     modifier = Modifier
-                        .weight(3f)
+                        .weight(1f)
                         .heightIn(min = MeshTheme.size.touchTargetMin)
                         .verticalScroll(scrollState),
                     value = textMessage,
@@ -217,7 +237,11 @@ fun ChatScreen(
                     maxLines = 5,
                     enabled = deviceStatus // disable text input when user is offline
                 )
-                Button(modifier = Modifier.weight(1f), onClick = {
+                // Sized to its own label, not weight(1f). As a fixed quarter of the row it
+                // was too narrow for the word at 200% text and split it ("Se / nd"). The
+                // text field takes whatever is left. At normal size the widths are within
+                // a few dp of the old 3:1 split. SC 1.4.4.
+                Button(onClick = {
                     val message = textMessage.trimEnd()
                     //val imgpath = "sdcard/padorubastard.jpg"//test image path
                     //future implementation should implement file picker
@@ -253,7 +277,14 @@ fun ChatScreen(
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(MeshTheme.spacing.sm),
+                        .padding(MeshTheme.spacing.sm)
+                        // A live region: this banner appears mid-conversation when the
+                        // other device drops off the mesh, and nothing about that is
+                        // announced otherwise. A sighted user sees a red card appear; a
+                        // screen reader user kept typing into a chat that could no longer
+                        // send. Polite, not Assertive, so it waits for a pause rather
+                        // than cutting across whatever is being read. SC 4.1.3.
+                        .semantics { liveRegion = LiveRegionMode.Polite },
                     colors = CardDefaults.cardColors(
                         containerColor = MeshTheme.colors.errorContainer,
                         // onErrorContainer, not error: `error` is the colour for content on
@@ -332,7 +363,12 @@ fun UserStatusBar(
                 Text(
                     text = userName,
                     style = MeshTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    // Marked as a heading so TalkBack's "navigate by heading" gesture can
+                    // jump straight here. Without any headings in the app, the only way
+                    // to move around a screen was to swipe through every element in turn.
+                    // SC 1.3.1 (Info and Relationships).
+                    modifier = Modifier.semantics { heading() }
                 )
 
                 Row(
@@ -367,6 +403,9 @@ fun UserStatusBar(
 @Composable
 fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
     val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+    val copyLabel = stringResource(R.string.copy_message)
+    val optionsLabel = stringResource(R.string.message_options)
 
     //track if messages are showing:
     val hasMessages = uiState.allChatMessages.isNotEmpty()
@@ -425,32 +464,45 @@ fun DisplayAllMessages(uiState: ChatScreenModel, onClickButton: () -> Unit) {
                     chatMessage = chatMessage,
                     sentBySelf = sentBySelf,
                     messageContent = {
-                        LongPressCopyableText(
-                            context = context,
-                            text = "",
-                            textCopyable = chatMessage.content,
+                        Text(
+                            text = chatMessage.content,
                             // was textSize = 15, which sat between bodyMedium (14) and
                             // bodyLarge (16). Message content is body text at the reading
-                            // size, so bodyLarge.
+                            // size, so bodyLarge. Plain Text rather than BasicText, so
+                            // the colour comes from the bubble's onBubble* content token.
                             style = MeshTheme.typography.bodyLarge
                         )
                     },
                     sender = sender,
-                    modifier = Modifier
+                    modifier = Modifier,
+                    onCopy = {
+                        clipboardManager.setText(AnnotatedString(chatMessage.content))
+                        Toast.makeText(context, "Text copied to clipboard!", Toast.LENGTH_SHORT)
+                            .show()
+                    },
+                    copyLabel = copyLabel,
+                    optionsLabel = optionsLabel
                 )
             }
         }
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class) // combinedClickable
 @Composable
 fun MessageBubble(
     chatMessage: Message,
     sentBySelf: Boolean,
     messageContent: @Composable () -> Unit,
     sender: String,
-    modifier: Modifier
+    modifier: Modifier,
+    // Null keeps the bubble inert (previews, tests). When set, a tap opens a small menu
+    // with Copy and a long press copies straight away.
+    onCopy: (() -> Unit)? = null,
+    copyLabel: String = "Copy",
+    optionsLabel: String = "Message options"
 ){
+    var menuOpen by remember { mutableStateOf(false) }
     ElevatedCard(
         // The old hardcoded cyan, with no content colour, measured about 1.9:1 in dark. Both
         // sides now use a paired container/content token, so the text colour can no
@@ -468,8 +520,41 @@ fun MessageBubble(
         modifier = modifier
             .padding(MeshTheme.spacing.sm)
             .widthIn(max = MeshTheme.size.bubbleMaxWidth)
+            // One focus stop per message instead of four. Unmerged, TalkBack stopped
+            // separately on the sender, the body, the attachment name and the timestamp,
+            // so reading a short conversation meant four swipes per message and the
+            // timestamp arrived detached from the message it belonged to. Merged, the
+            // bubble announces as "Ana, see you at six, 14:30". SC 1.3.1.
+            .semantics(mergeDescendants = true) { }
     ) {
-        Column(modifier = Modifier.padding(MeshTheme.spacing.xs)) {
+      Box {
+        Column(
+            modifier = Modifier
+                .then(
+                    if (onCopy == null) Modifier
+                    else Modifier
+                        // Copy used to be long-press only, which shut out anyone who
+                        // cannot hold a steady press. A tap now opens a menu with a
+                        // visible Copy item, and long press still copies directly for
+                        // people who know it. Opening a menu by accident is harmless, so
+                        // a stray tap while scrolling costs nothing. Inside the card, so
+                        // the ripple is clipped to the bubble's shape. SC 2.1.1.
+                        .semantics {
+                            customActions = listOf(
+                                CustomAccessibilityAction(copyLabel) {
+                                    onCopy()
+                                    true
+                                }
+                            )
+                        }
+                        .combinedClickable(
+                            onClickLabel = optionsLabel,
+                            onClick = { menuOpen = true },
+                            onLongClick = onCopy
+                        )
+                )
+                .padding(MeshTheme.spacing.xs)
+        ) {
             Text(
                 text = sender,
                 style = MeshTheme.typography.labelMedium
@@ -517,5 +602,17 @@ fun MessageBubble(
                 )
             }
         }
+        if (onCopy != null) {
+            DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                DropdownMenuItem(
+                    text = { Text(copyLabel) },
+                    onClick = {
+                        menuOpen = false
+                        onCopy()
+                    }
+                )
+            }
+        }
+      }
     }
 }

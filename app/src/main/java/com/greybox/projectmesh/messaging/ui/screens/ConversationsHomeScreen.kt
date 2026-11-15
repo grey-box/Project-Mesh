@@ -18,12 +18,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.components.MeshAvatar
 import com.greybox.projectmesh.components.MeshAvatarSize
+import com.greybox.projectmesh.components.MeshStatusDot
 import com.greybox.projectmesh.messaging.data.entities.Conversation
 import com.greybox.projectmesh.messaging.ui.models.ConversationsHomeScreenModel
 import com.greybox.projectmesh.messaging.ui.viewmodels.ConversationsHomeScreenViewModel
@@ -123,6 +127,15 @@ fun ConversationItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
+            // The row is already one focus stop because `clickable` merges its
+            // descendants, but nothing in that merged announcement said whether the
+            // person was reachable: the state lived only in the colour of an 8dp circle.
+            // stateDescription puts it where a screen reader expects state to be, so the
+            // row reads "Ana, Online, see you at six" rather than leaving a TalkBack user
+            // to open a conversation to find out it cannot send. SC 1.4.1 / SC 4.1.2.
+            .semantics {
+                stateDescription = if (conversation.isOnline) "Online" else "Offline"
+            }
             .padding(MeshTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -160,7 +173,16 @@ fun ConversationItem(
                         Text (
                             text = "Online",
                             style = MeshTheme.typography.labelSmall,
-                            color = MeshTheme.mesh.statusOnline
+                            // Was MeshTheme.mesh.statusOnline, which measures 3.36:1 on
+                            // surface in the light scheme and so failed the 4.5:1 text
+                            // floor (SC 1.4.3). The 5.00:1 figure documented in
+                            // ColorScheme.kt is for statusOnline as a *fill* with
+                            // onStatusOnline text on top; it says nothing about using the
+                            // same colour as text on a plain surface, which is exactly
+                            // what Meshcolors.kt warns against. onSurfaceVariant measures
+                            // 9.08:1 light / 10.12:1 dark, and the word itself plus the
+                            // dot beside it already carry the state without needing hue.
+                            color = MeshTheme.colors.onSurfaceVariant
                         )
                     }
                 }
@@ -189,15 +211,14 @@ fun ConversationItem(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier.weight(1f)
                 ) {
-                    //online/offline indicator
-                    Box(
-                        modifier = Modifier
-                            .size(MeshTheme.size.statusDotInline)
-                            .clip(CircleShape)
-                            .background(
-                                if (conversation.isOnline) MeshTheme.mesh.statusOnline
-                                else MeshTheme.mesh.statusOffline
-                            )
+                    // Filled dot when online, hollow ring when offline. This row showed
+                    // an "Online" label only in the online case, so offline was conveyed
+                    // by a grey circle and nothing else — and grey vs green measures
+                    // 1.04:1, meaning the two states were the same dot once hue was gone.
+                    // Shape is now the second channel. SC 1.4.1.
+                    MeshStatusDot(
+                        isOnline = conversation.isOnline,
+                        size = MeshTheme.size.statusDotInline
                     )
 
                     Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
@@ -250,7 +271,9 @@ fun EmptyConversationsView() {
 
         Text(
             text = "No Conversations Yet",
-            style = MeshTheme.typography.headlineSmall
+            style = MeshTheme.typography.headlineSmall,
+            // Styled as a heading, now declared as one. SC 1.3.1.
+            modifier = Modifier.semantics { heading() }
         )
 
         Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
@@ -287,7 +310,8 @@ fun ErrorView(
 
         Text(
             text = "Error Loading Conversations",
-            style = MeshTheme.typography.headlineSmall
+            style = MeshTheme.typography.headlineSmall,
+            modifier = Modifier.semantics { heading() }
         )
 
         Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))

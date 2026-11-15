@@ -12,9 +12,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.toggleable
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DividerDefaults
 import androidx.compose.material3.ListItem
+import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -26,10 +28,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.MNetLoggerAndroid
@@ -108,6 +115,31 @@ fun ShowLogScreen(
                     Text("Cancel")
                 }
             }
+        } else {
+            // A gesture-free way into selection mode.
+            //
+            // Long-press used to be the ONLY way to start selecting log lines, which made
+            // copying logs — the thing you do to report a bug — unreachable for anyone who
+            // cannot hold a steady press for half a second: a hand tremor, limited grip
+            // strength, a prosthetic, Switch Access, or an external keyboard. Exposing the
+            // gesture to TalkBack (below) fixes the screen-reader case but does nothing
+            // for those users, because their barrier is the physical press, not the
+            // announcement. Two different disabilities, one line of code, two fixes.
+            // SC 2.1.1 (Keyboard) and SC 2.5.7 (Dragging Movements).
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(MeshTheme.spacing.sm),
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                TextButton(
+                    onClick = { selectionMode = true },
+                    enabled = uiState.logs.isNotEmpty()
+                ) {
+                    Text("Select")
+                }
+            }
         }
 
         LazyColumn(
@@ -121,13 +153,68 @@ fun ShowLogScreen(
                 val logText = "[${formattedTime}] ${logLine.line}"
                 val isSelected = selectedLineIds.contains(logLine.lineId)
 
+                val enterSelection = {
+                    selectionMode = true
+                    selectedLineIds = setOf(logLine.lineId)
+                }
+
+                // In selection mode the row is a checkbox, and says so. `toggleable` with
+                // Role.Checkbox gives TalkBack the checked state and a working toggle
+                // action; the old `pointerInput` + `detectTapGestures` registered no
+                // semantics action at all, so there was nothing for a screen reader to
+                // activate and selection mode could not be used. SC 4.1.2.
+                //
+                // Out of selection mode the long-press is kept for the people who know
+                // it, but published as a real accessibility action rather than a raw
+                // pointer handler, so TalkBack can offer it from the actions menu.
+                val rowInteraction = if (selectionMode) {
+                    Modifier.toggleable(
+                        value = isSelected,
+                        role = Role.Checkbox,
+                        onValueChange = { checked ->
+                            selectedLineIds = if (checked) {
+                                selectedLineIds + logLine.lineId
+                            } else {
+                                selectedLineIds - logLine.lineId
+                            }
+                        }
+                    )
+                } else {
+                    Modifier
+                        .semantics {
+                            customActions = listOf(
+                                CustomAccessibilityAction("Select log lines") {
+                                    enterSelection()
+                                    true
+                                }
+                            )
+                        }
+                        .pointerInput(Unit) {
+                            detectTapGestures(onLongPress = { enterSelection() })
+                        }
+                }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = MeshTheme.spacing.sm, vertical = MeshTheme.spacing.xs)
                         .background(
-                            color = if (isSelected) MeshTheme.colors.primary.copy(alpha = 0.2f)
-                            else MeshTheme.colors.surfaceVariant,
+                            // surfaceContainer, not surfaceVariant. The hairline below is
+                            // drawn in `outline`, and outline-on-surfaceVariant measures
+                            // 2.94:1 in the dark scheme — just under the 3:1 that SC
+                            // 1.4.11 requires of a border that delimits a component. On
+                            // surfaceContainer the same border measures 4.89:1 dark and
+                            // 3.95:1 light.
+                            //
+                            // The selected tint is primaryContainer rather than the old
+                            // primary.copy(alpha = 0.2f). Both measure about 1.0:1
+                            // against the unselected row, so NEITHER is a usable state
+                            // indicator on its own — the Checkbox is what actually carries
+                            // selection, and this tint is redundant reinforcement only.
+                            // Using a real container token at least drops the alpha hack,
+                            // whose composited result nobody had measured.
+                            color = if (isSelected) MeshTheme.colors.primaryContainer
+                            else MeshTheme.colors.surfaceContainer,
                             shape = MeshTheme.shapes.small
                         )
                         .border(
@@ -140,41 +227,26 @@ fun ShowLogScreen(
                             shape = MeshTheme.shapes.small
                         )
                         .clip(MeshTheme.shapes.small)
-                        .pointerInput(Unit) {
-                            detectTapGestures(
-                                onTap = {
-                                    if (selectionMode) {
-                                        selectedLineIds = if (isSelected) {
-                                            selectedLineIds - logLine.lineId
-                                        } else {
-                                            selectedLineIds + logLine.lineId
-                                        }
-                                    }
-                                },
-                                onLongPress = {
-                                    if (!selectionMode) {
-                                        selectionMode = true
-                                        selectedLineIds = setOf(logLine.lineId)
-                                    }
-                                }
-                            )
-                        },
+                        .then(rowInteraction),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     if (selectionMode) {
                         Checkbox(
                             checked = isSelected,
-                            onCheckedChange = { checked ->
-                                selectedLineIds = if (checked) {
-                                    selectedLineIds + logLine.lineId
-                                } else {
-                                    selectedLineIds - logLine.lineId
-                                }
-                            }
+                            // null, so the checkbox is a visual indicator and the row owns
+                            // the interaction. Left clickable it became a second focus
+                            // target inside a row that is itself toggleable, which makes
+                            // TalkBack announce the same control twice.
+                            onCheckedChange = null
                         )
                     }
                     ListItem(
                         modifier = Modifier.weight(1f),
+                        // ListItem paints its own container, defaulting to `surface`,
+                        // straight over the row background set above. The selected tint
+                        // and the row colour were therefore being hidden behind it for the
+                        // whole width of the text.
+                        colors = ListItemDefaults.colors(containerColor = Color.Transparent),
                         headlineContent = {
                             Text(logText)
                         }
