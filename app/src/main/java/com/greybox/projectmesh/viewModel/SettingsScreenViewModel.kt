@@ -9,6 +9,7 @@ import com.greybox.projectmesh.arch.UserMessage
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.server.AppServer
 import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.TextSizeOption
 import com.greybox.projectmesh.user.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.combine
@@ -24,6 +25,7 @@ import java.net.InetAddress
 @Immutable
 data class SettingsUiState(
     val theme: AppTheme = AppTheme.SYSTEM,
+    val textSize: TextSizeOption = TextSizeOption.DEFAULT,
     val languageCode: String = "en",
     val deviceName: String = "",
     val autoFinish: Boolean = false,
@@ -60,6 +62,12 @@ class SettingsScreenViewModel(
             FormSettings(theme, lang, name, autoFinish, folder)
         }.onEach { s -> setState { withFormSettings(s) } }
             .launchIn(viewModelScope)
+
+        // Mirrored separately: the combine above is at its five-flow limit
+        setState { copy(textSize = settings.textSize.value) }
+        settings.textSize
+            .onEach { size -> setState { copy(textSize = size) } }
+            .launchIn(viewModelScope)
     }
 
     /** Snapshot of the repo's current values — synchronous, because they're StateFlows. */
@@ -79,6 +87,7 @@ class SettingsScreenViewModel(
     )
     // --- simple pass-throughs to the repository (single writer) ---
     fun setTheme(theme: AppTheme) = settings.setTheme(theme)
+    fun setTextSize(option: TextSizeOption) = settings.setTextSize(option)
     fun setLanguage(code: String) = settings.setLanguage(code)
     fun setAutoFinish(value: Boolean) = settings.setAutoFinish(value)
     fun setSaveToFolder(path: String) = settings.setSaveToFolder(path)

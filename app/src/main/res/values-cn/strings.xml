@@ -23,6 +23,11 @@
     <string name="general">通用</string>
     <string name="language">语言</string>
     <string name="theme">主题</string>
+    <string name="text_size">文字大小</string>
+    <string name="text_size_small">小</string>
+    <string name="text_size_default">默认</string>
+    <string name="text_size_large">大</string>
+    <string name="text_size_extra_large">特大</string>
     <string name="network">网络</string>
     <string name="server">服务器</string>
     <string name="restart">重启</string>

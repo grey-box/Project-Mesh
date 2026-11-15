@@ -31,8 +31,11 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -117,7 +120,11 @@ fun OnboardingScreen(
         else pagerState.animateScrollToPage(page)
     }
 
-    BackHandler(enabled = pagerState.currentPage > 0) {
+    // User-education page opened from onboarding. Onboarding runs outside AppNavHost,
+    // so we swap screens with local state instead of navController.
+    var showHowItWorks by rememberSaveable { mutableStateOf(false) }
+
+    BackHandler(enabled = pagerState.currentPage > 0 && !showHowItWorks) {
         scope.launch { goToPage(pagerState.currentPage - 1) }
     }
 
@@ -138,6 +145,12 @@ fun OnboardingScreen(
             onboardingViewModel.onUsernameChange(generatedName)
             onboardingViewModel.handleFirstTimeSetup { onComplete() }
         }
+    }
+
+    if (showHowItWorks) {
+        // pagerState is remembered above, so returning keeps the user on the same page
+        HowMeshWorksScreen(onBackClick = { showHowItWorks = false })
+        return
     }
 
     Surface(modifier = Modifier.fillMaxSize()) {
@@ -166,7 +179,10 @@ fun OnboardingScreen(
                     .fillMaxWidth()
             ) { page ->
                 if (page < infoPages.size) {
-                    InfoPageContent(infoPages[page])
+                    InfoPageContent(
+                        page = infoPages[page],
+                        onLearnMore = if (page == 0) ({ showHowItWorks = true }) else null
+                    )
                 } else {
                     UsernamePageContent(
                         username = uiState.username,
@@ -205,7 +221,7 @@ fun OnboardingScreen(
 }
 
 @Composable
-private fun InfoPageContent(page: InfoPage) {
+private fun InfoPageContent(page: InfoPage, onLearnMore: (() -> Unit)? = null) {
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -228,6 +244,12 @@ private fun InfoPageContent(page: InfoPage) {
         Headline(stringResource(page.headline))
         Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
         BodyText(stringResource(page.body))
+        if (onLearnMore != null) {
+            Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
+            TextButton(onClick = onLearnMore) {
+                Text(text = stringResource(R.string.how_mesh_works_link))
+            }
+        }
     }
 }
 

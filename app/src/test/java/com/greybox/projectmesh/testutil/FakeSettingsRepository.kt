@@ -2,6 +2,7 @@ package com.greybox.projectmesh.testutil
 
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.ui.theme.AppTheme
+import com.greybox.projectmesh.ui.theme.TextSizeOption
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.asStateFlow
  */
 class FakeSettingsRepository(
     initialTheme: AppTheme = AppTheme.SYSTEM,
+    initialTextSize: TextSizeOption = TextSizeOption.DEFAULT,
     initialLanguage: String = "en",
     initialDeviceName: String = "",
     initialAutoFinish: Boolean = false,
@@ -30,6 +32,9 @@ class FakeSettingsRepository(
 
     private val _theme = MutableStateFlow(initialTheme)
     override val theme: StateFlow<AppTheme> = _theme.asStateFlow()
+
+    private val _textSize = MutableStateFlow(initialTextSize)
+    override val textSize: StateFlow<TextSizeOption> = _textSize.asStateFlow()
 
     private val _languageCode = MutableStateFlow(initialLanguage)
     override val languageCode: StateFlow<String> = _languageCode.asStateFlow()
@@ -53,6 +58,7 @@ class FakeSettingsRepository(
     override val concurrencySupported: StateFlow<Boolean> = _concurrencySupported.asStateFlow()
 
     override fun setTheme(theme: AppTheme) { _theme.value = theme }
+    override fun setTextSize(option: TextSizeOption) { _textSize.value = option }
     override fun setLanguage(languageCode: String) { _languageCode.value = languageCode }
     override fun setDeviceName(deviceName: String) { _deviceName.value = deviceName }
     override fun setAutoFinish(autoFinish: Boolean) { _autoFinish.value = autoFinish }

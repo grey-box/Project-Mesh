@@ -124,9 +124,11 @@ class AccessibilitySemanticsTest {
     }
 
     /**
-     * GradientButton is a Box with a clickable, not a Material Button. Without an explicit
-     * Role, TalkBack read its label as static text with no "button" and no hint that it
-     * could be activated. Six of these render in SettingsScreen.
+     * GradientButton used to be a Box with a clickable, and without an explicit Role
+     * TalkBack read its label as static text with no "button" and no hint that it could
+     * be activated. It is now a Material 3 Button, which supplies the role itself; this
+     * test keeps any future custom rewrite from losing it again. Six of these render in
+     * SettingsScreen.
      */
     @Test
     fun gradientButton_hasButtonRole() {
