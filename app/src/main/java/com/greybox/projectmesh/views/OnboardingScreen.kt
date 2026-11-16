@@ -30,13 +30,11 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -81,7 +79,7 @@ private val infoPages = listOf(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
-    onComplete: () -> Unit
+    onSetupComplete: () -> Unit
 ) {
     val di = localDI()
     val localIp = getLocalIpFromDI(di)
@@ -105,7 +103,14 @@ fun OnboardingScreen(
     }
 
     val onboardingViewModel: OnboardingViewModel = viewModel(factory = factory)
-    val uiState by onboardingViewModel.uiState.collectAsState()
+    val uiState by onboardingViewModel.state.collectAsStateWithLifecycle()
+
+    // Completion is state, not a callback into the ViewModel (per the approved
+    // contract): when setup finishes the ViewModel flips isSetupComplete, and this
+    // effect is what tells the app shell. MainActivity then swaps to AppNavHost.
+    LaunchedEffect(uiState.isSetupComplete) {
+        if (uiState.isSetupComplete) onSetupComplete()
+    }
 
     val pagerState = rememberPagerState(initialPage = 0) { PAGE_COUNT }
     val scope = rememberCoroutineScope()
@@ -122,22 +127,17 @@ fun OnboardingScreen(
     }
 
     // User-education page opened from onboarding. Onboarding runs outside AppNavHost,
-    // so we swap screens with local state instead of navController.
-    var showHowItWorks by rememberSaveable { mutableStateOf(false) }
+    // so we swap screens with local state instead of navController. Lives in
+    // OnboardingUiState (per the contract) — the ViewModel is the single state holder.
+    val showHowItWorks = uiState.showHowItWorks
 
     BackHandler(enabled = pagerState.currentPage > 0 && !showHowItWorks) {
         scope.launch { goToPage(pagerState.currentPage - 1) }
     }
 
-    // Skip and Get started share one path: a typed username is kept,
-    // a blank one gets a generated guest name.
-    val finishOnboarding: () -> Unit = {
-        onboardingViewModel.completeOnboarding { onComplete() }
-    }
-
     if (showHowItWorks) {
         // pagerState is remembered above, so returning keeps the user on the same page
-        HowMeshWorksScreen(onBackClick = { showHowItWorks = false })
+        HowMeshWorksScreen(onBackClick = onboardingViewModel::onHowItWorksDismiss)
         return
     }
 
@@ -157,7 +157,7 @@ fun OnboardingScreen(
                     Spacer(modifier = Modifier.height(ButtonDefaults.MinHeight))
                 } else {
                     TextButton(
-                        onClick = finishOnboarding,
+                        onClick = onboardingViewModel::onSkipClick,
                         enabled = !uiState.isSubmitting
                     ) {
                         Text(
@@ -177,12 +177,12 @@ fun OnboardingScreen(
                 if (page < infoPages.size) {
                     InfoPageContent(
                         page = infoPages[page],
-                        onLearnMore = if (page == 0) ({ showHowItWorks = true }) else null
+                        onLearnMore = if (page == 0) (onboardingViewModel::onHowItWorksClick) else null
                     )
                 } else {
                     UsernamePageContent(
                         username = uiState.username,
-                        onUsernameChange = { newValue -> onboardingViewModel.onUsernameChange(newValue) }
+                        onUsernameChange = onboardingViewModel::onUsernameChange
                     )
                 }
             }
@@ -197,7 +197,9 @@ fun OnboardingScreen(
             Button(
                 onClick = {
                     if (isLastPage) {
-                        finishOnboarding()
+                        // Only the FINAL Next (Get started) belongs to the ViewModel —
+                        // pager navigation stays here in the composable (per the contract).
+                        onboardingViewModel.onNextClick()
                     } else {
                         scope.launch { goToPage(pagerState.currentPage + 1) }
                     }
