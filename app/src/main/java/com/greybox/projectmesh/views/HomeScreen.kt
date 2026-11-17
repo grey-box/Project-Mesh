@@ -90,6 +90,11 @@ import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
 import com.greybox.projectmesh.components.ConnectWifiLauncherResult
 import com.greybox.projectmesh.components.ConnectWifiLauncherStatus
 import com.greybox.projectmesh.components.MeshStatusDot
+//contextual help
+import com.greybox.projectmesh.components.HelpDialog
+import com.greybox.projectmesh.components.HelpLink
+import com.greybox.projectmesh.components.HelpParagraph
+//end
 import com.greybox.projectmesh.components.meshrabiyaConnectLauncher
 import com.ustadmobile.meshrabiya.log.MNetLogger
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -208,6 +213,29 @@ fun StartHomeScreen(
         onResult = onConnectWifiLauncherResult,
     )
     var userEnteredConnectUri by rememberSaveable { mutableStateOf("") }
+    //contextual help
+    var showUriHelp by rememberSaveable { mutableStateOf(false) }
+    var showHotspotOptionsHelp by rememberSaveable { mutableStateOf(false) }
+
+    if (showUriHelp) {
+        HelpDialog(
+            title = stringResource(R.string.help_uri_title),
+            onDismiss = { showUriHelp = false },
+        ) {
+            HelpParagraph(stringResource(R.string.help_uri_body_1))
+            HelpParagraph(stringResource(R.string.help_uri_body_2))
+            HelpParagraph(stringResource(R.string.help_uri_body_3))
+            HelpParagraph(stringResource(R.string.help_uri_body_4))
+        }
+    }
+    if (showHotspotOptionsHelp) {
+        HelpDialog(
+            title = stringResource(R.string.help_hotspot_options_title),
+            onDismiss = { showHotspotOptionsHelp = false },
+        ) {
+            HelpParagraph(stringResource(R.string.help_hotspot_options_body))
+        }
+    }//end of contextual help
 
     // connect to other device via connect uri
     fun connect(uri: String, logger: MNetLogger): Unit {
@@ -313,15 +341,27 @@ fun StartHomeScreen(
                 }
             }
         }
-
+        //remade
         item (key = "hotspot_type_option") {
             if(!uiState.wifiConnectionEnabled) {
                 val wifiDirectSupported = isWifiDirectSupported(context)
-                Text(
+                //contextual help: label and Options link on one line
+                Row(
                     modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm),
-                    text = stringResource(id = R.string.hotspot_type),
-                    style = MeshTheme.typography.bodySmall,
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.hotspot_type),
+                        style = MeshTheme.typography.bodySmall,
+                    )
+                    HelpLink(
+                        text = stringResource(R.string.help_hotspot_options_link),
+                        style = MeshTheme.typography.bodySmall,
+                        compact = true,
+                        modifier = Modifier.padding(start = MeshTheme.spacing.sm),
+                        onClick = { showHotspotOptionsHelp = true },
+                    )
+                }
                 Row(modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm)){
                     uiState.hotspotTypeMenu.forEach { hotspotType ->
                         val isDisabled = (hotspotType == HotspotType.WIFIDIRECT_GROUP && !wifiDirectSupported)
@@ -441,6 +481,21 @@ fun StartHomeScreen(
                         modifier = Modifier.padding(MeshTheme.spacing.sm),
                         text = stringResource(id = R.string.instruction)
                     )
+                    //contextual help - HERE
+                    Row(
+                        modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(text = stringResource(R.string.help_uri_step_prefix))
+                        HelpLink(
+                            text = stringResource(R.string.help_uri_step_link),
+                            style = MeshTheme.typography.bodyLarge,
+                            compact = true,
+                            onClick = { showUriHelp = true },
+                        )
+                        Text(text = stringResource(R.string.help_uri_step_suffix))
+                    }//
+
                     TextField(
                         value = userEnteredConnectUri,
                         onValueChange = {
