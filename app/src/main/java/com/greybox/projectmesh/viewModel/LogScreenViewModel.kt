@@ -1,41 +1,151 @@
 package com.greybox.projectmesh.viewModel
 
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.greybox.projectmesh.MNetLoggerAndroid
+import com.greybox.projectmesh.arch.StateViewModel
+import com.greybox.projectmesh.arch.UserMessage
+import com.greybox.projectmesh.R
 import com.ustadmobile.meshrabiya.log.LogLine
 import com.ustadmobile.meshrabiya.log.MNetLogger
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.direct
 import org.kodein.di.instance
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
-data class LogScreenModel(
-    val logs: List<LogLine> = emptyList()
+@Immutable
+data class LogUiState(
+    val logs: List<LogLine> = emptyList(),
+    val isSelectionMode: Boolean = false,
+    val selectedLineIds: Set<Int> = emptySet(),
+    val pendingCopyText: String? = null,
+    val userMessage: UserMessage? = null,
 )
 
 class LogScreenViewModel(
     di: DI,
     savedStateHandle: SavedStateHandle
-) : ViewModel() {
-    private val _uiState = MutableStateFlow(LogScreenModel())
-    val uiState: Flow<LogScreenModel> = _uiState.asStateFlow()
+) : StateViewModel<LogUiState>(LogUiState()) {
     private val logger: MNetLoggerAndroid = di.direct.instance<MNetLogger>() as MNetLoggerAndroid
 
     init {
         viewModelScope.launch {
-            logger.recentLogs.collect {
-                _uiState.update { prev ->
-                    prev.copy(
-                        logs = it
+            logger.recentLogs.collect { updatedLogs ->
+                setState {
+                    copy(
+                        logs = updatedLogs
                     )
                 }
             }
         }
     }
+
+    // start selection mode using the Select button
+    fun startSelection() {
+        setState {
+            if (logs.isEmpty()) this
+            else copy(isSelectionMode = true)
+        }
+    }
+
+    // start selecting when a user long presses a log
+    fun onLogLongPressed(lineId: Int){
+        setState {
+            if (!isSelectionMode) {
+                copy(
+                    isSelectionMode = true,
+                    selectedLineIds = setOf(lineId)
+                )
+            } else {
+                this
+            }
+        }
+    }
+
+    // select or deselect one log
+    fun toggleLogSelection(lineId: Int){
+        setState {
+            if (!isSelectionMode){
+                this
+            } else {
+                copy(
+                    selectedLineIds = if (lineId in selectedLineIds) {
+                        selectedLineIds - lineId
+                    } else {
+                        selectedLineIds + lineId
+                    }
+                )
+            }
+        }
+    }
+
+    // select every displayed log
+    fun selectAllLogs(){
+        setState {
+            if (isSelectionMode) {
+                copy(selectedLineIds = logs.map { it.lineId }.toSet())
+            } else {
+                this
+            }
+        }
+    }
+
+    // prepares selected logs to be copied
+    fun copySelectedLogs() {
+        val state = currentState
+        
+        if (!currentState.isSelectionMode) return
+
+        val formatter = SimpleDateFormat(
+            "HH:mm:ss.SS",
+            Locale.getDefault()
+        )
+
+        val selectedLogs = currentState.logs
+            .filter { it.lineId in currentState.selectedLineIds }
+            .joinToString("\n") { log ->
+                "[${formatter.format(Date(log.time))}] ${log.line}"
+            }
+        setState {
+            copy(
+                pendingCopyText = selectedLogs,
+                isSelectionMode = false,
+                selectedLineIds = emptySet()
+            )
+        }
+    }
+
+    // clear the copy request and shows a success message
+    fun onCopyCompleted() {
+        setState {
+            if (pendingCopyText == null) {
+                this
+            } else {
+                copy(
+                    pendingCopyText = null,
+                    userMessage = UserMessage(R.string.logs_copied)
+                )
+            }
+        }
+    }
+
+    // leave selection mode and clear the selected logs
+    fun cancelSelection() {
+        setState {
+            copy(
+                isSelectionMode = false,
+                selectedLineIds = emptySet()
+            )
+        }
+    }
+
+    // clear a temporary message after the UI displays it
+    fun onUserMessageShown() {
+        setState { copy(userMessage = null)}
+    }
+
 }
