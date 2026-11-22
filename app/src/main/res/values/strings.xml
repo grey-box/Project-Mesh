@@ -171,4 +171,29 @@
     <string name="how_mesh_works_a_other_phone">Sadly no. Your chats can be saved, but they are saved onto the device used. Each node is unique.</string>
     <string name="how_mesh_works_q_which_phone">Which phone is best?</string>
     <string name="how_mesh_works_a_which_phone">Any Android device running Android 10 or later can use Project Mesh, while any nodes capable of acting as a middleman can operate within the Mesh network.</string>
+
+    <!-- Contextual help -->
+    <string name="help_close">Close help</string>
+
+    <string name="help_uri_step_prefix">"6. Click "</string>
+    <string name="help_uri_step_link">HERE</string>
+    <string name="help_uri_step_suffix">" for more information"</string>
+    <string name="help_uri_title">What is a connect URI?</string>
+    <string name="help_uri_body_1">Meshrabiya is the open-source peer-to-peer networking library behind Wi-Fi Direct and virtual network routing in Project Mesh. It sets up direct local Wi-Fi connections, gives each device a virtual IP address, and forms multi-hop mesh paths without an internet connection or router.</string>
+    <string name="help_uri_body_2">Project Mesh uses meshrabiya:// as its custom URI scheme.</string>
+    <string name="help_uri_body_3">When a device creates a connect link or QR code, it starts the link with meshrabiya:// so Project Mesh can read the Wi-Fi details (network name, password, port and virtual address) needed to join that device\'s hotspot.</string>
+    <string name="help_uri_body_4">URI stands for Uniform Resource Identifier: a standard string that identifies a resource, such as a webpage, file or network endpoint, so apps can find and use it.</string>
+
+    <string name="help_hotspot_options_link">Options</string>
+    <string name="help_hotspot_options_title">Common questions</string>
+    <string name="help_hotspot_options_body">Can I use the URI connect method with Wi-Fi Direct?\nNo. The URI method only works with Local.\n\nQuick Share says \"Can\'t share 1 file because Wi-Fi Direct is already in use on your phone.\" What should I do?\nRestart your device or the other device. One of them is still using Wi-Fi Direct.\n\nWhich band should I use?\n5 GHz is faster. 2.4 GHz reaches farther and passes through walls and furniture better, but is slower.\n\nCan I change the hotspot type without losing my connection?\nNo. You will be disconnected and need to reconnect with the QR code or URI.\n\nWhat happens if I use Local while connected to a Wi-Fi router?\nYour device leaves the router and switches to hotspot mode, ready for other devices to connect.\n\nCan I still use Quick Share with Wi-Fi Direct or Local?\nYes. Use Quick Share to send the connect URI to the other device.</string>
+
+    <string name="help_log_link">What is this?</string>
+    <string name="help_log_title">About the Log page</string>
+    <string name="help_log_body_intro">The Log page shows the live diagnostic log from Meshrabiya, where real-time network events are recorded. It is mainly useful for Project Mesh developers. Here is how to read one line:</string>
+    <string name="help_log_example">[15:16:52.29] WifiDirectManager 169.254.33.215 Wifi2pChannel initialized</string>
+    <string name="help_log_part_time">[15:16:52.29]: the time of the event (hours, minutes, seconds, hundredths).</string>
+    <string name="help_log_part_component">WifiDirectManager: the part of the networking engine that handled the event.</string>
+    <string name="help_log_part_address">169.254.33.215: the virtual mesh address of the device that logged it.</string>
+    <string name="help_log_part_event">Wifi2pChannel initialized: what happened. Here, the Wi-Fi Direct (P2P) channel opened successfully.</string>
 </resources>
