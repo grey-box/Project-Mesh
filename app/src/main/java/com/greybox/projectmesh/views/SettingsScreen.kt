@@ -195,11 +195,12 @@ fun SettingsScreen(
                         uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
-                    Toast.makeText(context, "Directory selected: $uri", Toast.LENGTH_LONG).show()
+                    // Show the readable folder name, not the raw content:// URI
+                    val selectedFolderName = Uri.decode(uri.toString()).split(":").lastOrNull() ?: ""
+                    Toast.makeText(context, context.getString(R.string.save_folder_selected, selectedFolderName), Toast.LENGTH_LONG).show()
                     viewModel.setSaveToFolder(uri.toString())
-                } else {
-                    Toast.makeText(context, context.getString(R.string.error_no_save_folder), Toast.LENGTH_LONG).show()
                 }
+                // Picker cancelled: keep the current folder, no message
             }
             val folderNameToShow = if (ui.saveToFolder.startsWith("content://")) {
                 // Decode Uri and extract the folder name for content URIs

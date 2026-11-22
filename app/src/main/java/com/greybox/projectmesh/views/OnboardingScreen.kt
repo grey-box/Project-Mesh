@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.WifiTethering
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -128,23 +129,10 @@ fun OnboardingScreen(
         scope.launch { goToPage(pagerState.currentPage - 1) }
     }
 
+    // Skip and Get started share one path: a typed username is kept,
+    // a blank one gets a generated guest name.
     val finishOnboarding: () -> Unit = {
-        if (uiState.username.isNullOrBlank()) {
-            onboardingViewModel.blankUsernameGenerator{ generatedName ->
-                onboardingViewModel.onUsernameChange(generatedName)
-
-                onboardingViewModel.handleFirstTimeSetup { onComplete() }
-            }
-        } else {
-            onboardingViewModel.handleFirstTimeSetup { onComplete() }
-        }
-    }
-
-    val skipOnboarding: () -> Unit = {
-        onboardingViewModel.blankUsernameGenerator { generatedName ->
-            onboardingViewModel.onUsernameChange(generatedName)
-            onboardingViewModel.handleFirstTimeSetup { onComplete() }
-        }
+        onboardingViewModel.completeOnboarding { onComplete() }
     }
 
     if (showHowItWorks) {
@@ -164,11 +152,19 @@ fun OnboardingScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                TextButton(onClick = skipOnboarding) {
-                    Text(
-                        text = stringResource(R.string.onboarding_skip),
-                        color = MeshTheme.colors.onSurfaceVariant
-                    )
+                if (isLastPage) {
+                    // Keep the row height so the pager doesn't shift when Skip is hidden
+                    Spacer(modifier = Modifier.height(ButtonDefaults.MinHeight))
+                } else {
+                    TextButton(
+                        onClick = finishOnboarding,
+                        enabled = !uiState.isSubmitting
+                    ) {
+                        Text(
+                            text = stringResource(R.string.onboarding_skip),
+                            color = MeshTheme.colors.onSurfaceVariant
+                        )
+                    }
                 }
             }
 
@@ -206,6 +202,7 @@ fun OnboardingScreen(
                         scope.launch { goToPage(pagerState.currentPage + 1) }
                     }
                 },
+                enabled = !uiState.isSubmitting,
                 modifier = Modifier
                     .fillMaxWidth()
                     // heightIn, not height. A hard 48dp clipped the label at the 200% font
@@ -214,7 +211,11 @@ fun OnboardingScreen(
                     // before they had used the app at all. SC 1.4.4.
                     .heightIn(min = MeshTheme.size.buttonHeight)
             ) {
-                Text(text = stringResource(R.string.onboarding_next))
+                Text(
+                    text = stringResource(
+                        if (isLastPage) R.string.onboarding_get_started else R.string.onboarding_next
+                    )
+                )
             }
         }
     }

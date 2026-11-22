@@ -13,7 +13,8 @@ import timber.log.Timber
 
 
 data class OnboardingUiState(
-    val username: String
+    val username: String,
+    val isSubmitting: Boolean = false
 )
 
 class OnboardingViewModel(
@@ -28,6 +29,21 @@ class OnboardingViewModel(
 
     fun onUsernameChange(newUsername: String) {
         _uiState.value = _uiState.value.copy(username = newUsername)
+    }
+
+    // Single entry point for finishing onboarding (Get started or Skip).
+    // isSubmitting is set synchronously so a second tap is ignored.
+    fun completeOnboarding(onComplete: () -> Unit) {
+        if (_uiState.value.isSubmitting) return
+        _uiState.value = _uiState.value.copy(isSubmitting = true)
+        if (_uiState.value.username.isBlank()) {
+            blankUsernameGenerator { generatedName ->
+                onUsernameChange(generatedName)
+                handleFirstTimeSetup(onComplete)
+            }
+        } else {
+            handleFirstTimeSetup(onComplete)
+        }
     }
 
     fun handleFirstTimeSetup(onComplete: () -> Unit) {

@@ -7,7 +7,15 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
+//contextual help
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
+import com.greybox.projectmesh.R
+import com.greybox.projectmesh.components.HelpDialog
+import com.greybox.projectmesh.components.HelpLink
+import com.greybox.projectmesh.components.HelpParagraph
+//end
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -80,7 +88,28 @@ fun ShowLogScreen(
     }
     var selectionMode by remember { mutableStateOf(false) }
     var selectedLineIds by remember { mutableStateOf(setOf<Int>()) }
+    //contextual help
+    var showLogHelp by remember { mutableStateOf(false) }
 
+    if (showLogHelp) {
+        HelpDialog(
+            title = stringResource(R.string.help_log_title),
+            onDismiss = { showLogHelp = false },
+        ) {
+            HelpParagraph(stringResource(R.string.help_log_body_intro))
+            Text(
+                text = stringResource(R.string.help_log_example),
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                style = MeshTheme.typography.bodySmall,
+                modifier = Modifier.padding(bottom = MeshTheme.spacing.sm),
+            )
+            HelpParagraph(stringResource(R.string.help_log_part_time))
+            HelpParagraph(stringResource(R.string.help_log_part_component))
+            HelpParagraph(stringResource(R.string.help_log_part_address))
+            HelpParagraph(stringResource(R.string.help_log_part_event))
+        }
+    }//end of contextual help
     Column {
         if (selectionMode) {
             Row(
@@ -143,7 +172,7 @@ fun ShowLogScreen(
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.weight(1f)
         ) {
             items(
                 items = uiState.logs,
@@ -254,5 +283,15 @@ fun ShowLogScreen(
                 }
             }
         }
+        //contextual help
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+        ) {
+            HelpLink(
+                text = stringResource(R.string.help_log_link),
+                onClick = { showLogHelp = true },
+            )
+        }//end of contextual help
     }
 }
