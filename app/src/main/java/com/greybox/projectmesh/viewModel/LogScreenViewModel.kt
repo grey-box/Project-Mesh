@@ -32,13 +32,19 @@ class LogScreenViewModel(
 ) : StateViewModel<LogUiState>(LogUiState()) {
     private val logger: MNetLoggerAndroid = di.direct.instance<MNetLogger>() as MNetLoggerAndroid
 
+    private var latestLogs: List<LogLine> = emptyList()
     init {
         viewModelScope.launch {
             logger.recentLogs.collect { updatedLogs ->
-                setState {
-                    copy(
-                        logs = updatedLogs
-                    )
+
+                // Always remember the newest logs
+                latestLogs = updatedLogs
+
+                // Only update the displayed logs outside selection mode
+                if (!currentState.isSelectionMode) {
+                    setState {
+                        copy(logs = updatedLogs)
+                    }
                 }
             }
         }
@@ -112,6 +118,7 @@ class LogScreenViewModel(
             }
         setState {
             copy(
+                logs = latestLogs,
                 pendingCopyText = selectedLogs,
                 isSelectionMode = false,
                 selectedLineIds = emptySet()
@@ -137,6 +144,7 @@ class LogScreenViewModel(
     fun cancelSelection() {
         setState {
             copy(
+                logs = latestLogs,
                 isSelectionMode = false,
                 selectedLineIds = emptySet()
             )
