@@ -6,6 +6,7 @@ enum class FileSaveResult {
     SUCCESS,
     FILE_UNAVAILABLE,
     FOLDER_CREATE_FAILED,
+    SELECTED_FOLDER_FAILED,
     SAVE_FAILED
 }
 

@@ -121,6 +121,7 @@
 
     <string name="error_file_open_failed">Couldn\'t open this file.</string>
     <string name="error_file_open_unsupported">Cannot Open File Type on Device. Try Downloading &amp; Opening with Another App</string>
+    <string name="receive_file_saved">File saved</string>
     <string name="file_saved_to">File saved to: %1$s</string>
     <string name="save_folder_selected">Save folder set to %1$s</string>
     <string name="error_file_save_failed">Unable to Save File. Check for Sufficient Storage</string>
