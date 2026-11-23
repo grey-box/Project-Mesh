@@ -28,10 +28,9 @@ import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,17 +46,16 @@ import androidx.compose.ui.semantics.customActions
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.greybox.projectmesh.MNetLoggerAndroid
 import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.ui.theme.MeshTheme
-import com.greybox.projectmesh.viewModel.LogScreenModel
 import com.greybox.projectmesh.viewModel.LogScreenViewModel
-import com.ustadmobile.meshrabiya.log.MNetLogger
 import org.kodein.di.compose.localDI
-import org.kodein.di.instance
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.runtime.LaunchedEffect
+import com.greybox.projectmesh.viewModel.LogUiState
 
 @Composable
 fun LogScreen(
@@ -70,25 +68,54 @@ fun LogScreen(
         )
     )
 ){
-    val uiState by viewModel.uiState.collectAsState(initial = LogScreenModel())
-    ShowLogScreen(uiState)
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val clipboardManager = LocalClipboardManager.current
+
+    LaunchedEffect(uiState.pendingCopyText) {
+        uiState.pendingCopyText?.let { text ->
+            clipboardManager.setText(AnnotatedString(text))
+            viewModel.onCopyCompleted()
+        }
+    }
+
+    LaunchedEffect(uiState.userMessage?.id) {
+        uiState.userMessage?.let { message ->
+            Toast.makeText(
+                context,
+                message.textRes,
+                Toast.LENGTH_SHORT
+            ).show()
+            
+            viewModel.onUserMessageShown()
+        }
+    }
+
+    ShowLogScreen(
+        uiState = uiState,
+        onStartSelection = viewModel::startSelection,
+        onLogLongPressed = viewModel::onLogLongPressed,
+        onToggleLogSelection = viewModel::toggleLogSelection,
+        onSelectAll = viewModel::selectAllLogs,
+        onCopy = viewModel::copySelectedLogs,
+        onCancel = viewModel::cancelSelection
+    )
 }
 
 @Composable
 fun ShowLogScreen(
-    uiState: LogScreenModel
+    uiState: LogUiState,
+    onStartSelection: () -> Unit,
+    onLogLongPressed: (Int) -> Unit,
+    onToggleLogSelection: (Int) -> Unit,
+    onSelectAll: () -> Unit,
+    onCopy: () -> Unit,
+    onCancel: () -> Unit
 ){
-    val context = LocalContext.current
-    val localDi = localDI()
-    val logger: MNetLogger by localDi.instance()
-    val androidLogger = logger as MNetLoggerAndroid
-    val clipboardManager = LocalClipboardManager.current
     val timeFormatter = remember {
         SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
     }
-    var selectionMode by remember { mutableStateOf(false) }
-    var selectedLineIds by remember { mutableStateOf(setOf<Int>()) }
-    //contextual help
+    // contextual help
     var showLogHelp by remember { mutableStateOf(false) }
 
     if (showLogHelp) {
@@ -111,7 +138,7 @@ fun ShowLogScreen(
         }
     }//end of contextual help
     Column {
-        if (selectionMode) {
+        if (uiState.isSelectionMode) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -119,28 +146,13 @@ fun ShowLogScreen(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                TextButton(onClick = {
-                    selectedLineIds = uiState.logs.map { it.lineId }.toSet()
-                }) {
+                TextButton(onClick = onSelectAll) {
                     Text("Select All")
                 }
-                TextButton(onClick = {
-                    val selectedLogs = uiState.logs
-                        .filter { selectedLineIds.contains(it.lineId) }
-                        .joinToString("\n") {
-                            "[${timeFormatter.format(Date(it.time))}] ${it.line}"
-                        }
-                    clipboardManager.setText(AnnotatedString(selectedLogs))
-                    Toast.makeText(context, "Logs copied!", Toast.LENGTH_SHORT).show()
-                    selectionMode = false
-                    selectedLineIds = emptySet()
-                }) {
+                TextButton(onClick = onCopy){
                     Text("Copy")
                 }
-                TextButton(onClick = {
-                    selectionMode = false
-                    selectedLineIds = emptySet()
-                }) {
+                TextButton(onClick = onCancel) {
                     Text("Cancel")
                 }
             }
@@ -163,9 +175,9 @@ fun ShowLogScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 TextButton(
-                    onClick = { selectionMode = true },
+                    onClick = onStartSelection,
                     enabled = uiState.logs.isNotEmpty()
-                ) {
+                ){
                     Text("Select")
                 }
             }
@@ -180,11 +192,10 @@ fun ShowLogScreen(
             ) { logLine ->
                 val formattedTime = timeFormatter.format(Date(logLine.time))
                 val logText = "[${formattedTime}] ${logLine.line}"
-                val isSelected = selectedLineIds.contains(logLine.lineId)
+                val isSelected = uiState.selectedLineIds.contains(logLine.lineId)
 
                 val enterSelection = {
-                    selectionMode = true
-                    selectedLineIds = setOf(logLine.lineId)
+                    onLogLongPressed(logLine.lineId)
                 }
 
                 // In selection mode the row is a checkbox, and says so. `toggleable` with
@@ -196,16 +207,12 @@ fun ShowLogScreen(
                 // Out of selection mode the long-press is kept for the people who know
                 // it, but published as a real accessibility action rather than a raw
                 // pointer handler, so TalkBack can offer it from the actions menu.
-                val rowInteraction = if (selectionMode) {
+                val rowInteraction = if (uiState.isSelectionMode) {
                     Modifier.toggleable(
                         value = isSelected,
                         role = Role.Checkbox,
-                        onValueChange = { checked ->
-                            selectedLineIds = if (checked) {
-                                selectedLineIds + logLine.lineId
-                            } else {
-                                selectedLineIds - logLine.lineId
-                            }
+                        onValueChange = {
+                            onToggleLogSelection(logLine.lineId)
                         }
                     )
                 } else {
@@ -259,7 +266,7 @@ fun ShowLogScreen(
                         .then(rowInteraction),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (selectionMode) {
+                    if (uiState.isSelectionMode) {
                         Checkbox(
                             checked = isSelected,
                             // null, so the checkbox is a visual indicator and the row owns

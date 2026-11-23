@@ -62,6 +62,7 @@
     <string name="manual_test">Manual Test</string>
     <string name="reset">Reset</string>
     <string name="log">Log</string>
+    <string name="logs_copied">Logs copied</string>
 
     <string name="chat">Chat</string>
 
