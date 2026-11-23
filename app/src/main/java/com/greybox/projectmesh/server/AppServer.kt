@@ -30,6 +30,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.flow.updateAndGet
@@ -176,7 +177,7 @@ class AppServer(
 
     // similar to the previous one, it holds a list of IncomingTransferInfo object.
     private val _incomingTransfers = MutableStateFlow(emptyList<IncomingTransferInfo>())
-    val incomingTransfers: Flow<List<IncomingTransferInfo>> = _incomingTransfers.asStateFlow()
+    val incomingTransfers: StateFlow<List<IncomingTransferInfo>> = _incomingTransfers.asStateFlow()
 
     // This method (getListeningPort) is provided by the NanoHTTPD to get the port number which the
     // server is listening.

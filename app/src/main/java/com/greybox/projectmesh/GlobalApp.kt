@@ -49,6 +49,8 @@ import com.greybox.projectmesh.user.UserEntity
 import com.ustadmobile.meshrabiya.log.MNetLogger
 import java.text.SimpleDateFormat
 import java.util.Date
+import com.greybox.projectmesh.data.AndroidReceivedFileSaver
+import com.greybox.projectmesh.data.ReceivedFileSaver
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.data.SharedPrefsSettingsRepository
 
@@ -378,6 +380,9 @@ class GlobalApp : Application(), DIAware {
             applicationContext.getSharedPreferences("project_mesh_prefs", Context.MODE_PRIVATE)
         }
 
+        bind<ReceivedFileSaver>() with singleton {
+            AndroidReceivedFileSaver(applicationContext)
+        }
         bind<SettingsRepository>() with singleton {
             SharedPrefsSettingsRepository(instance(tag = "settings"), instance(tag = "mesh_prefs"))
         }

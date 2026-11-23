@@ -1,13 +1,6 @@
 package com.greybox.projectmesh.views
 
-import android.content.ContentValues
-import android.content.Context
 import android.content.Intent
-import android.net.Uri
-import android.os.Build
-import android.os.Environment
-import android.provider.DocumentsContract
-import android.provider.MediaStore
 import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.compose.foundation.clickable
@@ -31,15 +24,12 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.greybox.projectmesh.data.SettingsRepository
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.R
@@ -47,13 +37,14 @@ import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.server.AppServer
 import com.greybox.projectmesh.viewModel.ReceiveScreenViewModel
 import org.kodein.di.compose.localDI
-import org.kodein.di.DI
-import org.kodein.di.instance
-import java.io.File
 import androidx.compose.material3.HorizontalDivider
-import com.greybox.projectmesh.viewModel.ReceiveScreenModel
 import com.greybox.projectmesh.BuildConfig
 import com.greybox.projectmesh.ui.theme.MeshTheme
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.repeatOnLifecycle
+
 
 @Composable
 fun ReceiveScreen(
@@ -61,42 +52,25 @@ fun ReceiveScreen(
         factory = ViewModelFactory(
             di = localDI(),
             owner = LocalSavedStateRegistryOwner.current,
-            vmFactory = { di, savedStateHandle -> ReceiveScreenViewModel(di, savedStateHandle) },
+            vmFactory = { di, _ -> ReceiveScreenViewModel(di) },
             defaultArgs = null,
         )
     ),
 ) {
-    val uiState by viewModel.uiState.collectAsState(ReceiveScreenModel())
-    HandleIncomingTransfers(
-        uiState = uiState,
-        onAccept = viewModel::onAccept,
-        onDecline = viewModel::onDecline,
-        onDelete = viewModel::onDelete,
-    )
-}
-
-
-@Composable
-fun HandleIncomingTransfers(
-    uiState: ReceiveScreenModel,
-    onAccept: (AppServer.IncomingTransferInfo) -> Unit = {},
-    onDecline: (AppServer.IncomingTransferInfo) -> Unit = {},
-    onDelete: (AppServer.IncomingTransferInfo) -> Unit = {},
-){
-    val di: DI = localDI()
-    val settings: SettingsRepository by di.instance()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
-    val autoFinishEnabled by settings.autoFinish.collectAsState()
-    val defaultUri by settings.saveToFolder.collectAsState()
+    val lifecycle = LocalLifecycleOwner.current.lifecycle
 
-    LaunchedEffect(autoFinishEnabled, uiState.incomingTransfers) {
-        if (autoFinishEnabled) {
-            uiState.incomingTransfers
-                .filter { it.status == AppServer.Status.PENDING } // Only pending transfers
-                .forEach { transfer ->
-                    // Automatically trigger accept action
-                    onAccept(transfer)
-                }
+    LaunchedEffect(lifecycle, viewModel) {
+        lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
+            viewModel.autoAcceptWhileVisible()
+        }
+    }
+
+    LaunchedEffect(uiState.userMessage?.id) {
+        uiState.userMessage?.let { message ->
+            Toast.makeText(context, message.textRes, Toast.LENGTH_LONG).show()
+            viewModel.onUserMessageShown()
         }
     }
 
@@ -171,12 +145,12 @@ fun HandleIncomingTransfers(
                         }
                         if(transfer.status == AppServer.Status.PENDING){
                             Row{
-                                IconButton(onClick = {onAccept(transfer)},
+                                IconButton(onClick = { viewModel.onAccept(transfer) },
                                     modifier = Modifier.width(MeshTheme.size.buttonMinWidth)) {
                                     Icon(Icons.Default.CheckCircle, contentDescription = "Accept")
                                 }
                                 Spacer(modifier = Modifier.width(MeshTheme.spacing.sm))
-                                IconButton(onClick = {onDecline(transfer)},
+                                IconButton(onClick = { viewModel.onDecline(transfer) },
                                     modifier = Modifier.width(MeshTheme.size.buttonMinWidth)) {
                                     Icon(Icons.Default.Cancel, contentDescription = "Decline")
                                 }
@@ -190,10 +164,10 @@ fun HandleIncomingTransfers(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.spacedBy(MeshTheme.spacing.sm) // Space between buttons
                         ){
-                            IconButton(onClick = {onDelete(transfer)}) {
+                            IconButton(onClick = { viewModel.onDelete(transfer) }) {
                                 Icon(Icons.Default.Delete, contentDescription = "Delete")
                             }
-                            IconButton(onClick = {onDownload(context, transfer, defaultUri)}) {
+                            IconButton(onClick = { viewModel.onDownload(transfer) }) {
                                 Icon(Icons.Default.Download, contentDescription = "Download")
                             }
                         }
@@ -202,7 +176,7 @@ fun HandleIncomingTransfers(
                         Row (
                             verticalAlignment = Alignment.CenterVertically
                         ){
-                            IconButton(onClick = {onDelete(transfer)}) {
+                            IconButton(onClick = { viewModel.onDelete(transfer) }) {
                                 Icon(Icons.Default.Delete, contentDescription = "Delete")
                             }
                         }
@@ -211,130 +185,5 @@ fun HandleIncomingTransfers(
             )
             HorizontalDivider()
         }
-    }
-}
-
-fun onDownload(context: Context, transfer: AppServer.IncomingTransferInfo, uriOrPath: String) {
-    if (uriOrPath.startsWith("content://")) {
-        // Handle user-selected directory via SAF
-        saveFileToContentUri(context, transfer, uriOrPath)
-    } else {
-        // Handle default directory using File API
-        saveFileToDefaultPath(context, transfer, uriOrPath)
-    }
-}
-
-private fun saveFileToMediaStore(context: Context, transfer: AppServer.IncomingTransferInfo) {
-    // Skip for Android 9 and below
-    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
-        return
-    }
-
-    val resolver = context.contentResolver
-    val subDirectory = "Project Mesh"
-    val fullPath = "${Environment.DIRECTORY_DOWNLOADS}/$subDirectory"
-    val contentValues = ContentValues().apply {
-        put(MediaStore.Downloads.DISPLAY_NAME, transfer.name)
-        put(MediaStore.Downloads.MIME_TYPE, "application/octet-stream")
-        put(MediaStore.Downloads.RELATIVE_PATH, fullPath)
-    }
-
-    val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, contentValues)
-    if (uri == null) {
-        Toast.makeText(context, context.getString(R.string.error_file_save_failed), Toast.LENGTH_LONG).show()
-        return
-    }
-
-    try {
-        resolver.openOutputStream(uri)?.use { outputStream ->
-            transfer.file?.inputStream()?.use { inputStream ->
-                inputStream.copyTo(outputStream)
-            }
-        }
-        Toast.makeText(context,
-            context.getString(R.string.file_saved_to, fullPath),
-            Toast.LENGTH_LONG
-        ).show()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context,
-            context.getString(R.string.error_file_save_failed),
-            Toast.LENGTH_LONG
-        ).show()
-    }
-}
-
-
-private fun saveFileToDefaultPath(context: Context, transfer: AppServer.IncomingTransferInfo, folderPath: String) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        // Android 10+ → Use MediaStore API
-        saveFileToMediaStore(context, transfer)
-        return
-    }
-    // Below implementation is for Android 9 and below
-    val directoryFile = File(folderPath)
-
-    // Ensure the directory exists
-    if (!directoryFile.exists() && !directoryFile.mkdirs()) {
-        Toast.makeText(context, context.getString(R.string.error_folder_create_failed), Toast.LENGTH_LONG).show()
-        return
-    }
-
-    // Check if the file in `transfer` is valid
-    val sourceFile = transfer.file
-    if (sourceFile == null || !sourceFile.exists()) {
-        Toast.makeText(context, context.getString(R.string.error_file_unavailable), Toast.LENGTH_LONG).show()
-        return
-    }
-
-    try {
-        // Create the target file in the directory
-        val targetFile = File(directoryFile, transfer.name ?: "unknown_file")
-        sourceFile.copyTo(targetFile, overwrite = true)
-        Toast.makeText(context, context.getString(R.string.file_saved_to, targetFile.absolutePath), Toast.LENGTH_LONG).show()
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context, context.getString(R.string.error_file_save_failed), Toast.LENGTH_LONG).show()
-    }
-}
-
-private fun saveFileToContentUri(context: Context, transfer: AppServer.IncomingTransferInfo, uriString: String) {
-    val treeUri = Uri.parse(uriString)
-    val resolver = context.contentResolver
-
-    // Retrieve the document ID from the tree URI
-    val documentId = DocumentsContract.getTreeDocumentId(treeUri)
-    val directoryUri = DocumentsContract.buildDocumentUriUsingTree(treeUri, documentId)
-
-    // Check if the file in `transfer` is valid
-    val sourceFile = transfer.file
-    if (sourceFile == null || !sourceFile.exists()) {
-        Toast.makeText(context, context.getString(R.string.error_file_unavailable), Toast.LENGTH_LONG).show()
-        return
-    }
-
-    try {
-        // Create a new file in the selected directory
-        val targetUri = DocumentsContract.createDocument(
-            resolver,
-            directoryUri,
-            "application/octet-stream", // MIME type for binary files
-            transfer.name ?: "unknown_file"
-        )
-
-        if (targetUri != null) {
-            resolver.openOutputStream(targetUri)?.use { outputStream ->
-                sourceFile.inputStream().use { inputStream ->
-                    inputStream.copyTo(outputStream) // Copy file contents
-                }
-            }
-            // Notify the user of the successful download
-            Toast.makeText(context, context.getString(R.string.file_saved_to, targetUri.path), Toast.LENGTH_LONG).show()
-        } else {
-            Toast.makeText(context, context.getString(R.string.error_save_folder_failed), Toast.LENGTH_LONG).show()
-        }
-    } catch (e: Exception) {
-        e.printStackTrace()
-        Toast.makeText(context, context.getString(R.string.error_file_save_failed), Toast.LENGTH_LONG).show()
     }
 }

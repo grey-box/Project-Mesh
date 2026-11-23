@@ -1,74 +1,112 @@
 package com.greybox.projectmesh.viewModel
 
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
+import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.greybox.projectmesh.GlobalApp
+import com.greybox.projectmesh.R
+import com.greybox.projectmesh.arch.StateViewModel
+import com.greybox.projectmesh.arch.UserMessage
+import com.greybox.projectmesh.data.FileSaveResult
+import com.greybox.projectmesh.data.ReceivedFileSaver
+import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.server.AppServer
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.File
 
-data class ReceiveScreenModel(
+@Immutable
+data class ReceiveUiState(
     val incomingTransfers: List<AppServer.IncomingTransferInfo> = emptyList(),
+    val userMessage: UserMessage? = null,
 )
 
-class ReceiveScreenViewModel(di: DI, savedStateHandle: SavedStateHandle): ViewModel(){
-    private val _uiState = MutableStateFlow(ReceiveScreenModel())
-    val uiState: Flow<ReceiveScreenModel> = _uiState.asStateFlow()
+class ReceiveScreenViewModel(
+    di: DI,
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+) : StateViewModel<ReceiveUiState>(ReceiveUiState()) {
     private val appServer: AppServer by di.instance()
     private val receiveDir: File by di.instance(tag = GlobalApp.TAG_RECEIVE_DIR)
+    private val settings: SettingsRepository by di.instance()
+    private val fileSaver: ReceivedFileSaver by di.instance()
+
+    // Receiver-side IDs can be reused by different senders.
+    private val acceptingTransfers = mutableSetOf<Triple<String?, Int, Long>>()
+
     init {
+        setState { withTransfers(appServer.incomingTransfers.value) }
         viewModelScope.launch {
-            appServer.incomingTransfers.collect{
-                _uiState.update { prev ->
-                    prev.copy(
-                        incomingTransfers = it
-                    )
-                }
+            appServer.incomingTransfers.collect { transfers ->
+                setState { withTransfers(transfers) }
             }
         }
     }
 
-    /*
-    If user accept the file, then the file will be downloaded to specific directory
-    1. Make sure the destination directory exist, if not, then create one.
-    2. Process the file transfer by using "acceptIncomingTransfer" function from the Server side
-     */
-    fun onAccept(transfer: AppServer.IncomingTransferInfo){
+    private fun ReceiveUiState.withTransfers(transfers: List<AppServer.IncomingTransferInfo>) =
+        copy(incomingTransfers = transfers.toList())
+
+    internal suspend fun autoAcceptWhileVisible() {
+        combine(settings.autoFinish, appServer.incomingTransfers) { enabled, transfers ->
+            if (enabled) transfers.filter { it.status == AppServer.Status.PENDING } else emptyList()
+        }.collect { pending ->
+            pending.forEach(::onAccept)
+        }
+    }
+
+    fun onAccept(transfer: AppServer.IncomingTransferInfo) {
         viewModelScope.launch {
-            withContext(Dispatchers.IO){
-                if (!receiveDir.exists()){
-                    receiveDir.mkdirs()
+            val key = transfer.key()
+            val pending = appServer.incomingTransfers.value.any {
+                it.key() == key && it.status == AppServer.Status.PENDING
+            }
+            if (!pending || !acceptingTransfers.add(key)) return@launch
+
+            try {
+                withContext(ioDispatcher) {
+                    if (!receiveDir.exists()) {
+                        receiveDir.mkdirs()
+                    }
+                    appServer.acceptIncomingTransfer(transfer, File(receiveDir, transfer.name))
                 }
-                val file = File(receiveDir, transfer.name)
-                appServer.acceptIncomingTransfer(transfer, file)
+            } finally {
+                acceptingTransfers.remove(key)
             }
         }
     }
 
-    /*
-    If user decline the file, then call "onDeclineIncomingTransfer" function from the Server side
-     */
-    fun onDecline(transfer: AppServer.IncomingTransferInfo){
-        viewModelScope.launch{
+    fun onDecline(transfer: AppServer.IncomingTransferInfo) {
+        viewModelScope.launch {
             appServer.onDeclineIncomingTransfer(transfer)
         }
     }
 
-    /*
-    If user delete the file, then call "onDeleteIncomingTransfer" function from the Server side
-     */
-    fun onDelete(transfer: AppServer.IncomingTransferInfo){
+    fun onDelete(transfer: AppServer.IncomingTransferInfo) {
         viewModelScope.launch {
             appServer.onDeleteIncomingTransfer(transfer)
         }
     }
+
+    fun onDownload(transfer: AppServer.IncomingTransferInfo) {
+        viewModelScope.launch {
+            val message = when (fileSaver.save(transfer, settings.saveToFolder.value)) {
+                FileSaveResult.SUCCESS -> R.string.receive_file_saved
+                FileSaveResult.FILE_UNAVAILABLE -> R.string.error_file_unavailable
+                FileSaveResult.FOLDER_CREATE_FAILED -> R.string.error_folder_create_failed
+                FileSaveResult.SELECTED_FOLDER_FAILED -> R.string.error_save_folder_failed
+                FileSaveResult.SAVE_FAILED -> R.string.error_file_save_failed
+            }
+            setState { copy(userMessage = UserMessage(message)) }
+        }
+    }
+
+    fun onUserMessageShown() {
+        setState { copy(userMessage = null) }
+    }
+
+    private fun AppServer.IncomingTransferInfo.key() =
+        Triple(fromHost.hostAddress, id, requestReceivedTime)
 }
