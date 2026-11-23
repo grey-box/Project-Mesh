@@ -1,68 +1,71 @@
 package com.greybox.projectmesh.viewModel
 
 import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.greybox.projectmesh.GlobalApp
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import org.kodein.di.DI
-import com.greybox.projectmesh.server.AppServer
 import com.ustadmobile.meshrabiya.ext.requireAddressAsInt
 import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
 import com.ustadmobile.meshrabiya.vnet.VirtualNode
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import org.kodein.di.instance
 import java.net.InetAddress
+import androidx.compose.runtime.Immutable
+import com.greybox.projectmesh.arch.StateViewModel
+import com.greybox.projectmesh.user.UserRepository
+import com.ustadmobile.meshrabiya.ext.addressToDotNotation
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
+import org.kodein.di.DIAware
+//screen now reads ip from the virtualAddress parameter
+@Immutable
+data class PingUiState(
+    val deviceName: String = "",
+    val pingResults: List<PingResult> = emptyList(),
+)
 
-data class PingScreenModel(
-    val deviceName: String? = null,
-    val virtualAddress: InetAddress = InetAddress.getByName("192.168.0.1"),
-    val allOriginatorMessages: List<VirtualNode.LastOriginatorMessage> = emptyList()
+
+@Immutable
+data class PingResult(
+    val messageId: Int,
+    val pingTimeMs: Int,
+    val hopCount: Int,
+    val lastHopAddress: String,
 )
 
 class PingScreenViewModel(
     di: DI,
     savedStateHandle: SavedStateHandle,
-    virtualAddress: InetAddress
-): ViewModel() {
-    // _uiState will be updated whenever there is a change in the UI state
-    private val _uiState = MutableStateFlow(
-        PingScreenModel(
-            deviceName = runBlocking {
-                GlobalApp.GlobalUserRepo.userRepository.getUserByIp(virtualAddress.hostAddress)
-                    ?.name
-                    ?: "Unknown"
-            },
-            virtualAddress = virtualAddress
-        )
-    )
-    // uiState is a read-only property that shows the current UI state
-    val uiState: Flow<PingScreenModel> = _uiState.asStateFlow()
-    // di is used to get the AndroidVirtualNode instance
-    private val node: AndroidVirtualNode by di.instance()
-    private val appServer: AppServer by di.instance()
+    virtualAddress: InetAddress,
+    ioDispatcher: CoroutineDispatcher = Dispatchers.IO, //swapped for a test dispatcher in unit test
+): StateViewModel<PingUiState>(PingUiState()), DIAware {
+
+    override val di = di
+    private val node: AndroidVirtualNode by instance()
+    private val userRepository: UserRepository by instance()
     private var lastTimeReceived: Long = 0L
 
-    // launch a coroutine
     init {
+        viewModelScope.launch(ioDispatcher) {
+            val name = userRepository.getUserByIp(virtualAddress.hostAddress)?.name ?: "Unknown"
+            setState { copy(deviceName = name) }
+        }
+
         viewModelScope.launch {
-            // collect the state flow of the AndroidVirtualNode
-            node.state.collect{ localNodeState ->
-                val newOriginatorMessage = localNodeState.originatorMessages[virtualAddress.requireAddressAsInt()]
-                if ( newOriginatorMessage != null && lastTimeReceived != newOriginatorMessage.timeReceived ) {
-                    lastTimeReceived = newOriginatorMessage.timeReceived
-                    // update the UI state with the new state
-                    _uiState.update { prev ->
-                        prev.copy(
-                            allOriginatorMessages = ((prev.allOriginatorMessages + newOriginatorMessage) as List<VirtualNode.LastOriginatorMessage>)
-                        )
-                    }
+            node.state.collect { nodeState ->
+                val message = nodeState.originatorMessages[virtualAddress.requireAddressAsInt()]
+                if (message != null && message.timeReceived != lastTimeReceived) {
+                    lastTimeReceived = message.timeReceived
+                    //TODO: list grows forever while the screen is open
+                    setState { copy(pingResults = pingResults + message.toPingResult()) }
                 }
             }
         }
     }
+
+    private fun VirtualNode.LastOriginatorMessage.toPingResult() = PingResult(
+        messageId = originatorMessage.messageId,
+        pingTimeMs = originatorMessage.pingTimeSum.toInt(),
+        hopCount = hopCount.toInt(),
+        lastHopAddress = lastHopAddr.addressToDotNotation(),
+    )
 }
