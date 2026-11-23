@@ -51,9 +51,11 @@ import org.kodein.di.DI
 import org.kodein.di.instance
 import java.io.File
 import androidx.compose.material3.HorizontalDivider
-import com.greybox.projectmesh.viewModel.ReceiveScreenModel
+import com.greybox.projectmesh.viewModel.ReceiveUiState
 import com.greybox.projectmesh.BuildConfig
 import com.greybox.projectmesh.ui.theme.MeshTheme
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+
 
 @Composable
 fun ReceiveScreen(
@@ -66,7 +68,7 @@ fun ReceiveScreen(
         )
     ),
 ) {
-    val uiState by viewModel.uiState.collectAsState(ReceiveScreenModel())
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
     HandleIncomingTransfers(
         uiState = uiState,
         onAccept = viewModel::onAccept,
@@ -78,7 +80,7 @@ fun ReceiveScreen(
 
 @Composable
 fun HandleIncomingTransfers(
-    uiState: ReceiveScreenModel,
+    uiState: ReceiveUiState,
     onAccept: (AppServer.IncomingTransferInfo) -> Unit = {},
     onDecline: (AppServer.IncomingTransferInfo) -> Unit = {},
     onDelete: (AppServer.IncomingTransferInfo) -> Unit = {},
