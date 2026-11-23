@@ -3,15 +3,14 @@ package com.greybox.projectmesh.messaging.ui.screens
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.greybox.projectmesh.ViewModelFactory
-import com.greybox.projectmesh.viewModel.NetworkScreenViewModel
 import com.greybox.projectmesh.extension.WifiListItem
+import com.greybox.projectmesh.viewModel.NetworkScreenViewModel
 import org.kodein.di.compose.localDI
-import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
-import com.greybox.projectmesh.viewModel.NetworkScreenModel
 
 @Composable
 fun ChatNodeListScreen(
@@ -24,25 +23,23 @@ fun ChatNodeListScreen(
             vmFactory = { di, savedStateHandle ->
                 NetworkScreenViewModel(di, savedStateHandle)
             },
-            defaultArgs = null
+            defaultArgs = null,
         )
-    )
+    ),
 ) {
-    // Provide the same initial state you used in NetworkScreen
-    val uiState: NetworkScreenModel by viewModel.uiState.collectAsState(initial = NetworkScreenModel())
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
     LazyColumn {
         items(
-            items = uiState.allNodes.entries.toList(),
-            key = { it.key }
-        ) { nodeEntry ->
-            // Tapping a WifiListItem calls 'onNodeSelected' instead of onClickNetworkNode
+            items = uiState.nodes,
+            key = { it.address },
+        ) { node ->
+            // Tapping a WifiListItem calls 'onNodeSelected' (no user-info exchange here,
+            // same as before the migration)
             WifiListItem(
-                wifiAddress = nodeEntry.key,
-                wifiEntry = nodeEntry.value,
-                onClick = { selectedIp ->
-                    onNodeSelected(selectedIp)
-                }
+                wifiAddress = node.address,
+                wifiEntry = node.entry,
+                onClick = { selectedIp -> onNodeSelected(selectedIp) },
             )
         }
     }
