@@ -131,7 +131,14 @@ fun HandleIncomingTransfers(
                     context.startActivity(intent)
                 }
                 catch (e: Exception){
-                    Toast.makeText(context, context.getString(R.string.error_file_open_failed), Toast.LENGTH_SHORT).show()
+                    // Was "Error opening file: ${e.message}", which showed the user a raw
+                    // exception string in a Toast that vanishes in two seconds and cannot
+                    // be re-read. SC 3.3.1.
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.error_file_open_failed),
+                        Toast.LENGTH_LONG
+                    ).show()
                 }
 
             }
@@ -247,13 +254,13 @@ private fun saveFileToMediaStore(context: Context, transfer: AppServer.IncomingT
             }
         }
         Toast.makeText(context,
-            "File saved to: $fullPath",
+            context.getString(R.string.file_saved_to, fullPath),
             Toast.LENGTH_LONG
         ).show()
     } catch (e: Exception) {
         e.printStackTrace()
         Toast.makeText(context,
-            context.getString(R.string.error_file_verify_failed),
+            context.getString(R.string.error_file_save_failed),
             Toast.LENGTH_LONG
         ).show()
     }
@@ -286,10 +293,10 @@ private fun saveFileToDefaultPath(context: Context, transfer: AppServer.Incoming
         // Create the target file in the directory
         val targetFile = File(directoryFile, transfer.name ?: "unknown_file")
         sourceFile.copyTo(targetFile, overwrite = true)
-        Toast.makeText(context, "File saved to: ${targetFile.absolutePath}", Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.file_saved_to, targetFile.absolutePath), Toast.LENGTH_LONG).show()
     } catch (e: Exception) {
         e.printStackTrace()
-        Toast.makeText(context, context.getString(R.string.error_file_verify_failed), Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_file_save_failed), Toast.LENGTH_LONG).show()
     }
 }
 
@@ -324,12 +331,12 @@ private fun saveFileToContentUri(context: Context, transfer: AppServer.IncomingT
                 }
             }
             // Notify the user of the successful download
-            Toast.makeText(context, "File saved to: " + targetUri.path, Toast.LENGTH_LONG).show()
+            Toast.makeText(context, context.getString(R.string.file_saved_to, targetUri.path), Toast.LENGTH_LONG).show()
         } else {
             Toast.makeText(context, context.getString(R.string.error_save_folder_failed), Toast.LENGTH_LONG).show()
         }
     } catch (e: Exception) {
         e.printStackTrace()
-        Toast.makeText(context, context.getString(R.string.error_file_verify_failed), Toast.LENGTH_LONG).show()
+        Toast.makeText(context, context.getString(R.string.error_file_save_failed), Toast.LENGTH_LONG).show()
     }
 }

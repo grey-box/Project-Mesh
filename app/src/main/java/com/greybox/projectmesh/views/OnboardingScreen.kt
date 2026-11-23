@@ -23,6 +23,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Hub
 import androidx.compose.material.icons.outlined.WifiTethering
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -40,6 +41,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -48,6 +51,7 @@ import com.greybox.projectmesh.R
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.extension.getLocalIpFromDI
 import com.greybox.projectmesh.ui.theme.MeshTheme
+import com.greybox.projectmesh.ui.theme.rememberReduceMotion
 import com.greybox.projectmesh.viewModel.OnboardingViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.localDI
@@ -106,32 +110,29 @@ fun OnboardingScreen(
     val pagerState = rememberPagerState(initialPage = 0) { PAGE_COUNT }
     val scope = rememberCoroutineScope()
     val isLastPage = pagerState.currentPage == PAGE_COUNT - 1
+    val reduceMotion = rememberReduceMotion()
+
+    // Honours the system "Remove animations" setting. The page still changes; it just does
+    // not slide there. A full-width horizontal pan is among the motions most likely to
+    // provoke nausea or dizziness in someone with a vestibular disorder, and onboarding is
+    // the one screen nobody can skip past. SC 2.3.3 (Animation from Interactions).
+    val goToPage: suspend (Int) -> Unit = { page ->
+        if (reduceMotion) pagerState.scrollToPage(page)
+        else pagerState.animateScrollToPage(page)
+    }
 
     // User-education page opened from onboarding. Onboarding runs outside AppNavHost,
     // so we swap screens with local state instead of navController.
     var showHowItWorks by rememberSaveable { mutableStateOf(false) }
 
     BackHandler(enabled = pagerState.currentPage > 0 && !showHowItWorks) {
-        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
+        scope.launch { goToPage(pagerState.currentPage - 1) }
     }
 
+    // Skip and Get started share one path: a typed username is kept,
+    // a blank one gets a generated guest name.
     val finishOnboarding: () -> Unit = {
-        if (uiState.username.isNullOrBlank()) {
-            onboardingViewModel.blankUsernameGenerator{ generatedName ->
-                onboardingViewModel.onUsernameChange(generatedName)
-
-                onboardingViewModel.handleFirstTimeSetup { onComplete() }
-            }
-        } else {
-            onboardingViewModel.handleFirstTimeSetup { onComplete() }
-        }
-    }
-
-    val skipOnboarding: () -> Unit = {
-        onboardingViewModel.blankUsernameGenerator { generatedName ->
-            onboardingViewModel.onUsernameChange(generatedName)
-            onboardingViewModel.handleFirstTimeSetup { onComplete() }
-        }
+        onboardingViewModel.completeOnboarding { onComplete() }
     }
 
     if (showHowItWorks) {
@@ -151,11 +152,19 @@ fun OnboardingScreen(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.End
             ) {
-                TextButton(onClick = skipOnboarding) {
-                    Text(
-                        text = stringResource(R.string.onboarding_skip),
-                        color = MeshTheme.colors.onSurfaceVariant
-                    )
+                if (isLastPage) {
+                    // Keep the row height so the pager doesn't shift when Skip is hidden
+                    Spacer(modifier = Modifier.height(ButtonDefaults.MinHeight))
+                } else {
+                    TextButton(
+                        onClick = finishOnboarding,
+                        enabled = !uiState.isSubmitting
+                    ) {
+                        Text(
+                            text = stringResource(R.string.onboarding_skip),
+                            color = MeshTheme.colors.onSurfaceVariant
+                        )
+                    }
                 }
             }
 
@@ -190,14 +199,23 @@ fun OnboardingScreen(
                     if (isLastPage) {
                         finishOnboarding()
                     } else {
-                        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+                        scope.launch { goToPage(pagerState.currentPage + 1) }
                     }
                 },
+                enabled = !uiState.isSubmitting,
                 modifier = Modifier
                     .fillMaxWidth()
+                    // heightIn, not height. A hard 48dp clipped the label at the 200% font
+                    // scale Android permits — and this is the first screen anyone sees, so
+                    // a user who runs large text met a button whose text was cut off
+                    // before they had used the app at all. SC 1.4.4.
                     .heightIn(min = MeshTheme.size.buttonHeight)
             ) {
-                Text(text = stringResource(R.string.onboarding_next))
+                Text(
+                    text = stringResource(
+                        if (isLastPage) R.string.onboarding_get_started else R.string.onboarding_next
+                    )
+                )
             }
         }
     }
@@ -261,7 +279,11 @@ private fun Headline(text: String) {
     Text(
         text = text,
         style = MeshTheme.typography.headlineSmall,
-        color = MeshTheme.colors.onSurface
+        color = MeshTheme.colors.onSurface,
+        // headlineSmall made this look like a heading; it did not make it one. Declaring
+        // it means TalkBack announces "heading" and can jump between onboarding pages by
+        // heading rather than swiping through each paragraph. SC 1.3.1.
+        modifier = Modifier.semantics { heading() }
     )
 }
 

@@ -2,7 +2,13 @@ package com.greybox.projectmesh.navigation
 
 
 import androidx.activity.ComponentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.paneTitle
+import androidx.compose.ui.semantics.semantics
+import com.greybox.projectmesh.R
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -65,14 +71,18 @@ fun AppNavHost(
     ){ innerPadding ->
         NavHost(navController, startDestination = startDestination, Modifier.padding(innerPadding))
         {
-            composable(BottomNavItem.Home.route) { HomeScreen() }
+            composable(BottomNavItem.Home.route) {
+                ScreenPane(stringResource(R.string.home)) { HomeScreen() }
+            }
 
 
             composable(BottomNavItem.Network.route) {
                 // Just call NetworkScreen with no click callback
-                NetworkScreen(
-                    onNodeClick = {ip -> navController.navigate("pingScreen/$ip")}
-                )
+                ScreenPane(stringResource(R.string.network)) {
+                    NetworkScreen(
+                        onNodeClick = {ip -> navController.navigate("pingScreen/$ip")}
+                    )
+                }
             }
         
 
@@ -87,14 +97,16 @@ fun AppNavHost(
             composable(BottomNavItem.Send.route) {
                 val activity = LocalContext.current as ComponentActivity
                 val sharedUrisViewModel: SharedUriViewModel = viewModel(activity)
-                SendScreen(
-                    onSwitchToSelectDestNode = { uris ->
-                        Timber.tag("uri_track_nav_send").d("size: %s", uris.size.toString())
-                        Timber.tag("uri_track_nav_send").d("List: $uris")
-                        sharedUrisViewModel.setUris(uris)
-                        navController.navigate("selectDestNode")
-                    }
-                )
+                ScreenPane(stringResource(R.string.send)) {
+                    SendScreen(
+                        onSwitchToSelectDestNode = { uris ->
+                            Timber.tag("uri_track_nav_send").d("size: %s", uris.size.toString())
+                            Timber.tag("uri_track_nav_send").d("List: $uris")
+                            sharedUrisViewModel.setUris(uris)
+                            navController.navigate("selectDestNode")
+                        }
+                    )
+                }
             }
             composable("selectDestNode"){
                 val activity = LocalContext.current as ComponentActivity
@@ -108,16 +120,20 @@ fun AppNavHost(
                 )
             }
             
-            composable(BottomNavItem.Receive.route) { ReceiveScreen() }
+            composable(BottomNavItem.Receive.route) {
+                ScreenPane(stringResource(R.string.receive)) { ReceiveScreen() }
+            }
 
             composable(BottomNavItem.Log.route) {
-                LogScreen()
+                ScreenPane(stringResource(R.string.log)) { LogScreen() }
             }
-            
+
             composable(BottomNavItem.Settings.route) {
-                SettingsScreen(
-                    onOpenHowMeshWorks = { navController.navigate(HOW_MESH_WORKS_ROUTE) }
-                )
+                ScreenPane(stringResource(R.string.settings)) {
+                    SettingsScreen(
+                        onOpenHowMeshWorks = { navController.navigate(HOW_MESH_WORKS_ROUTE) }
+                    )
+                }
             }
 
             // User-education page: reachable from Settings, not listed in the bottom nav
@@ -131,15 +147,17 @@ fun AppNavHost(
                 //latest status of DeviceStatus manager
                 val deviceStatusRefreshTrigger = DeviceStatusManager.deviceStatusMap.collectAsState().value
                 // Show a list of nodes, let the user pick one
-                ConversationsHomeScreen(
-                    onConversationSelected = { userIdentifier ->
-                        // userIdentifier will be either an IP address (for online users)
-                        // or a conversation ID (for offline users)
-                        Timber.tag("Navigation").d("Selected conversation/user: $userIdentifier")
-                        //navigate to the chat screen with this identifier
-                        navController.navigate("chatScreen/${userIdentifier}")
-                    }
-                )
+                ScreenPane(stringResource(R.string.chat)) {
+                    ConversationsHomeScreen(
+                        onConversationSelected = { userIdentifier ->
+                            // userIdentifier will be either an IP address (for online users)
+                            // or a conversation ID (for offline users)
+                            Timber.tag("Navigation").d("Selected conversation/user: $userIdentifier")
+                            //navigate to the chat screen with this identifier
+                            navController.navigate("chatScreen/${userIdentifier}")
+                        }
+                    )
+                }
                 /*
                 ChatNodeListScreen(
                     onNodeSelected = { ip ->
@@ -208,5 +226,20 @@ fun AppNavHost(
                 }
             }
         }
+    }
+}
+
+/**
+ * Names a top-level tab for screen readers without drawing anything.
+ *
+ * None of the tab screens has a visible title, so switching tabs told a TalkBack user
+ * nothing about where they had landed. A paneTitle is announced when the pane appears
+ * ("Network"), the way an activity title would be. SC 2.4.2 (Page Titled). It is not a
+ * heading: TalkBack's heading navigation still needs visible title text to land on.
+ */
+@Composable
+private fun ScreenPane(title: String, content: @Composable () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().semantics { paneTitle = title }) {
+        content()
     }
 }

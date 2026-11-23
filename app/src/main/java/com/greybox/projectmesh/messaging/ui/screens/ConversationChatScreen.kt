@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -113,6 +114,13 @@ fun ConversationChatScreen (
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.md)
             ) {
+                // Was "Error: ${errorMessage.value}", which put a raw Java exception
+                // message on screen — "java.net.SocketTimeoutException: failed to connect
+                // to /192.168.49.1 (port 9614) after 10000ms". That is a log line, not a
+                // sentence. It gives a non-technical user nothing to act on, and for
+                // someone with a reading or cognitive disability it is simply an
+                // unreadable wall. SC 3.3.1. The exception is already captured by the
+                // Timber call in the catch block, which is where it belongs.
                 Text(
                     text = errorMessage.value ?: "",
                     style = MeshTheme.typography.bodyLarge,

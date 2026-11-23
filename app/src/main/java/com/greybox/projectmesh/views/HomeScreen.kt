@@ -10,9 +10,10 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -21,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -49,13 +51,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.CustomAccessibilityAction
+import androidx.compose.ui.semantics.customActions
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
@@ -85,6 +89,12 @@ import com.ustadmobile.meshrabiya.vnet.wifi.ConnectBand
 import com.ustadmobile.meshrabiya.vnet.wifi.HotspotType
 import com.greybox.projectmesh.components.ConnectWifiLauncherResult
 import com.greybox.projectmesh.components.ConnectWifiLauncherStatus
+import com.greybox.projectmesh.components.MeshStatusDot
+//contextual help
+import com.greybox.projectmesh.components.HelpDialog
+import com.greybox.projectmesh.components.HelpLink
+import com.greybox.projectmesh.components.HelpParagraph
+//end
 import com.greybox.projectmesh.components.meshrabiyaConnectLauncher
 import com.ustadmobile.meshrabiya.log.MNetLogger
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -203,6 +213,29 @@ fun StartHomeScreen(
         onResult = onConnectWifiLauncherResult,
     )
     var userEnteredConnectUri by rememberSaveable { mutableStateOf("") }
+    //contextual help
+    var showUriHelp by rememberSaveable { mutableStateOf(false) }
+    var showHotspotOptionsHelp by rememberSaveable { mutableStateOf(false) }
+
+    if (showUriHelp) {
+        HelpDialog(
+            title = stringResource(R.string.help_uri_title),
+            onDismiss = { showUriHelp = false },
+        ) {
+            HelpParagraph(stringResource(R.string.help_uri_body_1))
+            HelpParagraph(stringResource(R.string.help_uri_body_2))
+            HelpParagraph(stringResource(R.string.help_uri_body_3))
+            HelpParagraph(stringResource(R.string.help_uri_body_4))
+        }
+    }
+    if (showHotspotOptionsHelp) {
+        HelpDialog(
+            title = stringResource(R.string.help_hotspot_options_title),
+            onDismiss = { showHotspotOptionsHelp = false },
+        ) {
+            HelpParagraph(stringResource(R.string.help_hotspot_options_body))
+        }
+    }//end of contextual help
 
     // connect to other device via connect uri
     fun connect(uri: String, logger: MNetLogger): Unit {
@@ -269,14 +302,16 @@ fun StartHomeScreen(
                 text = stringResource(id = R.string.device_name) + ": ",
                 textCopyable = uiState.deviceName,
                 style = MeshTheme.typography.bodyMedium,
-                padding = MeshTheme.spacing.sm
+                padding = MeshTheme.spacing.sm,
+                copyActionLabel = stringResource(id = R.string.copy_device_name)
             )
             LongPressCopyableText(
                 context,
                 text = stringResource(id = R.string.ip_address) + ": ",
                 textCopyable = uiState.localAddress.addressToDotNotation(),
                 style = MeshTheme.typography.bodyMedium,
-                padding = MeshTheme.spacing.sm
+                padding = MeshTheme.spacing.sm,
+                copyActionLabel = stringResource(id = R.string.copy_ip_address)
             )
         }
 
@@ -306,15 +341,27 @@ fun StartHomeScreen(
                 }
             }
         }
-
+        //remade
         item (key = "hotspot_type_option") {
             if(!uiState.wifiConnectionEnabled) {
                 val wifiDirectSupported = isWifiDirectSupported(context)
-                Text(
+                //contextual help: label and Options link on one line
+                Row(
                     modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm),
-                    text = stringResource(id = R.string.hotspot_type),
-                    style = MeshTheme.typography.bodySmall,
-                )
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Text(
+                        text = stringResource(id = R.string.hotspot_type),
+                        style = MeshTheme.typography.bodySmall,
+                    )
+                    HelpLink(
+                        text = stringResource(R.string.help_hotspot_options_link),
+                        style = MeshTheme.typography.bodySmall,
+                        compact = true,
+                        modifier = Modifier.padding(start = MeshTheme.spacing.sm),
+                        onClick = { showHotspotOptionsHelp = true },
+                    )
+                }
                 Row(modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm)){
                     uiState.hotspotTypeMenu.forEach { hotspotType ->
                         val isDisabled = (hotspotType == HotspotType.WIFIDIRECT_GROUP && !wifiDirectSupported)
@@ -434,6 +481,21 @@ fun StartHomeScreen(
                         modifier = Modifier.padding(MeshTheme.spacing.sm),
                         text = stringResource(id = R.string.instruction)
                     )
+                    //contextual help - HERE
+                    Row(
+                        modifier = Modifier.padding(horizontal = MeshTheme.spacing.sm),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(text = stringResource(R.string.help_uri_step_prefix))
+                        HelpLink(
+                            text = stringResource(R.string.help_uri_step_link),
+                            style = MeshTheme.typography.bodyLarge,
+                            compact = true,
+                            onClick = { showUriHelp = true },
+                        )
+                        Text(text = stringResource(R.string.help_uri_step_suffix))
+                    }//
+
                     TextField(
                         value = userEnteredConnectUri,
                         onValueChange = {
@@ -477,7 +539,12 @@ fun StartHomeScreen(
                             }else {
                                 Icon(
                                     imageVector = Icons.Default.Wifi,
-                                    contentDescription = "",
+                                    // null rather than "". Both are silent to TalkBack,
+                                    // but an empty string reads as an unfinished edit,
+                                    // while null is the documented way to declare an icon
+                                    // decorative. It is decorative here: the connection
+                                    // state is in the supporting text beside it.
+                                    contentDescription = null,
                                 )
                             }
                         },
@@ -510,14 +577,14 @@ fun StartHomeScreen(
                 // to be confirmed: a hotspot being off is a state the user chose, not a
                 // fault, and `error` is reserved for things that went wrong. This is a
                 // visible change — the dot goes from red to grey when the hotspot is off.
-                Box(
-                    modifier = Modifier
-                        .size(MeshTheme.size.statusDotInline)
-                        .background(
-                            color = if (uiState.hotspotStatus) MeshTheme.mesh.statusOnline
-                            else MeshTheme.mesh.statusOffline,
-                            shape = CircleShape
-                        )
+                //
+                // Now shared with the other three dot sites via MeshStatusDot, which adds
+                // the filled/hollow shape distinction. This site was already the safest of
+                // the four, because the text to the left spells out "Online"/"Offline" in
+                // words, but it was open-coding the same dot a fourth time.
+                MeshStatusDot(
+                    isOnline = uiState.hotspotStatus,
+                    size = MeshTheme.size.statusDotInline
                 )
             }
         }
@@ -542,30 +609,62 @@ fun stopHotspotConfirmationDialog(context: Context, onConfirm: (Boolean) -> Unit
 // a literal smuggled across a function boundary: every call site passed a bare number
 // that this function turned into `.sp` and `.dp`, so no caller could pass a token and the
 // gate could never see the violation.
+@OptIn(ExperimentalFoundationApi::class) // combinedClickable
 @Composable
 fun LongPressCopyableText(context: Context,
                           text: String,
                           textCopyable: String,
                           style: TextStyle = MeshTheme.typography.bodyMedium,
-                          padding: Dp = MeshTheme.spacing.none){
+                          padding: Dp = MeshTheme.spacing.none,
+                          copyActionLabel: String = "Copy"){
     val clipboardManager = LocalClipboardManager.current
-    BasicText(
-        text = text + textCopyable,
-        // BasicText draws no colour of its own, so the role has to be applied here or the
-        // text renders black on a dark background.
-        style = style.copy(color = MeshTheme.colors.onBackground),
+    val copy = {
+        clipboardManager.setText(AnnotatedString(textCopyable))
+        Toast
+            .makeText(context, "Text copied to clipboard!", Toast.LENGTH_SHORT)
+            .show()
+    }
+    // BasicText draws no colour of its own, so the role has to be applied here or the
+    // text renders black on a dark background.
+    val styled = style.copy(color = MeshTheme.colors.onBackground)
+
+    // A plain tap copies, as well as a long press. A tap is reachable with a tremor, a
+    // prosthetic, a stylus or a switch; a 500ms sustained press is not. The custom action
+    // also lists Copy in TalkBack's actions menu. SC 2.1.1 (Keyboard) / SC 4.1.2.
+    //
+    // Chat bubbles used to share this function with tap left inert; they now have their
+    // own tap-for-menu in MessageBubble, so this is only the device name and IP rows.
+    //
+    // A Box rather than a bare BasicText because the row needs a real 48dp touch target
+    // and the text has to stay vertically centred inside it. heightIn alone would
+    // top-align the label; heightIn + wrapContentHeight cancels the minimum outright,
+    // since wrapContentHeight lets the content ignore incoming minimum constraints and
+    // then reports the content's own size.
+    Box(
         modifier = Modifier
-            .pointerInput(textCopyable) {
-                detectTapGestures(
-                    onLongPress = {
-                        clipboardManager.setText(AnnotatedString(textCopyable))
-                        Toast
-                            .makeText(context, "Text copied to clipboard!", Toast.LENGTH_SHORT)
-                            .show()
-                    })
+            .fillMaxWidth()
+            .semantics {
+                customActions = listOf(
+                    CustomAccessibilityAction(copyActionLabel) {
+                        copy()
+                        true
+                    }
+                )
             }
-            .padding(padding)
-    )
+            .heightIn(min = MeshTheme.size.touchTargetMin)
+            .combinedClickable(
+                onClickLabel = copyActionLabel,
+                onClick = copy,
+                onLongClick = copy
+            ),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        BasicText(
+            text = text + textCopyable,
+            style = styled,
+            modifier = Modifier.padding(padding)
+        )
+    }
 }
 
 // display the QR code

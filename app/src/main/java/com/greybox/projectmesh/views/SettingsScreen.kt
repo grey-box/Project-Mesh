@@ -45,6 +45,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.PopupProperties
@@ -193,11 +195,12 @@ fun SettingsScreen(
                         uri,
                         Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
                     )
-                    Toast.makeText(context, "Directory selected: $uri", Toast.LENGTH_LONG).show()
+                    // Show the readable folder name, not the raw content:// URI
+                    val selectedFolderName = Uri.decode(uri.toString()).split(":").lastOrNull() ?: ""
+                    Toast.makeText(context, context.getString(R.string.save_folder_selected, selectedFolderName), Toast.LENGTH_LONG).show()
                     viewModel.setSaveToFolder(uri.toString())
-                } else {
-                    Toast.makeText(context, context.getString(R.string.error_no_save_folder), Toast.LENGTH_LONG).show()
                 }
+                // Picker cancelled: keep the current folder, no message
             }
             val folderNameToShow = if (ui.saveToFolder.startsWith("content://")) {
                 // Decode Uri and extract the folder name for content URIs
@@ -246,7 +249,13 @@ fun SectionHeader(title: Int) {
     Spacer(modifier = Modifier.height(MeshTheme.spacing.lg))
     Text(
         text = stringResource(id = title),
-        style = MeshTheme.typography.titleLarge
+        style = MeshTheme.typography.titleLarge,
+        // These were headings in appearance only — bold and larger, but structurally just
+        // text. TalkBack's "navigate by heading" gesture had nothing to land on anywhere
+        // in the app, so the only way through this long settings list was to swipe past
+        // every single control in order. Declaring the heading is what makes the visual
+        // hierarchy a real one. SC 1.3.1 (Info and Relationships).
+        modifier = Modifier.semantics { heading() }
     )
 //    HorizontalDivider(
 //        modifier = Modifier

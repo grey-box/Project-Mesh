@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.tooling.preview.Preview
 import com.greybox.projectmesh.ui.theme.AppTheme
 import com.greybox.projectmesh.ui.theme.MeshTheme
@@ -59,7 +60,13 @@ fun MeshAvatar(
             Text(
                 text = initial,
                 style = initialStyle,
-                color = content
+                color = content,
+                // The initial is a visual stand-in for the name, and the name is always
+                // rendered next to this avatar at both call sites. Left in the semantics
+                // tree it makes TalkBack announce every row as "A, Ana, Online" — one
+                // stray letter in front of the thing it abbreviates. Cleared, not
+                // described, because there is nothing here a screen reader needs.
+                modifier = Modifier.clearAndSetSemantics { }
             )
         }
 
@@ -72,14 +79,13 @@ fun MeshAvatar(
                     .background(MeshTheme.colors.surface),
                 contentAlignment = Alignment.Center
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(MeshTheme.size.statusDot - MeshTheme.spacing.xs)
-                        .clip(CircleShape)
-                        .background(
-                            if (isOnline) MeshTheme.mesh.statusOnline
-                            else MeshTheme.mesh.statusOffline
-                        )
+                // Filled when online, a hollow ring when offline. The two status colours
+                // measure 1.04:1 against each other in light, so colour alone conveyed
+                // nothing in greyscale or sunlight; MeshStatusDot adds the shape channel
+                // that SC 1.4.1 requires.
+                MeshStatusDot(
+                    isOnline = isOnline,
+                    size = MeshTheme.size.statusDot - MeshTheme.spacing.xs
                 )
             }
         }
@@ -113,4 +119,14 @@ private fun MeshAvatarLightPreview() {
 @Composable
 private fun MeshAvatarDarkPreview() {
     ProjectMeshTheme(appTheme = AppTheme.DARK) { MeshAvatarSamples() }
+}
+
+// Android allows a font scale up to 200%, and not one preview in this project exercised
+// it, so text that clipped or overflowed at large sizes was invisible during development
+// and only reachable by changing a system setting on a device. Anything with a fixed
+// height or a single-line label needs this preview beside the light and dark ones.
+@Preview(showBackground = true, name = "Large text (200%)", fontScale = 2f)
+@Composable
+private fun MeshAvatarLargeTextPreview() {
+    ProjectMeshTheme(appTheme = AppTheme.LIGHT) { MeshAvatarSamples() }
 }

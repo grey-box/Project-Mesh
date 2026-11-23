@@ -8,6 +8,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.unit.dp
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Image
 import androidx.compose.material.icons.filled.SignalCellular4Bar
@@ -48,7 +51,12 @@ fun WifiListItem(
             Icon(
                 // replace this image with a custom icon or image
                 imageVector = Icons.Default.Image,
-                contentDescription = "Profile Picture",
+                // Was "Profile Picture", which described neither the icon nor the content:
+                // this is a generic placeholder glyph, there is no picture, and TalkBack
+                // read those two words aloud before every single node in the list. The
+                // node name sits immediately to the right and carries the identity, so
+                // the icon is decorative. SC 1.1.1.
+                contentDescription = null,
                 modifier = Modifier.size(MeshTheme.size.iconMd)
             )
         },
@@ -72,7 +80,16 @@ fun WifiListItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.SignalCellular4Bar,
-                    contentDescription = "Mesh Signal Strength",
+                    // Was "Mesh Signal Strength". The icon is a hardcoded four-bar glyph
+                    // that never changes, so that description announced a measurement the
+                    // app does not have — worse than silence, because a screen reader user
+                    // had no way to tell it was decorative. The real numbers are in the
+                    // "Ping"/"Hops" text beside it, which TalkBack does read.
+                    //
+                    // TODO: the four-bar glyph tells sighted users the same untruth. It
+                    // should be driven by hopCount/pingTimeSum or replaced by a neutral
+                    // icon; that is a data-wiring change, not an accessibility one.
+                    contentDescription = null,
                     modifier = Modifier.size(MeshTheme.size.iconMd)
                 )
                 Spacer(modifier = Modifier.width(MeshTheme.spacing.xs))
@@ -81,7 +98,16 @@ fun WifiListItem(
                 // each other. Expressing it as the Column's own vertical arrangement makes
                 // the spacing real and removes the stray Spacer.
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.xs)
+                    verticalArrangement = Arrangement.spacedBy(MeshTheme.spacing.xs),
+                    // ListItem measures trailing content first and gives the headline what
+                    // is left. At 200% text this column took most of the row, so the
+                    // device name and IP were squeezed into a narrow strip and split
+                    // mid-word ("Devic / e", "192.16 / 8.0.99"). Capping it at 40% of the
+                    // screen leaves room for the name; at normal size it is narrower than
+                    // the cap, so nothing changes. SC 1.4.4.
+                    modifier = Modifier.widthIn(
+                        max = LocalConfiguration.current.screenWidthDp.dp * 0.4f
+                    )
                 ){
                     Text(text = "Mesh status")
                     Text("Ping: ${wifiEntry.originatorMessage.pingTimeSum}ms "

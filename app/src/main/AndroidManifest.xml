@@ -91,9 +91,17 @@
                 android:name="android.support.FILE_PROVIDER_PATHS"
                 android:resource="@xml/filepaths"/>
         </provider>
+        <!--
+          QR scanner rotation follows the phone (fullUser), and honours the user's own
+          rotation lock. It was forced to portrait, which blocks anyone whose phone is
+          mounted sideways, for example on a wheelchair. WCAG 2.1 SC 1.3.4 (Orientation).
+          tools:replace stays because the library's own manifest sets sensorLandscape, and
+          dropping the override would lock it the other way. HomeScreen already passes
+          setOrientationLocked(false).
+        -->
         <activity
             android:name="com.journeyapps.barcodescanner.CaptureActivity"
-            android:screenOrientation="portrait"
+            android:screenOrientation="fullUser"
             android:stateNotNeeded="true"
             tools:replace="android:screenOrientation" />
         <activity android:name=".debug.CrashScreenActivity" android:process=":error_handler" android:exported="false"></activity>

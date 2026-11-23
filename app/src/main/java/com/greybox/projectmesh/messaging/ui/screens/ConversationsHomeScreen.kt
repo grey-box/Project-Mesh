@@ -18,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -125,6 +128,15 @@ fun ConversationItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
+            // The row is already one focus stop because `clickable` merges its
+            // descendants, but nothing in that merged announcement said whether the
+            // person was reachable: the state lived only in the colour of an 8dp circle.
+            // stateDescription puts it where a screen reader expects state to be, so the
+            // row reads "Ana, Online, see you at six" rather than leaving a TalkBack user
+            // to open a conversation to find out it cannot send. SC 1.4.1 / SC 4.1.2.
+            .semantics {
+                stateDescription = if (conversation.isOnline) "Online" else "Offline"
+            }
             .padding(MeshTheme.spacing.md),
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -228,7 +240,9 @@ fun EmptyConversationsView() {
 
         Text(
             text = "No Conversations Yet",
-            style = MeshTheme.typography.headlineSmall
+            style = MeshTheme.typography.headlineSmall,
+            // Styled as a heading, now declared as one. SC 1.3.1.
+            modifier = Modifier.semantics { heading() }
         )
 
         Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
@@ -265,7 +279,8 @@ fun ErrorView(
 
         Text(
             text = "Error Loading Conversations",
-            style = MeshTheme.typography.headlineSmall
+            style = MeshTheme.typography.headlineSmall,
+            modifier = Modifier.semantics { heading() }
         )
 
         Spacer(modifier = Modifier.height(MeshTheme.spacing.sm))
