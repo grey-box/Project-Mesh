@@ -84,7 +84,7 @@ fun ShowLogScreen(
     val androidLogger = logger as MNetLoggerAndroid
     val clipboardManager = LocalClipboardManager.current
     val timeFormatter = remember {
-        SimpleDateFormat("HH:mm:ss.SS", Locale.getDefault())
+        SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
     }
     var selectionMode by remember { mutableStateOf(false) }
     var selectedLineIds by remember { mutableStateOf(setOf<Int>()) }
