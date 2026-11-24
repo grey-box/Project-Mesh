@@ -1,6 +1,5 @@
 package com.greybox.projectmesh.viewModel
 
-import android.content.SharedPreferences
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.testutil.FakeSettingsRepository
 import com.greybox.projectmesh.testutil.MainDispatcherRule
@@ -11,7 +10,6 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
-import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -30,12 +28,10 @@ import java.net.InetAddress
  *  - [UserRepository]: MockK. The tests verify INTERACTIONS (which user was
  *    inserted/updated, that only one insert happens during a double-tap) rather
  *    than returned state — the mock sweet spot at a dependency boundary.
- *  - [SharedPreferences]: MockK. A pure interface with no observable state of
- *    its own here; the tests only need getString("UUID") to return a stub and
- *    to verify a generated UUID is written back.
  *  - [FakeSettingsRepository]: the existing hand-written fake, because the
  *    device-name assertion reads the fake's stateful flow — a mock would just
- *    be a more awkward fake.
+ *    be a more awkward fake. It also supplies the local UUID the way
+ *    GlobalApp.onCreate() does in production, before any screen can run.
  *  - [AndroidVirtualNode]: MockK stub of `address`, so the ViewModel's DI-based
  *    local-IP lookup resolves to a known address without a real virtual node.
  *
@@ -49,8 +45,6 @@ class OnboardingViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val userRepository: UserRepository = mockk(relaxed = true)
-    private val prefs: SharedPreferences = mockk()
-    private val editor: SharedPreferences.Editor = mockk(relaxed = true)
     private val virtualNode: AndroidVirtualNode = mockk()
 
     private val settings: FakeSettingsRepository = FakeSettingsRepository()
@@ -59,23 +53,16 @@ class OnboardingViewModelTest {
         InetAddress.getByAddress(byteArrayOf(192.toByte(), 168.toByte(), 42.toByte(), 1.toByte()))
 
     private fun buildVm(
-        existingUuid: String? = null,
+        localUuid: String? = "uuid-1",
         existingUsers: List<UserEntity> = emptyList(),
-        settingsRepo: SettingsRepository = settings,
     ): OnboardingViewModel {
-        every { prefs.edit() } returns editor
-        // Editor is a builder: putString returns the editor itself. Without this,
-        // a relaxed mock hands back a fresh child mock and the chained .apply()
-        // lands on the child, not on the mock we verify against.
-        every { editor.putString(any(), any()) } returns editor
-        every { prefs.getString("UUID", null) } returns existingUuid
+        settings.localUuid = localUuid
         coEvery { userRepository.getAllUsers() } returns existingUsers
         every { virtualNode.address } returns localIpAddress
 
         val di = DI {
             bind<UserRepository>() with singleton { userRepository }
-            bind<SettingsRepository>() with singleton { settingsRepo }
-            bind<SharedPreferences>(tag = "settings") with singleton { prefs }
+            bind<SettingsRepository>() with singleton { settings }
             bind<AndroidVirtualNode>() with singleton { virtualNode }
         }
         return OnboardingViewModel(di)
@@ -83,7 +70,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `initial state is the Editing phase`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1")
+        val vm = buildVm(localUuid = "uuid-1")
 
         assertEquals(OnboardingPhase.Editing, vm.state.value.phase)
         assertFalse(vm.state.value.showHowItWorks)
@@ -91,7 +78,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `typed username is kept, completes setup and names the device`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1")
+        val vm = buildVm(localUuid = "uuid-1")
         vm.onUsernameChange("Harshit")
 
         vm.onNextClick()
@@ -100,12 +87,11 @@ class OnboardingViewModelTest {
         coVerify(exactly = 1) { userRepository.insertOrUpdateUser("uuid-1", "Harshit", localIp) }
         assertEquals("Harshit", settings.deviceName.value)
         assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
-        verify(exactly = 0) { editor.putString(any(), any()) }  // existing UUID reused, nothing written
     }
 
     @Test
     fun `blank username generates Guest1 when no users exist`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1", existingUsers = emptyList())
+        val vm = buildVm(localUuid = "uuid-1", existingUsers = emptyList())
 
         vm.onNextClick()
         advanceUntilIdle()
@@ -118,7 +104,7 @@ class OnboardingViewModelTest {
     @Test
     fun `guest numbering continues from the highest existing GuestN`() = runTest(mainDispatcherRule.dispatcher) {
         val vm = buildVm(
-            existingUuid = "uuid-1",
+            localUuid = "uuid-1",
             existingUsers = listOf(
                 UserEntity(uuid = "u1", name = "Guest1"),
                 UserEntity(uuid = "u2", name = "Alice"),
@@ -135,7 +121,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `phase is Submitting between the finish tap and the setup writes`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1")
+        val vm = buildVm(localUuid = "uuid-1")
 
         vm.onNextClick()
         // No advanceUntilIdle yet: the synchronous guard must already have moved
@@ -148,7 +134,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `second tap while setup is running is ignored`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1")
+        val vm = buildVm(localUuid = "uuid-1")
 
         vm.onNextClick()
         vm.onNextClick()   // before advanceUntilIdle: the setup coroutine has not run yet
@@ -159,27 +145,25 @@ class OnboardingViewModelTest {
     }
 
     @Test
-    fun `missing UUID is generated and persisted before the user insert`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = null)
+    fun `missing local UUID registers nobody and returns to Editing`() = runTest(mainDispatcherRule.dispatcher) {
+        val vm = buildVm(localUuid = null)
 
-        vm.onUsernameChange("Harshit")
         vm.onNextClick()
         advanceUntilIdle()
 
-        // UUID was generated and written back to prefs…
-        verify(exactly = 1) { editor.putString("UUID", any()) }
-        verify(exactly = 1) { editor.apply() }
-        // …and the SAME generated UUID is what registers the user
-        verify {
-            editor.putString(withArg { uuidArg -> assertTrue(uuidArg.isNotBlank()) }, any())
-        }
-        coVerify { userRepository.insertOrUpdateUser(match { it.isNotBlank() }, "Harshit", localIp) }
+        // GlobalApp.onCreate() guarantees a UUID before any activity, so this
+        // path is unreachable in production; if it ever trips anyway, onboarding
+        // must not register a user against a missing UUID or strand the flow.
+        coVerify(exactly = 0) { userRepository.insertOrUpdateUser(any(), any(), any()) }
+        assertEquals("", settings.deviceName.value)
+        assertEquals(OnboardingPhase.Editing, vm.state.value.phase)
+        assertFalse(vm.state.value.showHowItWorks)
     }
 
     @Test
     fun `skip keeps a typed username instead of replacing it with a guest name`() =
         runTest(mainDispatcherRule.dispatcher) {
-            val vm = buildVm(existingUuid = "uuid-1")
+            val vm = buildVm(localUuid = "uuid-1")
             vm.onUsernameChange("Typed")
 
             vm.onSkipClick()
@@ -192,7 +176,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `skip with blank username generates a guest name`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1", existingUsers = listOf(UserEntity(uuid = "u1", name = "Guest4")))
+        val vm = buildVm(localUuid = "uuid-1", existingUsers = listOf(UserEntity(uuid = "u1", name = "Guest4")))
 
         vm.onSkipClick()
         advanceUntilIdle()
@@ -203,7 +187,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `how it works shows and dismisses through state`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1")
+        val vm = buildVm(localUuid = "uuid-1")
 
         assertFalse(vm.state.value.showHowItWorks)
         vm.onHowItWorksClick()
@@ -214,7 +198,7 @@ class OnboardingViewModelTest {
 
     @Test
     fun `completion is exposed only through state, never a callback`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm(existingUuid = "uuid-1")
+        val vm = buildVm(localUuid = "uuid-1")
         vm.onUsernameChange("Harshit")
 
         // The public surface ends at state: after finishing, the screen observes

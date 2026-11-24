@@ -1,13 +1,11 @@
 package com.greybox.projectmesh.viewModel
 
-import android.content.SharedPreferences
 import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.greybox.projectmesh.arch.StateViewModel
 import com.greybox.projectmesh.data.SettingsRepository
 import com.greybox.projectmesh.extension.getLocalIpFromDI
 import com.greybox.projectmesh.user.UserRepository
-import java.util.UUID
 import kotlinx.coroutines.launch
 import org.kodein.di.DI
 import org.kodein.di.DIAware
@@ -36,7 +34,6 @@ class OnboardingViewModel(
     override val di = di
     private val userRepository: UserRepository by instance()
     private val settingsRepository: SettingsRepository by instance()
-    private val prefs: SharedPreferences by instance(tag = "settings")
     private val localIp: String by lazy { getLocalIpFromDI(di) }
 
     fun onUsernameChange(newUsername: String) = setState { copy(username = newUsername) }
@@ -70,6 +67,16 @@ class OnboardingViewModel(
         if (currentState.phase != OnboardingPhase.Editing) return
         setState { copy(phase = OnboardingPhase.Submitting) }
         viewModelScope.launch {
+            val uuid = settingsRepository.localUuid
+            if (uuid == null) {
+                // GlobalApp.onCreate() persists the UUID before any activity can
+                // run, so this is unreachable in production. If it ever trips
+                // anyway, do not register a user against a missing UUID — fall
+                // back to Editing so the user can try again.
+                Timber.tag("OnboardingVM").e("No local UUID; setup aborted")
+                setState { copy(phase = OnboardingPhase.Editing) }
+                return@launch
+            }
             // Blank username -> generated guest name. Written into state so the
             // final page would show it too if setup ever failed and the user stayed.
             val name = currentState.username.ifBlank {
@@ -78,19 +85,13 @@ class OnboardingViewModel(
                     setState { copy(username = generated) }
                 }
             }
-            performFirstTimeSetup(name)
+            performFirstTimeSetup(uuid, name)
             setState { copy(phase = OnboardingPhase.Complete) }
         }
     }
 
-    /** Register the user and device name. */
-    private suspend fun performFirstTimeSetup(name: String) {
-        var uuid = prefs.getString("UUID", null)
-        if (uuid.isNullOrEmpty()) {
-            uuid = UUID.randomUUID().toString()
-            prefs.edit().putString("UUID", uuid).apply()
-        }
-        // Insert or update the user with the local IP
+    /** Register the user and device name under the UUID GlobalApp established at startup. */
+    private suspend fun performFirstTimeSetup(uuid: String, name: String) {
         userRepository.insertOrUpdateUser(
             uuid = uuid,
             name = name,
