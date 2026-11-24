@@ -6,6 +6,7 @@ import com.greybox.projectmesh.testutil.FakeSettingsRepository
 import com.greybox.projectmesh.testutil.MainDispatcherRule
 import com.greybox.projectmesh.user.UserEntity
 import com.greybox.projectmesh.user.UserRepository
+import com.ustadmobile.meshrabiya.vnet.AndroidVirtualNode
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -14,26 +15,33 @@ import io.mockk.verify
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
+import org.kodein.di.DI
+import org.kodein.di.bind
+import org.kodein.di.singleton
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
+import java.net.InetAddress
 
 /**
- * OnboardingViewModel tests, per the approved OnboardingScreen contract.
- *
  * Test doubles, and why:
  *  - [UserRepository]: MockK. The tests verify INTERACTIONS (which user was
  *    inserted/updated, that only one insert happens during a double-tap) rather
- *    than returned state — this is exactly the mock sweet spot at a dependency
- *    boundary.
+ *    than returned state — the mock sweet spot at a dependency boundary.
  *  - [SharedPreferences]: MockK. A pure interface with no observable state of
  *    its own here; the tests only need getString("UUID") to return a stub and
- *    to verify the generated UUID is written back.
- *  - [SettingsRepository]: the existing hand-written [FakeSettingsRepository],
- *    because the device-name assertion reads the fake's stateful flow — a mock
- *    would just be a more awkward fake.
+ *    to verify a generated UUID is written back.
+ *  - [FakeSettingsRepository]: the existing hand-written fake, because the
+ *    device-name assertion reads the fake's stateful flow — a mock would just
+ *    be a more awkward fake.
+ *  - [AndroidVirtualNode]: MockK stub of `address`, so the ViewModel's DI-based
+ *    local-IP lookup resolves to a known address without a real virtual node.
+ *
+ * The ViewModel receives all of these through a real Kodein [DI] container
+ * (mirroring the production bindings), so construction paths are exercised
+ * the same way the app exercises them.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class OnboardingViewModelTest {
@@ -43,9 +51,12 @@ class OnboardingViewModelTest {
     private val userRepository: UserRepository = mockk(relaxed = true)
     private val prefs: SharedPreferences = mockk()
     private val editor: SharedPreferences.Editor = mockk(relaxed = true)
+    private val virtualNode: AndroidVirtualNode = mockk()
 
     private val settings: FakeSettingsRepository = FakeSettingsRepository()
     private val localIp = "192.168.42.1"
+    private val localIpAddress: InetAddress =
+        InetAddress.getByAddress(byteArrayOf(192.toByte(), 168.toByte(), 42.toByte(), 1.toByte()))
 
     private fun buildVm(
         existingUuid: String? = null,
@@ -59,12 +70,23 @@ class OnboardingViewModelTest {
         every { editor.putString(any(), any()) } returns editor
         every { prefs.getString("UUID", null) } returns existingUuid
         coEvery { userRepository.getAllUsers() } returns existingUsers
-        return OnboardingViewModel(
-            userRepository = userRepository,
-            prefs = prefs,
-            settingsRepository = settingsRepo,
-            localIp = localIp,
-        )
+        every { virtualNode.address } returns localIpAddress
+
+        val di = DI {
+            bind<UserRepository>() with singleton { userRepository }
+            bind<SettingsRepository>() with singleton { settingsRepo }
+            bind<SharedPreferences>(tag = "settings") with singleton { prefs }
+            bind<AndroidVirtualNode>() with singleton { virtualNode }
+        }
+        return OnboardingViewModel(di)
+    }
+
+    @Test
+    fun `initial state is the Editing phase`() = runTest(mainDispatcherRule.dispatcher) {
+        val vm = buildVm(existingUuid = "uuid-1")
+
+        assertEquals(OnboardingPhase.Editing, vm.state.value.phase)
+        assertFalse(vm.state.value.showHowItWorks)
     }
 
     @Test
@@ -77,8 +99,7 @@ class OnboardingViewModelTest {
 
         coVerify(exactly = 1) { userRepository.insertOrUpdateUser("uuid-1", "Harshit", localIp) }
         assertEquals("Harshit", settings.deviceName.value)
-        assertTrue(vm.state.value.isSetupComplete)
-        assertFalse(vm.state.value.isSubmitting)
+        assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
         verify(exactly = 0) { editor.putString(any(), any()) }  // existing UUID reused, nothing written
     }
 
@@ -91,7 +112,7 @@ class OnboardingViewModelTest {
 
         assertEquals("Guest1", vm.state.value.username)
         coVerify(exactly = 1) { userRepository.insertOrUpdateUser("uuid-1", "Guest1", localIp) }
-        assertTrue(vm.state.value.isSetupComplete)
+        assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
     }
 
     @Test
@@ -113,6 +134,19 @@ class OnboardingViewModelTest {
     }
 
     @Test
+    fun `phase is Submitting between the finish tap and the setup writes`() = runTest(mainDispatcherRule.dispatcher) {
+        val vm = buildVm(existingUuid = "uuid-1")
+
+        vm.onNextClick()
+        // No advanceUntilIdle yet: the synchronous guard must already have moved
+        // the state to Submitting, which is what disables the screen's buttons.
+        assertEquals(OnboardingPhase.Submitting, vm.state.value.phase)
+
+        advanceUntilIdle()
+        assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
+    }
+
+    @Test
     fun `second tap while setup is running is ignored`() = runTest(mainDispatcherRule.dispatcher) {
         val vm = buildVm(existingUuid = "uuid-1")
 
@@ -121,7 +155,7 @@ class OnboardingViewModelTest {
         advanceUntilIdle()
 
         coVerify(exactly = 1) { userRepository.insertOrUpdateUser(any(), any(), any()) }
-        assertTrue(vm.state.value.isSetupComplete)
+        assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
     }
 
     @Test
@@ -153,7 +187,7 @@ class OnboardingViewModelTest {
 
             assertEquals("Typed", vm.state.value.username)
             coVerify(exactly = 1) { userRepository.insertOrUpdateUser("uuid-1", "Typed", localIp) }
-            assertTrue(vm.state.value.isSetupComplete)
+            assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
         }
 
     @Test
@@ -164,12 +198,12 @@ class OnboardingViewModelTest {
         advanceUntilIdle()
 
         assertEquals("Guest5", vm.state.value.username)
-        assertTrue(vm.state.value.isSetupComplete)
+        assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
     }
 
     @Test
     fun `how it works shows and dismisses through state`() = runTest(mainDispatcherRule.dispatcher) {
-        val vm = buildVm()
+        val vm = buildVm(existingUuid = "uuid-1")
 
         assertFalse(vm.state.value.showHowItWorks)
         vm.onHowItWorksClick()
@@ -184,11 +218,11 @@ class OnboardingViewModelTest {
         vm.onUsernameChange("Harshit")
 
         // The public surface ends at state: after finishing, the screen observes
-        // isSetupComplete and informs the shell (MainActivity -> AppViewModel).
+        // the Complete phase and informs the shell (MainActivity -> AppViewModel).
         vm.onNextClick()
         advanceUntilIdle()
 
-        assertTrue(vm.state.value.isSetupComplete)
+        assertEquals(OnboardingPhase.Complete, vm.state.value.phase)
         // A further finish attempt must be a no-op, exactly like the double-tap guard.
         vm.onSkipClick()
         advanceUntilIdle()

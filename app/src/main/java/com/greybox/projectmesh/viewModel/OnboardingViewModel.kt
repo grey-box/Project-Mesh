@@ -5,34 +5,39 @@ import androidx.compose.runtime.Immutable
 import androidx.lifecycle.viewModelScope
 import com.greybox.projectmesh.arch.StateViewModel
 import com.greybox.projectmesh.data.SettingsRepository
+import com.greybox.projectmesh.extension.getLocalIpFromDI
 import com.greybox.projectmesh.user.UserRepository
 import java.util.UUID
 import kotlinx.coroutines.launch
+import org.kodein.di.DI
+import org.kodein.di.DIAware
+import org.kodein.di.instance
 import timber.log.Timber
 
 /**
- * Screen state per the approved OnboardingScreen contract:
- *  - completion is modelled AS STATE ([isSetupComplete]) instead of an `onComplete`
- *    callback handed INTO the ViewModel — the screen observes it and informs the shell.
- *  - `showHowItWorks` moved out of the composable's rememberSaveable into screen state.
- *  - [isSubmitting] is retained from the review pass: the repository writes are async,
- *    so a second tap in that window must be dropped, and the buttons use it to disable
- *    themselves.
+ * The three phases of the onboarding flow. A single enum instead of parallel
+ * booleans, so only the states the flow actually uses are representable:
+ * [Editing] is the pager, [Submitting] is the async setup window (second taps
+ * are dropped), [Complete] tells the shell setup is done.
  */
+enum class OnboardingPhase { Editing, Submitting, Complete }
+
 @Immutable
 data class OnboardingUiState(
     val username: String = "",
-    val isSetupComplete: Boolean = false,
+    val phase: OnboardingPhase = OnboardingPhase.Editing,
     val showHowItWorks: Boolean = false,
-    val isSubmitting: Boolean = false,
 )
 
 class OnboardingViewModel(
-    private val userRepository: UserRepository,
-    private val prefs: SharedPreferences,
-    private val settingsRepository: SettingsRepository,
-    private val localIp: String // Use the local IP here
-) : StateViewModel<OnboardingUiState>(OnboardingUiState()) {
+    di: DI,
+) : StateViewModel<OnboardingUiState>(OnboardingUiState()), DIAware {
+
+    override val di = di
+    private val userRepository: UserRepository by instance()
+    private val settingsRepository: SettingsRepository by instance()
+    private val prefs: SharedPreferences by instance(tag = "settings")
+    private val localIp: String by lazy { getLocalIpFromDI(di) }
 
     fun onUsernameChange(newUsername: String) = setState { copy(username = newUsername) }
 
@@ -51,18 +56,19 @@ class OnboardingViewModel(
     /**
      * Skip (pages 1–2). Deliberately the same single path as [onNextClick]:
      * a username typed on the final page is preserved, a blank one becomes
-     * a generated guest name (review fix).
+     * a generated guest name.
      */
     fun onSkipClick() = finishOnboarding()
 
     /**
-     * The one completion path. `isSubmitting` is set synchronously so a
-     * second tap is ignored while the setup writes are still in flight.
-     * Only the state lives here: the shell is notified via [OnboardingUiState.isSetupComplete].
+     * The one completion path. The phase moves to [OnboardingPhase.Submitting]
+     * synchronously, so a second tap while the repository writes are still in
+     * flight is ignored. The screen observes the state and informs the shell
+     * once the phase reaches [OnboardingPhase.Complete].
      */
     private fun finishOnboarding() {
-        if (currentState.isSubmitting || currentState.isSetupComplete) return
-        setState { copy(isSubmitting = true) }
+        if (currentState.phase != OnboardingPhase.Editing) return
+        setState { copy(phase = OnboardingPhase.Submitting) }
         viewModelScope.launch {
             // Blank username -> generated guest name. Written into state so the
             // final page would show it too if setup ever failed and the user stayed.
@@ -73,13 +79,11 @@ class OnboardingViewModel(
                 }
             }
             performFirstTimeSetup(name)
-            // Terminal state: the submitting flag comes back down so the final
-            // state is a clean "done" (isSetupComplete alone also blocks re-entry).
-            setState { copy(isSetupComplete = true, isSubmitting = false) }
+            setState { copy(phase = OnboardingPhase.Complete) }
         }
     }
 
-    /** Generate or retrieve the user's UUID, then register the user and device name. */
+    /** Register the user and device name. */
     private suspend fun performFirstTimeSetup(name: String) {
         var uuid = prefs.getString("UUID", null)
         if (uuid.isNullOrEmpty()) {
