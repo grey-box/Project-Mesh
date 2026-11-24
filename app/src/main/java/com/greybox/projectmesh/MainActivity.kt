@@ -84,7 +84,7 @@ class MainActivity : ComponentActivity(), DIAware {
             key(locale) {
                 ProjectMeshTheme(appTheme = ui.theme, textSize = ui.textSize) {
                     if (!ui.hasRunBefore) {
-                        OnboardingScreen(onComplete = appViewModel::completeOnboarding)
+                        OnboardingScreen(onSetupComplete = appViewModel::completeOnboarding)
                     } else {
                         AppNavHost(di, ui.startDestination, onScreenChanged = appViewModel::onScreenChanged)
                     }

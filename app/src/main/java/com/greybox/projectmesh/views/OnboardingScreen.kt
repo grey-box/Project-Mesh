@@ -30,32 +30,26 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalSavedStateRegistryOwner
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.semantics
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.greybox.projectmesh.GlobalApp
 import com.greybox.projectmesh.R
-import com.greybox.projectmesh.data.SettingsRepository
-import com.greybox.projectmesh.extension.getLocalIpFromDI
+import com.greybox.projectmesh.ViewModelFactory
 import com.greybox.projectmesh.ui.theme.MeshTheme
 import com.greybox.projectmesh.ui.theme.rememberReduceMotion
+import com.greybox.projectmesh.viewModel.OnboardingPhase
 import com.greybox.projectmesh.viewModel.OnboardingViewModel
 import kotlinx.coroutines.launch
 import org.kodein.di.compose.localDI
-import org.kodein.di.instance
 
 private const val PAGE_COUNT = 3
 
@@ -81,31 +75,22 @@ private val infoPages = listOf(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun OnboardingScreen(
-    onComplete: () -> Unit
+    viewModel: OnboardingViewModel = viewModel(
+        factory = ViewModelFactory(
+            di = localDI(),
+            owner = LocalSavedStateRegistryOwner.current,
+            vmFactory = { di, _ -> OnboardingViewModel(di) },
+            defaultArgs = null,
+        )),
+    onSetupComplete: () -> Unit
 ) {
-    val di = localDI()
-    val localIp = getLocalIpFromDI(di)
-    val settingsRepository: SettingsRepository by di.instance()
+    val uiState by viewModel.state.collectAsStateWithLifecycle()
 
-    val factory = remember {
-        object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                if (modelClass.isAssignableFrom(OnboardingViewModel::class.java)) {
-                    @Suppress("UNCHECKED_CAST")
-                    return OnboardingViewModel(
-                        userRepository = GlobalApp.GlobalUserRepo.userRepository,
-                        prefs = GlobalApp.GlobalUserRepo.prefs,
-                        settingsRepository = settingsRepository,
-                        localIp = localIp
-                    ) as T
-                }
-                throw IllegalArgumentException("Unknown ViewModel class")
-            }
-        }
+    // When setup finishes the ViewModel's phase becomes Complete, and this
+    // effect is what tells the app shell. MainActivity then swaps to AppNavHost.
+    LaunchedEffect(uiState.phase) {
+        if (uiState.phase == OnboardingPhase.Complete) onSetupComplete()
     }
-
-    val onboardingViewModel: OnboardingViewModel = viewModel(factory = factory)
-    val uiState by onboardingViewModel.uiState.collectAsState()
 
     val pagerState = rememberPagerState(initialPage = 0) { PAGE_COUNT }
     val scope = rememberCoroutineScope()
@@ -122,22 +107,17 @@ fun OnboardingScreen(
     }
 
     // User-education page opened from onboarding. Onboarding runs outside AppNavHost,
-    // so we swap screens with local state instead of navController.
-    var showHowItWorks by rememberSaveable { mutableStateOf(false) }
+    // so we swap screens with local state instead of navController. The ViewModel
+    // is the single state holder.
+    val showHowItWorks = uiState.showHowItWorks
 
     BackHandler(enabled = pagerState.currentPage > 0 && !showHowItWorks) {
         scope.launch { goToPage(pagerState.currentPage - 1) }
     }
 
-    // Skip and Get started share one path: a typed username is kept,
-    // a blank one gets a generated guest name.
-    val finishOnboarding: () -> Unit = {
-        onboardingViewModel.completeOnboarding { onComplete() }
-    }
-
     if (showHowItWorks) {
         // pagerState is remembered above, so returning keeps the user on the same page
-        HowMeshWorksScreen(onBackClick = { showHowItWorks = false })
+        HowMeshWorksScreen(onBackClick = viewModel::onHowItWorksDismiss)
         return
     }
 
@@ -157,8 +137,8 @@ fun OnboardingScreen(
                     Spacer(modifier = Modifier.height(ButtonDefaults.MinHeight))
                 } else {
                     TextButton(
-                        onClick = finishOnboarding,
-                        enabled = !uiState.isSubmitting
+                        onClick = viewModel::onSkipClick,
+                        enabled = uiState.phase == OnboardingPhase.Editing
                     ) {
                         Text(
                             text = stringResource(R.string.onboarding_skip),
@@ -177,12 +157,12 @@ fun OnboardingScreen(
                 if (page < infoPages.size) {
                     InfoPageContent(
                         page = infoPages[page],
-                        onLearnMore = if (page == 0) ({ showHowItWorks = true }) else null
+                        onLearnMore = if (page == 0) (viewModel::onHowItWorksClick) else null
                     )
                 } else {
                     UsernamePageContent(
                         username = uiState.username,
-                        onUsernameChange = { newValue -> onboardingViewModel.onUsernameChange(newValue) }
+                        onUsernameChange = viewModel::onUsernameChange
                     )
                 }
             }
@@ -197,12 +177,14 @@ fun OnboardingScreen(
             Button(
                 onClick = {
                     if (isLastPage) {
-                        finishOnboarding()
+                        // Only the FINAL Next (Get started) belongs to the ViewModel —
+                        // pager navigation stays here in the composable.
+                        viewModel.onNextClick()
                     } else {
                         scope.launch { goToPage(pagerState.currentPage + 1) }
                     }
                 },
-                enabled = !uiState.isSubmitting,
+                enabled = uiState.phase == OnboardingPhase.Editing,
                 modifier = Modifier
                     .fillMaxWidth()
                     // heightIn, not height. A hard 48dp clipped the label at the 200% font

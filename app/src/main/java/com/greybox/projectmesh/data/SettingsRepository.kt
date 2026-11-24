@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.asStateFlow
     val concurrencyKnown: StateFlow<Boolean>
     val concurrencySupported: StateFlow<Boolean>
 
-    // written only once by OnboardingViewModel
+    // Written once by GlobalApp.onCreate() before any activity starts; read-only here
     val localUuid: String?
 
     fun setTheme(theme: AppTheme)
